@@ -24,7 +24,9 @@ namespace Services.Service
         }
         public void Create(CreatePlaceHall model)
         {
-            _unitOfWork.PlaceHallRepository.Insert(_mapper.Map<PlaceHall>(model));
+            var item = _mapper.Map<PlaceHall>(model);
+            ValidateUniqueFields(item, "There is already existing same PlaceHallName for PlaceAddress");
+            _unitOfWork.PlaceHallRepository.Insert(item);
             _unitOfWork.Save();
         }
 
@@ -50,8 +52,14 @@ namespace Services.Service
             if (item == null)
                 throw new NullReferenceException("No PlaceHall to update");
             _mapper.Map(model, item);
+            ValidateUniqueFields(item, "There is already existing same PlaceHallName for PlaceAddress");
             _unitOfWork.PlaceHallRepository.Update(item);
             _unitOfWork.Save();
+        }
+        private void ValidateUniqueFields(PlaceHall model, string errorMessage)
+        {
+            if (_unitOfWork.PlaceHallRepository.Get(x => x.HallName == model.HallName && x.PlaceAddressID == x.PlaceAddressID).Any())
+                throw new InvalidOperationException(errorMessage);
         }
     }
 }

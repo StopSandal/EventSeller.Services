@@ -24,7 +24,9 @@ namespace Services.Service
         }
         public void Create(CreateHallSector model)
         {
-            _unitOfWork.HallSectorRepository.Insert(_mapper.Map<HallSector>(model));
+            var item = _mapper.Map<HallSector>(model);
+            ValidateUniqueFields(item, "There is already existing same HallSectorName for PlaceHall");
+            _unitOfWork.HallSectorRepository.Insert(item);
             _unitOfWork.Save();
         }
 
@@ -50,8 +52,14 @@ namespace Services.Service
             if (item == null)
                 throw new NullReferenceException("No HallSector to update");
             _mapper.Map(model, item);
+            ValidateUniqueFields(item, "There is already existing same HallSectorName for PlaceHall");
             _unitOfWork.HallSectorRepository.Update(item);
             _unitOfWork.Save();
+        }
+        private void ValidateUniqueFields(HallSector model,string errorMessage)
+        {
+            if (_unitOfWork.HallSectorRepository.Get(x => x.SectorName == model.SectorName && x.PlaceHallID == x.PlaceHallID).Any())
+                throw new InvalidOperationException(errorMessage);
         }
     }
 }
