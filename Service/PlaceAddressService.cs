@@ -7,7 +7,7 @@ namespace Services.Service
     public interface IPlaceAddressService
     {
         PlaceAddress GetByID(long id);
-        IEnumerable<PlaceAddress> GetPlaceAddresss();
+        IEnumerable<PlaceAddress> GetPlaceAddresses();
         void Create(CreatePlaceAddress model);
         void Update(long id, UpdatePlaceAddress model);
         void Delete(long id);
@@ -39,7 +39,7 @@ namespace Services.Service
             return _unitOfWork.PlaceAddressRepository.GetByID(id);
         }
 
-        public IEnumerable<PlaceAddress> GetPlaceAddresss()
+        public IEnumerable<PlaceAddress> GetPlaceAddresses()
         {
             return _unitOfWork.PlaceAddressRepository.Get();
         }
