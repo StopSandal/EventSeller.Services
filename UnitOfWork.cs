@@ -1,5 +1,5 @@
-﻿using DataLayer.EF;
-using DataLayer.Model;
+﻿using DataLayer.Model;
+using DataLayer.Model.EF;
 using Services.Repository;
 
 
