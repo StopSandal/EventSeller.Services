@@ -1,4 +1,4 @@
-﻿using DataLayer.EF;
+﻿using DataLayer.Model.EF;
 using DataLayer.Model;
 using Microsoft.EntityFrameworkCore;
 using System.Linq.Expressions;
@@ -72,19 +72,8 @@ namespace Services.Repository
 
         public virtual void Update(TEntity entityToUpdate)
         {
-            var existingEntity = dbSet.FirstOrDefault(e => e.ID==entityToUpdate.ID);
-            var sourceProperties = typeof(TEntity).GetProperties(BindingFlags.Public | BindingFlags.Instance);
-
-            foreach (var sourceProperty in sourceProperties)
-            {
-                if (sourceProperty.CanWrite)
-                {
-                    var value = sourceProperty.GetValue(entityToUpdate);
-                    sourceProperty.SetValue(existingEntity, value);
-                }
-            }
-            dbSet.Attach(existingEntity);
-            context.Entry(existingEntity).State = EntityState.Modified;
+            dbSet.Attach(entityToUpdate);
+            context.Entry(entityToUpdate).State = EntityState.Modified;
         }
     }
 }
