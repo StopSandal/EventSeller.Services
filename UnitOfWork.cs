@@ -7,13 +7,17 @@ namespace Services
 {
     public class UnitOfWork : IDisposable
     {
-        private readonly SellerContext context = new();
+        private readonly SellerContext context;
         private GenericRepository<Event> eventRepository;
         private GenericRepository<HallSector> hallSectorRepository;
         private GenericRepository<PlaceAddress> placeAddressRepository;
         private GenericRepository<PlaceHall> placeHallRepository;
         private GenericRepository<Ticket> ticketRepository;
         private GenericRepository<TicketSeat> ticketSeatRepository;
+        public UnitOfWork(SellerContext sellerContext)
+        {
+            context=sellerContext;
+        }
 
         public GenericRepository<Event> EventRepository
         {
