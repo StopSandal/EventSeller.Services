@@ -6,8 +6,7 @@ using System.Reflection;
 
 namespace Services.Repository
 {
-    public class GenericRepository<TEntity> where TEntity : class,IEntity
-    {
+    public class GenericRepository<TEntity> where TEntity : class { 
         internal SellerContext context;
         internal DbSet<TEntity> dbSet;
 
