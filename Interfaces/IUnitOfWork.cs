@@ -7,7 +7,7 @@ using System.Threading.Tasks;
 
 namespace EventSeller.Services.Interfaces
 {
-    internal interface IUnitOfWork : IDisposable
+    public interface IUnitOfWork : IDisposable
     {
         IRepositoryAsync<Event> EventRepository { get; }
         IRepositoryAsync<HallSector> HallSectorRepository { get; }
