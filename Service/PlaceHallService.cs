@@ -1,6 +1,7 @@
 ﻿using AutoMapper;
 using DataLayer.Model;
 using DataLayer.Models.PlaceHall;
+using EventSeller.Services.Interfaces;
 
 namespace Services.Service
 {
@@ -15,9 +16,9 @@ namespace Services.Service
 
     public class PlaceHallService : IPlaceHallService
     {
-        UnitOfWork _unitOfWork;
+        IUnitOfWork _unitOfWork;
         IMapper _mapper;
-        public PlaceHallService(UnitOfWork unitOfWork, IMapper mapper)
+        public PlaceHallService(IUnitOfWork unitOfWork, IMapper mapper)
         {
             _unitOfWork = unitOfWork;
             _mapper = mapper;

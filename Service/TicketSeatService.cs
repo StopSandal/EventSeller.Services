@@ -1,6 +1,7 @@
 ﻿using AutoMapper;
 using DataLayer.Model;
 using DataLayer.Models.TicketSeat;
+using EventSeller.Services.Interfaces;
 
 namespace Services.Service
 {
@@ -15,9 +16,9 @@ namespace Services.Service
 
     public class TicketSeatService : ITicketSeatService
     {
-        UnitOfWork _unitOfWork;
+        IUnitOfWork _unitOfWork;
         IMapper _mapper;
-        public TicketSeatService(UnitOfWork unitOfWork, IMapper mapper)
+        public TicketSeatService(IUnitOfWork unitOfWork, IMapper mapper)
         {
             _unitOfWork = unitOfWork;
             _mapper = mapper;

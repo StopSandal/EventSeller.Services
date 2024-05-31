@@ -1,6 +1,7 @@
 ﻿using AutoMapper;
 using DataLayer.Model;
 using DataLayer.Models.HallSector;
+using EventSeller.Services.Interfaces;
 
 namespace Services.Service
 {
@@ -15,9 +16,9 @@ namespace Services.Service
 
     public class HallSectorService : IHallSectorService
     {
-        UnitOfWork _unitOfWork;
+        IUnitOfWork _unitOfWork;
         IMapper _mapper;
-        public HallSectorService(UnitOfWork unitOfWork, IMapper mapper)
+        public HallSectorService(IUnitOfWork unitOfWork, IMapper mapper)
         {
             _unitOfWork = unitOfWork;
             _mapper = mapper;
