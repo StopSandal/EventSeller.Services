@@ -8,8 +8,8 @@ namespace Services.Service
     {
         Ticket GetByID(long id);
         IEnumerable<Ticket> GetTickets();
-        void Create(CreateTicket model);
-        void Update(long id, UpdateTicket model);
+        void Create(AddTicketDto model);
+        void Update(long id, EditTicketDto model);
         void Delete(long id);
     }
 
@@ -22,7 +22,7 @@ namespace Services.Service
             _unitOfWork = unitOfWork;
             _mapper = mapper;
         }
-        public void Create(CreateTicket model)
+        public void Create(AddTicketDto model)
         {
             _unitOfWork.TicketRepository.Insert(_mapper.Map<Ticket>(model));
             _unitOfWork.Save();
@@ -44,7 +44,7 @@ namespace Services.Service
             return _unitOfWork.TicketRepository.Get();
         }
 
-        public void Update(long id, UpdateTicket model)
+        public void Update(long id, EditTicketDto model)
         {
             var item = _unitOfWork.TicketRepository.GetByID(id);
             if (item == null)

@@ -26,11 +26,11 @@ namespace Services
         }
         private void MapEvent()
         {
-            // CreateEvent -> Event
-            CreateMap<CreateEvent, Event>();
+            // AddEventDto -> Event
+            CreateMap<AddEventDto, Event>();
 
-            // UpdateEvent -> Event
-            CreateMap<UpdateEvent, Event>()
+            // EditEventDto -> Event
+            CreateMap<EditEventDto, Event>()
                 .ForAllMembers(x => x.Condition(
                     (src, dest, prop) =>
                     {
@@ -43,11 +43,11 @@ namespace Services
         }
         private void MapHallSector()
         {
-            // CreateHallSector -> HallSector
-            CreateMap<CreateHallSector, HallSector>();
+            // AddHallSectorDto -> HallSector
+            CreateMap<AddHallSectorDto, HallSector>();
 
-            // UpdateHallSector -> HallSector
-            CreateMap<UpdateHallSector, HallSector>()
+            // EditHallSectorDto -> HallSector
+            CreateMap<EditHallSectorDto, HallSector>()
                 .ForAllMembers(x => x.Condition(
                     (src, dest, prop) =>
                     {
@@ -61,11 +61,11 @@ namespace Services
         }
         private void MapPlaceAddress()
         {
-            // CreatePlaceAddress -> PlaceAddress
-            CreateMap<CreatePlaceAddress, PlaceAddress>();
+            // AddPlaceAddressDto -> PlaceAddress
+            CreateMap<AddPlaceAddressDto, PlaceAddress>();
 
-            // UpdatePlaceAddress -> PlaceAddress
-            CreateMap<UpdatePlaceAddress, PlaceAddress>()
+            // EditPlaceAddressDto -> PlaceAddress
+            CreateMap<EditPlaceAddressDto, PlaceAddress>()
                 .ForAllMembers(x => x.Condition(
                     (src, dest, prop) =>
                     {
@@ -79,11 +79,11 @@ namespace Services
         }
         private void MapPlaceHall()
         {
-            // CreatePlaceHall -> PlaceHall
-            CreateMap<CreatePlaceHall, PlaceHall>();
+            // AddPlaceHallDto -> PlaceHall
+            CreateMap<AddPlaceHallDto, PlaceHall>();
 
-            // UpdatePlaceHall -> PlaceHall
-            CreateMap<UpdatePlaceHall, PlaceHall>()
+            // EditPlaceHallDto -> PlaceHall
+            CreateMap<EditPlaceHallDto, PlaceHall>()
                 .ForAllMembers(x => x.Condition(
                     (src, dest, prop) =>
                     {
@@ -97,11 +97,11 @@ namespace Services
         }
         private void MapTicketSeat()
         {
-            // CreateTicketSeat -> TicketSeat
-            CreateMap<CreateTicketSeat, TicketSeat>();
+            // AddTicketSeatDto -> TicketSeat
+            CreateMap<AddTicketSeatDto, TicketSeat>();
 
-            // UpdateTicketSeat -> TicketSeat
-            CreateMap<UpdateTicketSeat, TicketSeat>()
+            // EditTicketSeatDto -> TicketSeat
+            CreateMap<EditTicketSeatDto, TicketSeat>()
                 .ForAllMembers(x => x.Condition(
                     (src, dest, prop) =>
                     {
@@ -115,11 +115,11 @@ namespace Services
         }
         private void MapTicket()
         {
-            // CreateTicket -> Ticket
-            CreateMap<CreateTicket, Ticket>();
+            // AddTicketDto -> Ticket
+            CreateMap<AddTicketDto, Ticket>();
 
-            // UpdateTicket -> Ticket
-            CreateMap<UpdateTicket, Ticket>()
+            // EditTicketDto -> Ticket
+            CreateMap<EditTicketDto, Ticket>()
                 .ForAllMembers(x => x.Condition(
                     (src, dest, prop) =>
                     {

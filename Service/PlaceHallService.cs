@@ -8,8 +8,8 @@ namespace Services.Service
     {
         PlaceHall GetByID(long id);
         IEnumerable<PlaceHall> GetPlaceHalls();
-        void Create(CreatePlaceHall model);
-        void Update(long id, UpdatePlaceHall model);
+        void Create(AddPlaceHallDto model);
+        void Update(long id, EditPlaceHallDto model);
         void Delete(long id);
     }
 
@@ -22,7 +22,7 @@ namespace Services.Service
             _unitOfWork = unitOfWork;
             _mapper = mapper;
         }
-        public void Create(CreatePlaceHall model)
+        public void Create(AddPlaceHallDto model)
         {
             var item = _mapper.Map<PlaceHall>(model);
             ValidateUniqueFields(item, "There is already existing same PlaceHallName for PlaceAddress");
@@ -46,7 +46,7 @@ namespace Services.Service
             return _unitOfWork.PlaceHallRepository.Get();
         }
 
-        public void Update(long id, UpdatePlaceHall model)
+        public void Update(long id, EditPlaceHallDto model)
         {
             var item = _unitOfWork.PlaceHallRepository.GetByID(id);
             if (item == null)

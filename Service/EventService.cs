@@ -8,8 +8,8 @@ namespace Services.Service
     {
         Event GetByID(long id);
         IEnumerable<Event> GetEvents();
-        void Create(CreateEvent model);
-        void Update(long id, UpdateEvent model);
+        void Create(AddEventDto model);
+        void Update(long id, EditEventDto model);
         void Delete(long id);
     }
 
@@ -22,7 +22,7 @@ namespace Services.Service
             _unitOfWork = unitOfWork;
             _mapper = mapper;
         }
-        public void Create(CreateEvent model)
+        public void Create(AddEventDto model)
         {
             _unitOfWork.EventRepository.Insert( _mapper.Map<Event>(model) );
             _unitOfWork.Save();
@@ -44,7 +44,7 @@ namespace Services.Service
             return _unitOfWork.EventRepository.Get();
         }
 
-        public void Update(long id, UpdateEvent model)
+        public void Update(long id, EditEventDto model)
         {
             var item = _unitOfWork.EventRepository.GetByID(id);
             if (item == null)

@@ -8,8 +8,8 @@ namespace Services.Service
     {
         HallSector GetByID(long id);
         IEnumerable<HallSector> GetHallSectors();
-        void Create(CreateHallSector model);
-        void Update(long id, UpdateHallSector model);
+        void Create(AddHallSectorDto model);
+        void Update(long id, EditHallSectorDto model);
         void Delete(long id);
     }
 
@@ -22,7 +22,7 @@ namespace Services.Service
             _unitOfWork = unitOfWork;
             _mapper = mapper;
         }
-        public void Create(CreateHallSector model)
+        public void Create(AddHallSectorDto model)
         {
             var item = _mapper.Map<HallSector>(model);
             ValidateUniqueFields(item, "There is already existing same HallSectorName for PlaceHall");
@@ -46,7 +46,7 @@ namespace Services.Service
             return _unitOfWork.HallSectorRepository.Get();
         }
 
-        public void Update(long id, UpdateHallSector model)
+        public void Update(long id, EditHallSectorDto model)
         {
             var item = _unitOfWork.HallSectorRepository.GetByID(id);
             if (item == null)

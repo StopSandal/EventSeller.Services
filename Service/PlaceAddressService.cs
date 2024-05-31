@@ -8,8 +8,8 @@ namespace Services.Service
     {
         PlaceAddress GetByID(long id);
         IEnumerable<PlaceAddress> GetPlaceAddresses();
-        void Create(CreatePlaceAddress model);
-        void Update(long id, UpdatePlaceAddress model);
+        void Create(AddPlaceAddressDto model);
+        void Update(long id, EditPlaceAddressDto model);
         void Delete(long id);
     }
 
@@ -22,7 +22,7 @@ namespace Services.Service
             _unitOfWork = unitOfWork;
             _mapper = mapper;
         }
-        public void Create(CreatePlaceAddress model)
+        public void Create(AddPlaceAddressDto model)
         {
             _unitOfWork.PlaceAddressRepository.Insert(_mapper.Map<PlaceAddress>(model));
             _unitOfWork.Save();
@@ -44,7 +44,7 @@ namespace Services.Service
             return _unitOfWork.PlaceAddressRepository.Get();
         }
 
-        public void Update(long id, UpdatePlaceAddress model)
+        public void Update(long id, EditPlaceAddressDto model)
         {
             var item = _unitOfWork.PlaceAddressRepository.GetByID(id);
             if (item == null)
