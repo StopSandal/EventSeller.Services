@@ -6,11 +6,11 @@ namespace Services.Service
 {
     public interface IPlaceAddressService
     {
-        PlaceAddress GetByID(long id);
-        IEnumerable<PlaceAddress> GetPlaceAddresses();
-        void Create(AddPlaceAddressDto model);
-        void Update(long id, EditPlaceAddressDto model);
-        void Delete(long id);
+        Task<PlaceAddress> GetByID(long id);
+        Task<IEnumerable<PlaceAddress>> GetPlaceAddresses();
+        Task Create(AddPlaceAddressDto model);
+        Task Update(long id, EditPlaceAddressDto model);
+        Task Delete(long id);
     }
 
     public class PlaceAddressService : IPlaceAddressService
@@ -22,36 +22,36 @@ namespace Services.Service
             _unitOfWork = unitOfWork;
             _mapper = mapper;
         }
-        public void Create(AddPlaceAddressDto model)
+        public async Task Create(AddPlaceAddressDto model)
         {
-            _unitOfWork.PlaceAddressRepository.Insert(_mapper.Map<PlaceAddress>(model));
-            _unitOfWork.Save();
+            await _unitOfWork.PlaceAddressRepository.Insert(_mapper.Map<PlaceAddress>(model));
+            await _unitOfWork.Save();
         }
 
-        public void Delete(long id)
+        public async Task Delete(long id)
         {
-            _unitOfWork.PlaceAddressRepository.Delete(id);
-            _unitOfWork.Save();
+            await _unitOfWork.PlaceAddressRepository.Delete(id);
+            await _unitOfWork.Save();
         }
 
-        public PlaceAddress GetByID(long id)
+        public Task<PlaceAddress> GetByID(long id)
         {
             return _unitOfWork.PlaceAddressRepository.GetByID(id);
         }
 
-        public IEnumerable<PlaceAddress> GetPlaceAddresses()
+        public Task<IEnumerable<PlaceAddress>> GetPlaceAddresses()
         {
             return _unitOfWork.PlaceAddressRepository.Get();
         }
 
-        public void Update(long id, EditPlaceAddressDto model)
+        public async Task Update(long id, EditPlaceAddressDto model)
         {
-            var item = _unitOfWork.PlaceAddressRepository.GetByID(id);
+            var item = await _unitOfWork.PlaceAddressRepository.GetByID(id);
             if (item == null)
                 throw new NullReferenceException("No PlaceAddress to update");
             _mapper.Map(model, item);
             _unitOfWork.PlaceAddressRepository.Update(item);
-            _unitOfWork.Save();
+            await _unitOfWork.Save();
         }
     }
 }

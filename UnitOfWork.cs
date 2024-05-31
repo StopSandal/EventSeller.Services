@@ -1,25 +1,26 @@
 ﻿using DataLayer.Model;
 using DataLayer.Model.EF;
+using EventSeller.Services.Interfaces;
 using Services.Repository;
 
 
 namespace Services
 {
-    public class UnitOfWork : IDisposable
+    public class UnitOfWork : IUnitOfWork
     {
         private readonly SellerContext context;
-        private GenericRepository<Event> eventRepository;
-        private GenericRepository<HallSector> hallSectorRepository;
-        private GenericRepository<PlaceAddress> placeAddressRepository;
-        private GenericRepository<PlaceHall> placeHallRepository;
-        private GenericRepository<Ticket> ticketRepository;
-        private GenericRepository<TicketSeat> ticketSeatRepository;
+        private IRepositoryAsync<Event> eventRepository;
+        private IRepositoryAsync<HallSector> hallSectorRepository;
+        private IRepositoryAsync<PlaceAddress> placeAddressRepository;
+        private IRepositoryAsync<PlaceHall> placeHallRepository;
+        private IRepositoryAsync<Ticket> ticketRepository;
+        private IRepositoryAsync<TicketSeat> ticketSeatRepository;
         public UnitOfWork(SellerContext sellerContext)
         {
             context=sellerContext;
         }
 
-        public GenericRepository<Event> EventRepository
+        public IRepositoryAsync<Event> EventRepository
         {
             get
             {
@@ -30,7 +31,7 @@ namespace Services
                 return eventRepository;
             }
         }
-        public GenericRepository<HallSector> HallSectorRepository
+        public IRepositoryAsync<HallSector> HallSectorRepository
         {
             get
             {
@@ -41,7 +42,7 @@ namespace Services
                 return hallSectorRepository;
             }
         }
-        public GenericRepository<PlaceAddress> PlaceAddressRepository
+        public IRepositoryAsync<PlaceAddress> PlaceAddressRepository
         {
             get
             {
@@ -52,7 +53,7 @@ namespace Services
                 return placeAddressRepository;
             }
         }
-        public GenericRepository<PlaceHall> PlaceHallRepository
+        public IRepositoryAsync<PlaceHall> PlaceHallRepository
         {
             get
             {
@@ -63,7 +64,7 @@ namespace Services
                 return placeHallRepository;
             }
         }
-        public GenericRepository<Ticket> TicketRepository
+        public IRepositoryAsync<Ticket> TicketRepository
         {
             get
             {
@@ -74,7 +75,7 @@ namespace Services
                 return ticketRepository;
             }
         }
-        public GenericRepository<TicketSeat> TicketSeatRepository
+        public IRepositoryAsync<TicketSeat> TicketSeatRepository
         {
             get
             {
@@ -85,9 +86,9 @@ namespace Services
                 return ticketSeatRepository;
             }
         }
-        public void Save()
+        public Task Save()
         {
-            context.SaveChanges();
+            return context.SaveChangesAsync();
         }
 
         private bool disposed = false;

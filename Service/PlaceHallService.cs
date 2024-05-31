@@ -6,11 +6,11 @@ namespace Services.Service
 {
     public interface IPlaceHallService
     {
-        PlaceHall GetByID(long id);
-        IEnumerable<PlaceHall> GetPlaceHalls();
-        void Create(AddPlaceHallDto model);
-        void Update(long id, EditPlaceHallDto model);
-        void Delete(long id);
+        Task<PlaceHall> GetByID(long id);
+        Task<IEnumerable<PlaceHall>> GetPlaceHalls();
+        Task Create(AddPlaceHallDto model);
+        Task Update(long id, EditPlaceHallDto model);
+        Task Delete(long id);
     }
 
     public class PlaceHallService : IPlaceHallService
@@ -22,43 +22,43 @@ namespace Services.Service
             _unitOfWork = unitOfWork;
             _mapper = mapper;
         }
-        public void Create(AddPlaceHallDto model)
+        public async Task Create(AddPlaceHallDto model)
         {
             var item = _mapper.Map<PlaceHall>(model);
-            ValidateUniqueFields(item, "There is already existing same PlaceHallName for PlaceAddress");
-            _unitOfWork.PlaceHallRepository.Insert(item);
-            _unitOfWork.Save();
+            await ValidateUniqueFields(item, "There is already existing same PlaceHallName for PlaceAddress");
+            await _unitOfWork.PlaceHallRepository.Insert(item);
+            await _unitOfWork.Save();
         }
 
-        public void Delete(long id)
+        public async Task Delete(long id)
         {
-            _unitOfWork.PlaceHallRepository.Delete(id);
-            _unitOfWork.Save();
+            await _unitOfWork.PlaceHallRepository.Delete(id);
+            await _unitOfWork.Save();
         }
 
-        public PlaceHall GetByID(long id)
+        public Task<PlaceHall> GetByID(long id)
         {
             return _unitOfWork.PlaceHallRepository.GetByID(id);
         }
 
-        public IEnumerable<PlaceHall> GetPlaceHalls()
+        public Task<IEnumerable<PlaceHall>> GetPlaceHalls()
         {
             return _unitOfWork.PlaceHallRepository.Get();
         }
 
-        public void Update(long id, EditPlaceHallDto model)
+        public async Task Update(long id, EditPlaceHallDto model)
         {
-            var item = _unitOfWork.PlaceHallRepository.GetByID(id);
+            var item = await _unitOfWork.PlaceHallRepository.GetByID(id);
             if (item == null)
                 throw new NullReferenceException("No PlaceHall to update");
             _mapper.Map(model, item);
-            ValidateUniqueFields(item, "There is already existing same PlaceHallName for PlaceAddress");
+            await ValidateUniqueFields(item, "There is already existing same PlaceHallName for PlaceAddress");
             _unitOfWork.PlaceHallRepository.Update(item);
-            _unitOfWork.Save();
+            await _unitOfWork.Save();
         }
-        private void ValidateUniqueFields(PlaceHall model, string errorMessage)
+        private async Task ValidateUniqueFields(PlaceHall model, string errorMessage)
         {
-            if (_unitOfWork.PlaceHallRepository.Get(x => x.HallName == model.HallName && x.PlaceAddressID == x.PlaceAddressID).Any())
+            if ((await _unitOfWork.PlaceHallRepository.Get(x => x.HallName == model.HallName && x.PlaceAddressID == x.PlaceAddressID)).Any())
                 throw new InvalidOperationException(errorMessage);
         }
     }
