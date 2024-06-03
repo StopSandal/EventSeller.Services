@@ -6,6 +6,10 @@ using Services.Repository;
 
 namespace Services
 {
+    /// <summary>
+    /// Represents the default implementation of the <see cref="IUnitOfWork"/>.
+    /// </summary>
+    /// <inheritdoc cref="IUnitOfWork"/>
     public class UnitOfWork : IUnitOfWork
     {
         private readonly SellerContext context;
@@ -15,11 +19,15 @@ namespace Services
         private IRepositoryAsync<PlaceHall> placeHallRepository;
         private IRepositoryAsync<Ticket> ticketRepository;
         private IRepositoryAsync<TicketSeat> ticketSeatRepository;
+        /// <summary>
+        /// Initializes a new instance of the <see cref="UnitOfWork"/> class with the specified context.
+        /// </summary>
+        /// <param name="sellerContext">The database context.</param>
         public UnitOfWork(SellerContext sellerContext)
         {
             context=sellerContext;
         }
-
+        /// <inheritdoc />
         public IRepositoryAsync<Event> EventRepository
         {
             get
@@ -31,6 +39,7 @@ namespace Services
                 return eventRepository;
             }
         }
+        /// <inheritdoc />
         public IRepositoryAsync<HallSector> HallSectorRepository
         {
             get
@@ -42,6 +51,7 @@ namespace Services
                 return hallSectorRepository;
             }
         }
+        /// <inheritdoc />
         public IRepositoryAsync<PlaceAddress> PlaceAddressRepository
         {
             get
@@ -53,6 +63,7 @@ namespace Services
                 return placeAddressRepository;
             }
         }
+        /// <inheritdoc />
         public IRepositoryAsync<PlaceHall> PlaceHallRepository
         {
             get
@@ -75,6 +86,7 @@ namespace Services
                 return ticketRepository;
             }
         }
+        /// <inheritdoc />
         public IRepositoryAsync<TicketSeat> TicketSeatRepository
         {
             get
@@ -86,6 +98,8 @@ namespace Services
                 return ticketSeatRepository;
             }
         }
+        
+        /// <inheritdoc/>
         public Task Save()
         {
             return context.SaveChangesAsync();
