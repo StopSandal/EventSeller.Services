@@ -6,6 +6,9 @@ using DataLayer.Models.PlaceAddress;
 using DataLayer.Models.PlaceHall;
 using DataLayer.Models.Ticket;
 using DataLayer.Models.TicketSeat;
+using EventSeller.DataLayer.Entities;
+using EventSeller.DataLayer.EntitiesDto.User;
+using EventSeller.DataLayer.EntitiesViewModel;
 
 namespace Services
 {
@@ -23,6 +26,35 @@ namespace Services
             MapPlaceHall();
             MapTicketSeat();
             MapTicket();
+            MapUser();
+        }
+        private void MapUser()
+        {
+            // AddUserDto -> User
+            CreateMap<AddUserDto, User>();
+
+            // EditUserDto -> User
+            CreateMap<EditUserDto, User>()
+                .ForAllMembers(x => x.Condition(
+                    (src, dest, prop) =>
+                    {
+                        if (prop == null) return false;
+                        if (prop.GetType() == typeof(string) && string.IsNullOrEmpty((string)prop)) return false;
+
+                        return true;
+                    }
+                ));
+
+            CreateMap<LoginUserVM, User>()
+                .ForAllMembers(x => x.Condition(
+                    (src, dest, prop) =>
+                    {
+                        if (prop == null) return false;
+                        if (prop.GetType() == typeof(string) && string.IsNullOrEmpty((string)prop)) return false;
+
+                        return true;
+                    }
+                ));
         }
         private void MapEvent()
         {
