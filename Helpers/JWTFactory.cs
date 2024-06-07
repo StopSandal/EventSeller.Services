@@ -7,6 +7,7 @@ using System.Collections.Generic;
 using System.IdentityModel.Tokens.Jwt;
 using System.Linq;
 using System.Security.Claims;
+using System.Security.Cryptography;
 using System.Text;
 using System.Threading.Tasks;
 
@@ -21,12 +22,16 @@ namespace EventSeller.Services.Helpers
             _configuration = configuration;
         }
 
-        public string GenerateToken(IdentityUser user)
+        public string GenerateRefreshToken()
         {
-            var claims = new List<Claim> {
-                new Claim(ClaimTypes.Name, user.UserName),
-                new Claim(ClaimTypes.Email, user.Email),
-            };
+            var randomNumber = new byte[64];
+            using var rng = RandomNumberGenerator.Create();
+            rng.GetBytes(randomNumber);
+            return Convert.ToBase64String(randomNumber);
+        }
+
+        public string GenerateToken(IEnumerable<Claim> claims)
+        {
             var jwtToken = new JwtSecurityToken(
                 claims: claims,
                 notBefore: DateTime.UtcNow,
@@ -38,6 +43,34 @@ namespace EventSeller.Services.Helpers
                     SecurityAlgorithms.HmacSha256Signature)
                 );
             return new JwtSecurityTokenHandler().WriteToken(jwtToken);
+        }
+
+        public async Task<ClaimsIdentity?> GetIdentityFromExpiredTokenAsync(string? accessToken)
+        {
+            var tokenValidationParameters = new TokenValidationParameters
+            {
+                ValidateAudience = false,
+                ValidateIssuer = false,
+                ValidateIssuerSigningKey = true,
+                IssuerSigningKey = new SymmetricSecurityKey(Encoding.UTF8.GetBytes(_configuration["JWT:Secret"])),
+                ValidateLifetime = false
+            };
+
+            try
+            {
+                var tokenHandler = new JwtSecurityTokenHandler();
+                var result = await tokenHandler.ValidateTokenAsync(accessToken, tokenValidationParameters);
+                return result.ClaimsIdentity;
+            }
+            catch (SecurityTokenException ex)
+            {
+                throw new SecurityTokenException($"Token validation failed: {ex.Message}");
+            }
+        }
+
+        public int GetRefreshTokenValidityInDays()
+        {
+            return int.Parse(_configuration["JWT:RefreshTokenValidityInDays"]);
         }
     }
 }

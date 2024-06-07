@@ -27,7 +27,8 @@ namespace EventSeller.Services.Service
         Task<User> GetUserByUserName(string userName);
         Task Update(string id, EditUserDto model);
         Task Delete(string id);
-        Task<string> Login(LoginUserVM user);
+        Task<TokenVM> Login(LoginUserVM user);
+        Task<TokenVM> RefreshToken(TokenVM token);
     }
     public interface IRoleActions
     {
@@ -87,20 +88,70 @@ namespace EventSeller.Services.Service
             return await _userManager.FindByNameAsync(userName);
         }
 
-        public async Task<string> Login(LoginUserVM user)
+        public async Task<TokenVM> Login(LoginUserVM user)
         {
-            var existingUser = await GetUserByUserName(user.UserName);
-            if ( existingUser == null)
-            {
-                existingUser = await _userManager.FindByEmailAsync(user.Email);
-            }
+            
+            var existingUser = await GetUserByUserName(user.UserName) ?? await _userManager.FindByEmailAsync(user.Email);
+
             if (existingUser == null)
             {
                 throw new InvalidDataException("This user doesn't exists");
             }
-            var token = _JWTFactory.GenerateToken(existingUser);
+            // get claims and JWT token
+            var claims = await GetUserClaimsAsync(existingUser);
+            var token = _JWTFactory.GenerateToken(claims);
+            //set JWT token
+            await _userManager.RemoveAuthenticationTokenAsync(existingUser, "Server", "jwt");
             await _userManager.SetAuthenticationTokenAsync(existingUser, "Server", "jwt", token);
-           return _JWTFactory.GenerateToken(existingUser);
+            //set Refresh token for user
+            var refreshToken = _JWTFactory.GenerateRefreshToken();
+            existingUser.RefreshToken = refreshToken;
+            existingUser.RefreshTokenExpiryTime = DateTime.Now.AddDays(_JWTFactory.GetRefreshTokenValidityInDays());
+            await _userManager.UpdateAsync(existingUser);
+
+            return new TokenVM()
+            {
+                AccessToken = token,
+                RefreshToken = refreshToken
+            };
+        }
+
+        public async Task<TokenVM> RefreshToken(TokenVM token)
+        {
+            string? accessToken = token.AccessToken;
+            string? refreshToken = token.RefreshToken;
+
+            var identity = await _JWTFactory.GetIdentityFromExpiredTokenAsync(accessToken);
+
+            if (identity == null)
+            {
+                throw new InvalidOperationException("Invalid access token");
+            }
+
+            string username = identity.Name;
+
+            var user = await GetUserByUserName(username);
+
+            if (user == null || user.RefreshToken != refreshToken || user.RefreshTokenExpiryTime <= DateTime.Now)
+            {
+                throw new InvalidOperationException("Invalid access token or refresh token");
+            }
+
+
+            var newRefreshToken = _JWTFactory.GenerateRefreshToken();
+            user.RefreshToken = newRefreshToken;
+            await _userManager.UpdateAsync(user);
+
+            var newAccessToken = _JWTFactory.GenerateToken(await GetUserClaimsAsync(user));
+            await _userManager.RemoveAuthenticationTokenAsync(user, "Server", "jwt");
+            await _userManager.SetAuthenticationTokenAsync(user, "Server", "jwt", newAccessToken);
+
+
+            return new TokenVM
+            {
+                AccessToken = newAccessToken,
+                RefreshToken = newRefreshToken
+            };
         }
 
         public async Task RemoveRole(string id,string role)
@@ -138,6 +189,23 @@ namespace EventSeller.Services.Service
                 throw new NullReferenceException("No User to update");
             _mapper.Map(model, user);
             await _userManager.UpdateAsync(user);
+        }
+        private async Task<IEnumerable<Claim>> GetUserClaimsAsync(User user)
+        {
+            
+            var claims = new List<Claim>()
+            {
+                new Claim(ClaimTypes.Name, user.UserName),
+                new Claim(JwtRegisteredClaimNames.Jti, Guid.NewGuid().ToString()),
+            };
+
+            var userRoles = await _userManager.GetRolesAsync(user);
+
+            foreach (var userRole in userRoles)
+            {
+                claims.Add(new Claim(ClaimTypes.Role, userRole));
+            }
+            return claims;
         }
     }
 }
