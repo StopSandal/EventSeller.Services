@@ -35,7 +35,7 @@ namespace EventSeller.Services.Helpers
             var jwtToken = new JwtSecurityToken(
                 claims: claims,
                 notBefore: DateTime.UtcNow,
-                expires: DateTime.UtcNow.AddHours(6),
+                expires: DateTime.UtcNow.AddDays(int.Parse(_configuration["JWT:AccessTokenDaysForExpiration"])),
                 signingCredentials: new SigningCredentials(
                     new SymmetricSecurityKey(
                        Encoding.UTF8.GetBytes(_configuration["JWT:Secret"])
