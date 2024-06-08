@@ -35,6 +35,13 @@ namespace EventSeller.Services.Service
         /// <returns>A task that represents the asynchronous operation. The task result contains the list of all roles.</returns>
         Task<IEnumerable<string>> GetAllRoles();
 
+        /// <summary>
+        /// Retrieves the roles for a specified user by their username.
+        /// </summary>
+        /// <param name="userName">The username of the user whose roles are to be retrieved.</param>
+        /// <returns>A task that represents the asynchronous operation. The task result contains the list of roles for the specified user.</returns>
+        Task<IEnumerable<string>> GetUserRolesByUserName(string userName);
+
     }
     /// <summary>
     /// Service class for managing user roles.
@@ -101,6 +108,20 @@ namespace EventSeller.Services.Service
         public async Task<IEnumerable<string>> GetAllRoles()
         {
             var roles = await _roleManager.Roles.Select(r => r.Name).ToListAsync();
+            return roles;
+        }
+        ///<inheritdoc/>
+        /// <exception cref="InvalidOperationException">Thrown when the user does not exist.</exception>
+        public async Task<IEnumerable<string>> GetUserRolesByUserName(string userName)
+        {
+            // Assuming there is a way to get the current user, e.g., via a service or context.
+            var user = await _userManager.FindByNameAsync(userName);
+            if (user == null)
+            {
+                throw new InvalidOperationException("Current user is not available.");
+            }
+
+            var roles = await _userManager.GetRolesAsync(user);
             return roles;
         }
     }

@@ -62,13 +62,6 @@ namespace EventSeller.Services.Service
         /// <param name="token">The token view model containing the access token and refresh token.</param>
         /// <returns>A task that represents the asynchronous operation. The task result contains the new token view model.</returns>
         Task<TokenVM> RefreshToken(TokenVM token);
-
-        /// <summary>
-        /// Retrieves the roles for a specified user by their username.
-        /// </summary>
-        /// <param name="userName">The username of the user whose roles are to be retrieved.</param>
-        /// <returns>A task that represents the asynchronous operation. The task result contains the list of roles for the specified user.</returns>
-        Task<IEnumerable<string>> GetUserRoles(string userName);
     }
 
     
@@ -227,20 +220,7 @@ namespace EventSeller.Services.Service
             await _userManager.UpdateAsync(user);
         }
 
-        ///<inheritdoc/>
-        /// <exception cref="InvalidOperationException">Thrown when the user does not exist.</exception>
-        public async Task<IEnumerable<string>> GetUserRoles(string userName)
-        {
-            // Assuming there is a way to get the current user, e.g., via a service or context.
-            var user = await GetUserByUserName(userName);
-            if (user == null)
-            {
-                throw new InvalidOperationException("Current user is not available.");
-            }
 
-            var roles = await _userManager.GetRolesAsync(user);
-            return roles;
-        }
         /// <summary>
         /// Retrieves the claims for a given user.
         /// </summary>
