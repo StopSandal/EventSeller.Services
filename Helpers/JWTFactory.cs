@@ -13,6 +13,9 @@ using System.Threading.Tasks;
 
 namespace EventSeller.Services.Helpers
 {
+    /// <summary>
+    /// Implementation of <see cref="IJWTFactory"/>
+    /// </summary>
     public class JWTFactory : IJWTFactory
     {
         private readonly IConfiguration _configuration;
@@ -21,7 +24,7 @@ namespace EventSeller.Services.Helpers
         {
             _configuration = configuration;
         }
-
+        /// <inheritdoc/>
         public string GenerateRefreshToken()
         {
             var randomNumber = new byte[64];
@@ -29,7 +32,7 @@ namespace EventSeller.Services.Helpers
             rng.GetBytes(randomNumber);
             return Convert.ToBase64String(randomNumber);
         }
-
+        /// <inheritdoc/>
         public string GenerateToken(IEnumerable<Claim> claims)
         {
             var jwtToken = new JwtSecurityToken(
@@ -44,7 +47,7 @@ namespace EventSeller.Services.Helpers
                 );
             return new JwtSecurityTokenHandler().WriteToken(jwtToken);
         }
-
+        /// <inheritdoc/>
         public async Task<ClaimsIdentity?> GetIdentityFromExpiredTokenAsync(string? accessToken)
         {
             var tokenValidationParameters = new TokenValidationParameters
@@ -67,7 +70,7 @@ namespace EventSeller.Services.Helpers
                 throw new SecurityTokenException($"Token validation failed: {ex.Message}");
             }
         }
-
+        /// <inheritdoc/>
         public int GetRefreshTokenValidityInDays()
         {
             return int.Parse(_configuration["JWT:RefreshTokenValidityInDays"]);
