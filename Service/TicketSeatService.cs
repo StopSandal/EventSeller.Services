@@ -1,57 +1,107 @@
 ﻿using AutoMapper;
 using DataLayer.Model;
 using DataLayer.Models.TicketSeat;
+using EventSeller.Services.Interfaces;
 
 namespace Services.Service
 {
+    /// <summary>
+    /// Represents all actions with the <see cref="TicketSeat"/> class.
+    /// </summary>
+    /// <remarks>All actions include CRUD operations</remarks>
     public interface ITicketSeatService
     {
-        TicketSeat GetByID(long id);
-        IEnumerable<TicketSeat> GetTicketSeats();
-        void Create(CreateTicketSeat model);
-        void Update(long id, UpdateTicketSeat model);
-        void Delete(long id);
+        /// <summary>
+        /// Retrieves a ticket seat by its identifier.
+        /// </summary>
+        /// <param name="id">The identifier of the ticket seat.</param>
+        /// <returns>A task that represents the asynchronous operation. The task result contains the ticket seat.</returns>
+        Task<TicketSeat> GetByID(long id);
+
+        /// <summary>
+        /// Retrieves a collection of all ticket seats.
+        /// </summary>
+        /// <returns>A task that represents the asynchronous operation. The task result contains a collection of ticket seats.</returns>
+        Task<IEnumerable<TicketSeat>> GetTicketSeats();
+
+        /// <summary>
+        /// Creates a new ticket seat.
+        /// </summary>
+        /// <param name="model">The data transfer object containing ticket seat details.</param>
+        /// <returns>A task that represents the asynchronous operation.</returns>
+        Task Create(AddTicketSeatDto model);
+
+        /// <summary>
+        /// Updates an existing ticket seat.
+        /// </summary>
+        /// <param name="id">The identifier of the ticket seat to update.</param>
+        /// <param name="model">The data transfer object containing updated ticket seat details.</param>
+        /// <returns>A task that represents the asynchronous operation.</returns>
+        Task Update(long id, EditTicketSeatDto model);
+
+        /// <summary>
+        /// Deletes a ticket seat by its identifier.
+        /// </summary>
+        /// <param name="id">The identifier of the ticket seat to delete.</param>
+        /// <returns>A task that represents the asynchronous operation.</returns>
+        Task Delete(long id);
     }
 
+    /// <summary>
+    /// Represents the default implementation of the <see cref="ITicketSeatService"/>.
+    /// </summary>
+    /// <inheritdoc cref="ITicketSeatService"/>
     public class TicketSeatService : ITicketSeatService
     {
-        UnitOfWork _unitOfWork;
-        IMapper _mapper;
-        public TicketSeatService(UnitOfWork unitOfWork, IMapper mapper)
+        private readonly IUnitOfWork _unitOfWork;
+        private readonly IMapper _mapper;
+
+        /// <summary>
+        /// Initializes a new instance of the <see cref="TicketSeatService"/> class with the specified unit of work and mapper.
+        /// </summary>
+        /// <param name="unitOfWork">The unit of work <see cref="IUnitOfWork"/>.</param>
+        /// <param name="mapper">The mapper.</param>
+        public TicketSeatService(IUnitOfWork unitOfWork, IMapper mapper)
         {
             _unitOfWork = unitOfWork;
             _mapper = mapper;
         }
-        public void Create(CreateTicketSeat model)
+
+        /// <inheritdoc/>
+        public async Task Create(AddTicketSeatDto model)
         {
-            _unitOfWork.TicketSeatRepository.Insert(_mapper.Map<TicketSeat>(model));
-            _unitOfWork.Save();
+            await _unitOfWork.TicketSeatRepository.Insert(_mapper.Map<TicketSeat>(model));
+            await _unitOfWork.Save();
         }
 
-        public void Delete(long id)
+        /// <inheritdoc/>
+        public async Task Delete(long id)
         {
-            _unitOfWork.TicketSeatRepository.Delete(id);
-            _unitOfWork.Save();
+            await _unitOfWork.TicketSeatRepository.Delete(id);
+            await _unitOfWork.Save();
         }
 
-        public TicketSeat GetByID(long id)
+        /// <inheritdoc/>
+        public Task<TicketSeat> GetByID(long id)
         {
             return _unitOfWork.TicketSeatRepository.GetByID(id);
         }
 
-        public IEnumerable<TicketSeat> GetTicketSeats()
+        /// <inheritdoc/>
+        public Task<IEnumerable<TicketSeat>> GetTicketSeats()
         {
             return _unitOfWork.TicketSeatRepository.Get();
         }
 
-        public void Update(long id, UpdateTicketSeat model)
+        /// <inheritdoc/>
+        public async Task Update(long id, EditTicketSeatDto model)
         {
-            var item = _unitOfWork.TicketSeatRepository.GetByID(id);
+            var item = await _unitOfWork.TicketSeatRepository.GetByID(id);
             if (item == null)
                 throw new NullReferenceException("No TicketSeat to update");
             _mapper.Map(model, item);
             _unitOfWork.TicketSeatRepository.Update(item);
-            _unitOfWork.Save();
+            await _unitOfWork.Save();
         }
     }
 }

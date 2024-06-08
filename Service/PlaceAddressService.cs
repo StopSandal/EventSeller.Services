@@ -1,57 +1,103 @@
 ﻿using AutoMapper;
 using DataLayer.Model;
 using DataLayer.Models.PlaceAddress;
+using EventSeller.Services.Interfaces;
 
 namespace Services.Service
 {
+    /// <summary>
+    /// Represents all actions with the <see cref="PlaceAddress"/> class.
+    /// </summary>
+    /// <remarks>All actions include CRUD operations</remarks>
     public interface IPlaceAddressService
     {
-        PlaceAddress GetByID(long id);
-        IEnumerable<PlaceAddress> GetPlaceAddresses();
-        void Create(CreatePlaceAddress model);
-        void Update(long id, UpdatePlaceAddress model);
-        void Delete(long id);
+        /// <summary>
+        /// Retrieves a place address by its identifier.
+        /// </summary>
+        /// <param name="id">The identifier of the place address.</param>
+        /// <returns>A task that represents the asynchronous operation. The task result contains the place address.</returns>
+        Task<PlaceAddress> GetByID(long id);
+
+        /// <summary>
+        /// Retrieves a collection of all place addresses.
+        /// </summary>
+        /// <returns>A task that represents the asynchronous operation. The task result contains a collection of place addresses.</returns>
+        Task<IEnumerable<PlaceAddress>> GetPlaceAddresses();
+
+        /// <summary>
+        /// Creates a new place address.
+        /// </summary>
+        /// <param name="model">The data transfer object containing place address details.</param>
+        /// <returns>A task that represents the asynchronous operation.</returns>
+        Task Create(AddPlaceAddressDto model);
+
+        /// <summary>
+        /// Updates an existing place address.
+        /// </summary>
+        /// <param name="id">The identifier of the place address to update.</param>
+        /// <param name="model">The data transfer object containing updated place address details.</param>
+        /// <returns>A task that represents the asynchronous operation.</returns>
+        Task Update(long id, EditPlaceAddressDto model);
+
+        /// <summary>
+        /// Deletes a place address by its identifier.
+        /// </summary>
+        /// <param name="id">The identifier of the place address to delete.</param>
+        /// <returns>A task that represents the asynchronous operation.</returns>
+        Task Delete(long id);
     }
 
+    /// <summary>
+    /// Represents the default implementation of the <see cref="IPlaceAddressService"/>.
+    /// </summary>
+    /// <inheritdoc cref="IPlaceAddressService"/>
     public class PlaceAddressService : IPlaceAddressService
     {
-        UnitOfWork _unitOfWork;
+        IUnitOfWork _unitOfWork;
         IMapper _mapper;
-        public PlaceAddressService(UnitOfWork unitOfWork, IMapper mapper)
+
+        /// <summary>
+        /// Initializes a new instance of the <see cref="PlaceAddressService"/> class with the specified unit of work and mapper.
+        /// </summary>
+        /// <param name="unitOfWork">The unit of work <see cref="IUnitOfWork"/>.</param>
+        /// <param name="mapper">The mapper.</param>
+        public PlaceAddressService(IUnitOfWork unitOfWork, IMapper mapper)
         {
             _unitOfWork = unitOfWork;
             _mapper = mapper;
         }
-        public void Create(CreatePlaceAddress model)
-        {
-            _unitOfWork.PlaceAddressRepository.Insert(_mapper.Map<PlaceAddress>(model));
-            _unitOfWork.Save();
-        }
 
-        public void Delete(long id)
+        /// <inheritdoc/>
+        public async Task Create(AddPlaceAddressDto model)
         {
-            _unitOfWork.PlaceAddressRepository.Delete(id);
-            _unitOfWork.Save();
+            await _unitOfWork.PlaceAddressRepository.Insert(_mapper.Map<PlaceAddress>(model));
+            await _unitOfWork.Save();
         }
-
-        public PlaceAddress GetByID(long id)
+        /// <inheritdoc/>
+        public async Task Delete(long id)
+        {
+            await _unitOfWork.PlaceAddressRepository.Delete(id);
+            await _unitOfWork.Save();
+        }
+        /// <inheritdoc/>
+        public Task<PlaceAddress> GetByID(long id)
         {
             return _unitOfWork.PlaceAddressRepository.GetByID(id);
         }
-
-        public IEnumerable<PlaceAddress> GetPlaceAddresses()
+        /// <inheritdoc/>
+        public Task<IEnumerable<PlaceAddress>> GetPlaceAddresses()
         {
             return _unitOfWork.PlaceAddressRepository.Get();
         }
-
-        public void Update(long id, UpdatePlaceAddress model)
+        /// <inheritdoc/>
+        public async Task Update(long id, EditPlaceAddressDto model)
         {
-            var item = _unitOfWork.PlaceAddressRepository.GetByID(id);
+            var item = await _unitOfWork.PlaceAddressRepository.GetByID(id);
             if (item == null)
                 throw new NullReferenceException("No PlaceAddress to update");
             _mapper.Map(model, item);
             _unitOfWork.PlaceAddressRepository.Update(item);
-            _unitOfWork.Save();
+            await _unitOfWork.Save();
         }
     }
 }

@@ -1,57 +1,97 @@
 ﻿using AutoMapper;
 using DataLayer.Model;
 using DataLayer.Models.Event;
+using EventSeller.Services.Interfaces;
 
 namespace Services.Service
 {
+    /// <summary>
+    /// Represents all actions with <see cref="Event"/> class.
+    /// </summary>
+    /// <remarks>All actions include CRUD operations</remarks>
     public interface IEventService 
     {
-        Event GetByID(long id);
-        IEnumerable<Event> GetEvents();
-        void Create(CreateEvent model);
-        void Update(long id, UpdateEvent model);
-        void Delete(long id);
+        /// <summary>
+        /// Retrieves an event by its identifier.
+        /// </summary>
+        /// <param name="id">The identifier of the event.</param>
+        /// <returns>A task that represents the asynchronous operation. The task result contains the event.</returns>
+        Task<Event> GetByID(long id);
+        /// <summary>
+        /// Retrieves a collection of all events.
+        /// </summary>
+        /// <returns>A task that represents the asynchronous operation. The task result contains a collection of events.</returns>
+        Task<IEnumerable<Event>> GetEvents();
+        /// <summary>
+        /// Creates a new event.
+        /// </summary>
+        /// <param name="model">The data transfer object containing event details.</param>
+        /// <returns>A task that represents the asynchronous operation.</returns>
+        Task Create(AddEventDto model);
+        /// <summary>
+        /// Updates an existing event.
+        /// </summary>
+        /// <param name="id">The identifier of the event to update.</param>
+        /// <param name="model">The data transfer object containing updated event details.</param>
+        /// <returns>A task that represents the asynchronous operation.</returns>
+        Task Update(long id, EditEventDto model);
+        /// <summary>
+        /// Deletes an event by its identifier.
+        /// </summary>
+        /// <param name="id">The identifier of the event to delete.</param>
+        /// <returns>A task that represents the asynchronous operation.</returns>
+        Task Delete(long id);
     }
-
+    /// <summary>
+    /// Represents the default implementation of the <see cref="IEventService"/>.
+    /// </summary>
+    /// <inheritdoc cref="IEventService"/>
     public class EventService : IEventService
     {
-        UnitOfWork _unitOfWork;
+        IUnitOfWork _unitOfWork;
         IMapper _mapper;
-        public EventService(UnitOfWork unitOfWork, IMapper mapper)
+
+        /// <summary>
+        /// Initializes a new instance of the <see cref="EventService"/> class with the specified unit of work and mapper.
+        /// </summary>
+        /// <param name="unitOfWork">The unit of work. <see cref="IUnitOfWork"/> </param>
+        /// <param name="mapper">The mapper.</param>
+        public EventService(IUnitOfWork unitOfWork, IMapper mapper)
         {
             _unitOfWork = unitOfWork;
             _mapper = mapper;
         }
-        public void Create(CreateEvent model)
+        /// <inheritdoc/>
+        public async Task Create(AddEventDto model)
         {
-            _unitOfWork.EventRepository.Insert( _mapper.Map<Event>(model) );
-            _unitOfWork.Save();
+            await _unitOfWork.EventRepository.Insert( _mapper.Map<Event>(model) );
+            await _unitOfWork.Save();
         }
-
-        public void Delete(long id)
+        /// <inheritdoc/>
+        public async Task Delete(long id)
         {
-            _unitOfWork.EventRepository.Delete(id);
-            _unitOfWork.Save();
+            await _unitOfWork.EventRepository.Delete(id);
+            await _unitOfWork.Save();
         }
-
-        public Event GetByID(long id)
+        /// <inheritdoc/>
+        public Task<Event> GetByID(long id)
         {
             return _unitOfWork.EventRepository.GetByID(id);
         }
-
-        public IEnumerable<Event> GetEvents()
+        /// <inheritdoc/>
+        public Task<IEnumerable<Event>> GetEvents()
         {
             return _unitOfWork.EventRepository.Get();
         }
-
-        public void Update(long id, UpdateEvent model)
+        /// <inheritdoc/>
+        public async Task Update(long id, EditEventDto model)
         {
-            var item = _unitOfWork.EventRepository.GetByID(id);
+            var item = await _unitOfWork.EventRepository.GetByID(id);
             if (item == null)
                 throw new NullReferenceException("No Event to update");
             _mapper.Map(model, item);
             _unitOfWork.EventRepository.Update(item);
-            _unitOfWork.Save();
+            await _unitOfWork.Save();
         }
     }
 }
