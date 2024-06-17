@@ -16,6 +16,10 @@ namespace EventSeller.Services.Service
     /// </summary>
     public class UserService : IUserService
     {
+        private const string LOGIN_PROVIDER = "Server";
+        private const string TOKEN_NAME = "JWT";
+        private const string USER_BASE_ROLE = "Basic";
+
         private readonly UserManager<User> _userManager;
         private readonly SignInManager<User> _signInManager;
         private readonly IMapper _mapper;
@@ -52,7 +56,7 @@ namespace EventSeller.Services.Service
             {
                 throw new InvalidOperationException($"Password doesn't meet requirements {result.Errors}");
             }
-            await _userManager.AddToRoleAsync(user, "Basic");
+            await _userManager.AddToRoleAsync(user, USER_BASE_ROLE);
             if (!result.Succeeded)
             {
                 throw new InvalidOperationException($"Can't assign basic user role {result.Errors}");
@@ -100,8 +104,8 @@ namespace EventSeller.Services.Service
             var claims = await GetUserClaimsAsync(existingUser);
             var token = _JWTFactory.GenerateToken(claims);
             //set JWT token
-            await _userManager.RemoveAuthenticationTokenAsync(existingUser, "Server", "jwt");
-            await _userManager.SetAuthenticationTokenAsync(existingUser, "Server", "jwt", token);
+            await _userManager.RemoveAuthenticationTokenAsync(existingUser, LOGIN_PROVIDER, TOKEN_NAME);
+            await _userManager.SetAuthenticationTokenAsync(existingUser, LOGIN_PROVIDER, TOKEN_NAME, token);
             //set Refresh token for user
             var refreshToken = _JWTFactory.GenerateRefreshToken();
             existingUser.RefreshToken = refreshToken;
@@ -144,8 +148,8 @@ namespace EventSeller.Services.Service
 
             // reset JWT token
             var newAccessToken = _JWTFactory.GenerateToken(await GetUserClaimsAsync(user));
-            await _userManager.RemoveAuthenticationTokenAsync(user, "Server", "jwt");
-            await _userManager.SetAuthenticationTokenAsync(user, "Server", "jwt", newAccessToken);
+            await _userManager.RemoveAuthenticationTokenAsync(user, LOGIN_PROVIDER, TOKEN_NAME);
+            await _userManager.SetAuthenticationTokenAsync(user, LOGIN_PROVIDER, TOKEN_NAME, newAccessToken);
 
 
             return new TokenVM

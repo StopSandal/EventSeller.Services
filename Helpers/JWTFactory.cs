@@ -18,6 +18,10 @@ namespace EventSeller.Services.Helpers
     /// </summary>
     public class JWTFactory : IJWTFactory
     {
+        private const string ACCESS_TOKEN_EXPIRATION_DAYS = "JWT:AccessTokenDaysForExpiration";
+        private const string SECRET_KEY = "JWT:Secret";
+        private const string REFRESH_TOKEN_VALIDITY_DAYS = "JWT:RefreshTokenValidityInDays";
+
         private readonly IConfiguration _configuration;
 
         public JWTFactory(IConfiguration configuration)
@@ -38,10 +42,10 @@ namespace EventSeller.Services.Helpers
             var jwtToken = new JwtSecurityToken(
                 claims: claims,
                 notBefore: DateTime.UtcNow,
-                expires: DateTime.UtcNow.AddDays(int.Parse(_configuration["JWT:AccessTokenDaysForExpiration"])),
+                expires: DateTime.UtcNow.AddDays(int.Parse(_configuration[ACCESS_TOKEN_EXPIRATION_DAYS])),
                 signingCredentials: new SigningCredentials(
                     new SymmetricSecurityKey(
-                       Encoding.UTF8.GetBytes(_configuration["JWT:Secret"])
+                       Encoding.UTF8.GetBytes(_configuration[SECRET_KEY])
                         ),
                     SecurityAlgorithms.HmacSha256Signature)
                 );
@@ -55,7 +59,7 @@ namespace EventSeller.Services.Helpers
                 ValidateAudience = false,
                 ValidateIssuer = false,
                 ValidateIssuerSigningKey = true,
-                IssuerSigningKey = new SymmetricSecurityKey(Encoding.UTF8.GetBytes(_configuration["JWT:Secret"])),
+                IssuerSigningKey = new SymmetricSecurityKey(Encoding.UTF8.GetBytes(_configuration[SECRET_KEY])),
                 ValidateLifetime = false
             };
 
@@ -73,7 +77,7 @@ namespace EventSeller.Services.Helpers
         /// <inheritdoc/>
         public int GetRefreshTokenValidityInDays()
         {
-            return int.Parse(_configuration["JWT:RefreshTokenValidityInDays"]);
+            return int.Parse(_configuration[REFRESH_TOKEN_VALIDITY_DAYS]);
         }
     }
 }
