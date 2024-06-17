@@ -25,7 +25,7 @@ namespace Services.Repository
             this.dbSet = context.Set<TEntity>();
         }
         /// <inheritdoc/>
-        public virtual async Task<IEnumerable<TEntity>> Get(
+        public virtual async Task<IEnumerable<TEntity>> GetAsync(
             Expression<Func<TEntity, bool>> filter = null,
             Func<IQueryable<TEntity>, IOrderedQueryable<TEntity>> orderBy = null,
             string includeProperties = "")
@@ -53,19 +53,19 @@ namespace Services.Repository
             }
         }
         /// <inheritdoc/>
-        public async virtual Task<TEntity> GetByID(object id)
+        public async virtual Task<TEntity> GetByIDAsync(object id)
         {
             return await dbSet.FindAsync(id);
         }
         /// <inheritdoc/>
-        public async virtual Task Insert(TEntity entity)
+        public async virtual Task InsertAsync(TEntity entity)
         {
             await dbSet.AddAsync(entity);
         }
         /// <inheritdoc/>
-        public async virtual Task Delete(object id)
+        public async virtual Task DeleteAsync(object id)
         {
-            TEntity entityToDelete = await GetByID(id);
+            TEntity entityToDelete = await GetByIDAsync(id);
             Delete(entityToDelete);
         }
         /// <inheritdoc/>

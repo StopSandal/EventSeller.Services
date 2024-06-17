@@ -27,40 +27,40 @@ namespace Services.Service
         }
 
         /// <inheritdoc/>
-        public async Task Create(AddTicketSeatDto model)
+        public async Task CreateAsync(AddTicketSeatDto model)
         {
-            await _unitOfWork.TicketSeatRepository.Insert(_mapper.Map<TicketSeat>(model));
-            await _unitOfWork.Save();
+            await _unitOfWork.TicketSeatRepository.InsertAsync(_mapper.Map<TicketSeat>(model));
+            await _unitOfWork.SaveAsync();
         }
 
         /// <inheritdoc/>
-        public async Task Delete(long id)
+        public async Task DeleteAsync(long id)
         {
-            await _unitOfWork.TicketSeatRepository.Delete(id);
-            await _unitOfWork.Save();
+            await _unitOfWork.TicketSeatRepository.DeleteAsync(id);
+            await _unitOfWork.SaveAsync();
         }
 
         /// <inheritdoc/>
-        public Task<TicketSeat> GetByID(long id)
+        public Task<TicketSeat> GetByIDAsync(long id)
         {
-            return _unitOfWork.TicketSeatRepository.GetByID(id);
+            return _unitOfWork.TicketSeatRepository.GetByIDAsync(id);
         }
 
         /// <inheritdoc/>
-        public Task<IEnumerable<TicketSeat>> GetTicketSeats()
+        public Task<IEnumerable<TicketSeat>> GetTicketSeatsAsync()
         {
-            return _unitOfWork.TicketSeatRepository.Get();
+            return _unitOfWork.TicketSeatRepository.GetAsync();
         }
 
         /// <inheritdoc/>
-        public async Task Update(long id, EditTicketSeatDto model)
+        public async Task UpdateAsync(long id, EditTicketSeatDto model)
         {
-            var item = await _unitOfWork.TicketSeatRepository.GetByID(id);
+            var item = await _unitOfWork.TicketSeatRepository.GetByIDAsync(id);
             if (item == null)
                 throw new NullReferenceException("No TicketSeat to update");
             _mapper.Map(model, item);
             _unitOfWork.TicketSeatRepository.Update(item);
-            await _unitOfWork.Save();
+            await _unitOfWork.SaveAsync();
         }
     }
 }

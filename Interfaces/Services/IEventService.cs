@@ -19,30 +19,30 @@ namespace EventSeller.Services.Interfaces.Services
         /// </summary>
         /// <param name="id">The identifier of the event.</param>
         /// <returns>A task that represents the asynchronous operation. The task result contains the event.</returns>
-        Task<Event> GetByID(long id);
+        Task<Event> GetByIDAsync(long id);
         /// <summary>
         /// Retrieves a collection of all events.
         /// </summary>
         /// <returns>A task that represents the asynchronous operation. The task result contains a collection of events.</returns>
-        Task<IEnumerable<Event>> GetEvents();
+        Task<IEnumerable<Event>> GetEventsAsync();
         /// <summary>
         /// Creates a new event.
         /// </summary>
         /// <param name="model">The data transfer object containing event details.</param>
         /// <returns>A task that represents the asynchronous operation.</returns>
-        Task Create(AddEventDto model);
+        Task CreateAsync(AddEventDto model);
         /// <summary>
         /// Updates an existing event.
         /// </summary>
         /// <param name="id">The identifier of the event to update.</param>
         /// <param name="model">The data transfer object containing updated event details.</param>
         /// <returns>A task that represents the asynchronous operation.</returns>
-        Task Update(long id, EditEventDto model);
+        Task UpdateAsync(long id, EditEventDto model);
         /// <summary>
         /// Deletes an event by its identifier.
         /// </summary>
         /// <param name="id">The identifier of the event to delete.</param>
         /// <returns>A task that represents the asynchronous operation.</returns>
-        Task Delete(long id);
+        Task DeleteAsync(long id);
     }
 }

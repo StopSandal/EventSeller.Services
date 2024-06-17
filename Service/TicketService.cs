@@ -27,40 +27,40 @@ namespace Services.Service
         }
 
         /// <inheritdoc/>
-        public async Task Create(AddTicketDto model)
+        public async Task CreateAsync(AddTicketDto model)
         {
-            await _unitOfWork.TicketRepository.Insert(_mapper.Map<Ticket>(model));
-            await _unitOfWork.Save();
+            await _unitOfWork.TicketRepository.InsertAsync(_mapper.Map<Ticket>(model));
+            await _unitOfWork.SaveAsync();
         }
 
         /// <inheritdoc/>
-        public async Task Delete(long id)
+        public async Task DeleteAsync(long id)
         {
-            await _unitOfWork.TicketRepository.Delete(id);
-            await _unitOfWork.Save();
+            await _unitOfWork.TicketRepository.DeleteAsync(id);
+            await _unitOfWork.SaveAsync();
         }
 
         /// <inheritdoc/>
-        public Task<Ticket> GetByID(long id)
+        public Task<Ticket> GetByIDAsync(long id)
         {
-            return _unitOfWork.TicketRepository.GetByID(id);
+            return _unitOfWork.TicketRepository.GetByIDAsync(id);
         }
 
         /// <inheritdoc/>
-        public Task<IEnumerable<Ticket>> GetTickets()
+        public Task<IEnumerable<Ticket>> GetTicketsAsync()
         {
-            return _unitOfWork.TicketRepository.Get();
+            return _unitOfWork.TicketRepository.GetAsync();
         }
 
         /// <inheritdoc/>
-        public async Task Update(long id, EditTicketDto model)
+        public async Task UpdateAsync(long id, EditTicketDto model)
         {
-            var item = await _unitOfWork.TicketRepository.GetByID(id);
+            var item = await _unitOfWork.TicketRepository.GetByIDAsync(id);
             if (item == null)
                 throw new NullReferenceException("No Ticket to update");
             _mapper.Map(model, item);
             _unitOfWork.TicketRepository.Update(item);
-            await _unitOfWork.Save();
+            await _unitOfWork.SaveAsync();
         }
     }
 }

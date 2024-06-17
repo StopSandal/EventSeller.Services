@@ -26,36 +26,36 @@ namespace Services.Service
             _mapper = mapper;
         }
         /// <inheritdoc/>
-        public async Task Create(AddEventDto model)
+        public async Task CreateAsync(AddEventDto model)
         {
-            await _unitOfWork.EventRepository.Insert( _mapper.Map<Event>(model) );
-            await _unitOfWork.Save();
+            await _unitOfWork.EventRepository.InsertAsync( _mapper.Map<Event>(model) );
+            await _unitOfWork.SaveAsync();
         }
         /// <inheritdoc/>
-        public async Task Delete(long id)
+        public async Task DeleteAsync(long id)
         {
-            await _unitOfWork.EventRepository.Delete(id);
-            await _unitOfWork.Save();
+            await _unitOfWork.EventRepository.DeleteAsync(id);
+            await _unitOfWork.SaveAsync();
         }
         /// <inheritdoc/>
-        public Task<Event> GetByID(long id)
+        public Task<Event> GetByIDAsync(long id)
         {
-            return _unitOfWork.EventRepository.GetByID(id);
+            return _unitOfWork.EventRepository.GetByIDAsync(id);
         }
         /// <inheritdoc/>
-        public Task<IEnumerable<Event>> GetEvents()
+        public Task<IEnumerable<Event>> GetEventsAsync()
         {
-            return _unitOfWork.EventRepository.Get();
+            return _unitOfWork.EventRepository.GetAsync();
         }
         /// <inheritdoc/>
-        public async Task Update(long id, EditEventDto model)
+        public async Task UpdateAsync(long id, EditEventDto model)
         {
-            var item = await _unitOfWork.EventRepository.GetByID(id);
+            var item = await _unitOfWork.EventRepository.GetByIDAsync(id);
             if (item == null)
                 throw new NullReferenceException("No Event to update");
             _mapper.Map(model, item);
             _unitOfWork.EventRepository.Update(item);
-            await _unitOfWork.Save();
+            await _unitOfWork.SaveAsync();
         }
     }
 }

@@ -22,7 +22,7 @@ namespace EventSeller.Services.Service
         /// <inheritdoc />
         /// <exception cref="InvalidDataException">Thrown when the user does not exist.</exception>
         /// <exception cref="InvalidOperationException">Thrown when the user does not have the specified role or removal fails.</exception>
-        public async Task RemoveRole(string id, string role)
+        public async Task RemoveRoleAsync(string id, string role)
         {
             var user = await _userManager.FindByIdAsync(id);
 
@@ -46,7 +46,7 @@ namespace EventSeller.Services.Service
         /// <inheritdoc />
         /// <exception cref="InvalidDataException">Thrown when the user does not exist.</exception>
         /// <exception cref="InvalidOperationException">Thrown when the user already has the specified role or assignment fails.</exception>
-        public async Task SetRole(string id, string role)
+        public async Task SetRoleAsync(string id, string role)
         {
             var user = await _userManager.FindByIdAsync(id);
             if (user == null)
@@ -67,14 +67,14 @@ namespace EventSeller.Services.Service
             }
         }
         /// <inheritdoc/>
-        public async Task<IEnumerable<string>> GetAllRoles()
+        public async Task<IEnumerable<string>> GetAllRolesAsync()
         {
             var roles = await _roleManager.Roles.Select(r => r.Name).ToListAsync();
             return roles;
         }
         ///<inheritdoc/>
         /// <exception cref="InvalidOperationException">Thrown when the user does not exist.</exception>
-        public async Task<IEnumerable<string>> GetUserRolesByUserName(string userName)
+        public async Task<IEnumerable<string>> GetUserRolesByUserNameAsync(string userName)
         {
             // Assuming there is a way to get the current user, e.g., via a service or context.
             var user = await _userManager.FindByNameAsync(userName);

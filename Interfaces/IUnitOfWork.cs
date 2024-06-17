@@ -45,6 +45,6 @@ namespace EventSeller.Services.Interfaces
         /// Saves all changes made in this unit of work to the underlying database.
         /// </summary>
         /// <returns>A task that represents the asynchronous save operation.</returns>
-        Task Save();
+        Task SaveAsync();
     }
 }

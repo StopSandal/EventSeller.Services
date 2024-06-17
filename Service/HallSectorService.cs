@@ -25,39 +25,39 @@ namespace Services.Service
             _mapper = mapper;
         }
         /// <inheritdoc/>
-        public async Task Create(AddHallSectorDto model)
+        public async Task CreateAsync(AddHallSectorDto model)
         {
             var item = _mapper.Map<HallSector>(model);
             await ValidateUniqueFields(item, "There is already existing same HallSectorName for PlaceHall");
-            await _unitOfWork.HallSectorRepository.Insert(item);
-            await _unitOfWork.Save();
+            await _unitOfWork.HallSectorRepository.InsertAsync(item);
+            await _unitOfWork.SaveAsync();
         }
         /// <inheritdoc/>
-        public async Task Delete(long id)
+        public async Task DeleteAsync(long id)
         {
-            await _unitOfWork.HallSectorRepository.Delete(id);
-            await _unitOfWork.Save();
+            await _unitOfWork.HallSectorRepository.DeleteAsync(id);
+            await _unitOfWork.SaveAsync();
         }
         /// <inheritdoc/>
-        public Task<HallSector> GetByID(long id)
+        public Task<HallSector> GetByIDAsync(long id)
         {
-            return _unitOfWork.HallSectorRepository.GetByID(id);
+            return _unitOfWork.HallSectorRepository.GetByIDAsync(id);
         }
         /// <inheritdoc/>
-        public Task<IEnumerable<HallSector>> GetHallSectors()
+        public Task<IEnumerable<HallSector>> GetHallSectorsAsync()
         {
-            return _unitOfWork.HallSectorRepository.Get();
+            return _unitOfWork.HallSectorRepository.GetAsync();
         }
         /// <inheritdoc/>
-        public async Task Update(long id, EditHallSectorDto model)
+        public async Task UpdateAsync(long id, EditHallSectorDto model)
         {
-            var item = await _unitOfWork.HallSectorRepository.GetByID(id);
+            var item = await _unitOfWork.HallSectorRepository.GetByIDAsync(id);
             if (item == null)
                 throw new NullReferenceException("No HallSector to update");
             _mapper.Map(model, item);
             await ValidateUniqueFields(item, "There is already existing same HallSectorName for PlaceHall");
             _unitOfWork.HallSectorRepository.Update(item);
-            await _unitOfWork.Save();
+            await _unitOfWork.SaveAsync();
         }
         /// <summary>
         /// Validates that the hall sector has unique fields before performing any database operations.
@@ -68,7 +68,7 @@ namespace Services.Service
         /// <exception cref="InvalidOperationException">Thrown if a duplicate hall sector is found.</exception>
         private async Task ValidateUniqueFields(HallSector model,string errorMessage)
         {
-            if ((await _unitOfWork.HallSectorRepository.Get(x => x.SectorName == model.SectorName && x.PlaceHallID == x.PlaceHallID)).Any())
+            if ((await _unitOfWork.HallSectorRepository.GetAsync(x => x.SectorName == model.SectorName && x.PlaceHallID == x.PlaceHallID)).Any())
                 throw new InvalidOperationException(errorMessage);
         }
     }

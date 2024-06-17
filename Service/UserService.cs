@@ -30,9 +30,9 @@ namespace EventSeller.Services.Service
 
         /// <inheritdoc />
         /// <exception cref="InvalidOperationException">Thrown when the username or email is already in use.</exception>
-        public async Task CreateUser(AddUserDto addUserDto)
+        public async Task CreateUserAsync(AddUserDto addUserDto)
         {
-            if(await GetUserByUserName(addUserDto.UserName) != null)
+            if(await GetUserByUserNameAsync(addUserDto.UserName) != null)
             {
                 throw new InvalidOperationException("This UserName is already taken.");
             }
@@ -59,7 +59,7 @@ namespace EventSeller.Services.Service
         }
         /// <inheritdoc />
         /// <exception cref="InvalidOperationException">Thrown when the user does not exist or deletion fails.</exception>
-        public async Task Delete(string id)
+        public async Task DeleteAsync(string id)
         {
             var user = await _userManager.FindByIdAsync(id);
             if(user == null) 
@@ -73,16 +73,16 @@ namespace EventSeller.Services.Service
             }
         }
         /// <inheritdoc />
-        public async Task<User> GetUserByUserName(string userName)
+        public async Task<User> GetUserByUserNameAsync(string userName)
         {
             return await _userManager.FindByNameAsync(userName);
         }
         /// <inheritdoc />
         /// <exception cref="InvalidDataException">Thrown when the user does not exist or the password is incorrect.</exception>
-        public async Task<TokenVM> Login(LoginUserVM user)
+        public async Task<TokenVM> LoginAsync(LoginUserVM user)
         {
             
-            var existingUser = await GetUserByUserName(user.UserName) ?? await _userManager.FindByEmailAsync(user.Email);
+            var existingUser = await GetUserByUserNameAsync(user.UserName) ?? await _userManager.FindByEmailAsync(user.Email);
             if (existingUser == null)
             {
                 throw new InvalidDataException("This user doesn't exists");
@@ -115,7 +115,7 @@ namespace EventSeller.Services.Service
         }
         /// <inheritdoc />
         /// <exception cref="InvalidOperationException">Thrown when the access token or refresh token is invalid.</exception>
-        public async Task<TokenVM> RefreshToken(TokenVM token)
+        public async Task<TokenVM> RefreshTokenAsync(TokenVM token)
         {
             string? accessToken = token.AccessToken;
             string? refreshToken = token.RefreshToken;
@@ -129,7 +129,7 @@ namespace EventSeller.Services.Service
 
             string username = identity.Name;
 
-            var user = await GetUserByUserName(username);
+            var user = await GetUserByUserNameAsync(username);
 
             if (user == null || user.RefreshToken != refreshToken || user.RefreshTokenExpiryTime <= DateTime.Now)
             {
@@ -156,7 +156,7 @@ namespace EventSeller.Services.Service
 
         /// <inheritdoc />
         /// <exception cref="NullReferenceException">Thrown when the user to update does not exist.</exception>
-        public async Task Update(string id, EditUserDto model)
+        public async Task UpdateAsync(string id, EditUserDto model)
         {
             var user = await _userManager.FindByIdAsync(id);
             if (user == null)

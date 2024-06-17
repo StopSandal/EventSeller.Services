@@ -19,20 +19,20 @@ namespace EventSeller.Services.Interfaces.Services
         /// </summary>
         /// <param name="id">The identifier of the ticket seat.</param>
         /// <returns>A task that represents the asynchronous operation. The task result contains the ticket seat.</returns>
-        Task<TicketSeat> GetByID(long id);
+        Task<TicketSeat> GetByIDAsync(long id);
 
         /// <summary>
         /// Retrieves a collection of all ticket seats.
         /// </summary>
         /// <returns>A task that represents the asynchronous operation. The task result contains a collection of ticket seats.</returns>
-        Task<IEnumerable<TicketSeat>> GetTicketSeats();
+        Task<IEnumerable<TicketSeat>> GetTicketSeatsAsync();
 
         /// <summary>
         /// Creates a new ticket seat.
         /// </summary>
         /// <param name="model">The data transfer object containing ticket seat details.</param>
         /// <returns>A task that represents the asynchronous operation.</returns>
-        Task Create(AddTicketSeatDto model);
+        Task CreateAsync(AddTicketSeatDto model);
 
         /// <summary>
         /// Updates an existing ticket seat.
@@ -40,13 +40,13 @@ namespace EventSeller.Services.Interfaces.Services
         /// <param name="id">The identifier of the ticket seat to update.</param>
         /// <param name="model">The data transfer object containing updated ticket seat details.</param>
         /// <returns>A task that represents the asynchronous operation.</returns>
-        Task Update(long id, EditTicketSeatDto model);
+        Task UpdateAsync(long id, EditTicketSeatDto model);
 
         /// <summary>
         /// Deletes a ticket seat by its identifier.
         /// </summary>
         /// <param name="id">The identifier of the ticket seat to delete.</param>
         /// <returns>A task that represents the asynchronous operation.</returns>
-        Task Delete(long id);
+        Task DeleteAsync(long id);
     }
 }

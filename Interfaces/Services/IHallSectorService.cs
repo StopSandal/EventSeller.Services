@@ -19,20 +19,20 @@ namespace EventSeller.Services.Interfaces.Services
         /// </summary>
         /// <param name="id">The identifier of the hall sector.</param>
         /// <returns>A task that represents the asynchronous operation. The task result contains the hall sector.</returns>
-        Task<HallSector> GetByID(long id);
+        Task<HallSector> GetByIDAsync(long id);
 
         /// <summary>
         /// Retrieves a collection of all hall sectors.
         /// </summary>
         /// <returns>A task that represents the asynchronous operation. The task result contains a collection of hall sectors.</returns>
-        Task<IEnumerable<HallSector>> GetHallSectors();
+        Task<IEnumerable<HallSector>> GetHallSectorsAsync();
 
         /// <summary>
         /// Creates a new hall sector.
         /// </summary>
         /// <param name="model">The data transfer object containing hall sector details.</param>
         /// <returns>A task that represents the asynchronous operation.</returns>
-        Task Create(AddHallSectorDto model);
+        Task CreateAsync(AddHallSectorDto model);
 
         /// <summary>
         /// Updates an existing hall sector.
@@ -40,13 +40,13 @@ namespace EventSeller.Services.Interfaces.Services
         /// <param name="id">The identifier of the hall sector to update.</param>
         /// <param name="model">The data transfer object containing updated hall sector details.</param>
         /// <returns>A task that represents the asynchronous operation.</returns>
-        Task Update(long id, EditHallSectorDto model);
+        Task UpdateAsync(long id, EditHallSectorDto model);
 
         /// <summary>
         /// Deletes a hall sector by its identifier.
         /// </summary>
         /// <param name="id">The identifier of the hall sector to delete.</param>
         /// <returns>A task that represents the asynchronous operation.</returns>
-        Task Delete(long id);
+        Task DeleteAsync(long id);
     }
 }

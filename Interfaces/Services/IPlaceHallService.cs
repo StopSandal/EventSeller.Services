@@ -19,20 +19,20 @@ namespace EventSeller.Services.Interfaces.Services
         /// </summary>
         /// <param name="id">The identifier of the place hall.</param>
         /// <returns>A task that represents the asynchronous operation. The task result contains the place hall.</returns>
-        Task<PlaceHall> GetByID(long id);
+        Task<PlaceHall> GetByIDAsync(long id);
 
         /// <summary>
         /// Retrieves a collection of all place halls.
         /// </summary>
         /// <returns>A task that represents the asynchronous operation. The task result contains a collection of place halls.</returns>
-        Task<IEnumerable<PlaceHall>> GetPlaceHalls();
+        Task<IEnumerable<PlaceHall>> GetPlaceHallsAsync();
 
         /// <summary>
         /// Creates a new place hall.
         /// </summary>
         /// <param name="model">The data transfer object containing place hall details.</param>
         /// <returns>A task that represents the asynchronous operation.</returns>
-        Task Create(AddPlaceHallDto model);
+        Task CreateAsync(AddPlaceHallDto model);
 
         /// <summary>
         /// Updates an existing place hall.
@@ -40,13 +40,13 @@ namespace EventSeller.Services.Interfaces.Services
         /// <param name="id">The identifier of the place hall to update.</param>
         /// <param name="model">The data transfer object containing updated place hall details.</param>
         /// <returns>A task that represents the asynchronous operation.</returns>
-        Task Update(long id, EditPlaceHallDto model);
+        Task UpdateAsync(long id, EditPlaceHallDto model);
 
         /// <summary>
         /// Deletes a place hall by its identifier.
         /// </summary>
         /// <param name="id">The identifier of the place hall to delete.</param>
         /// <returns>A task that represents the asynchronous operation.</returns>
-        Task Delete(long id);
+        Task DeleteAsync(long id);
     }
 }
