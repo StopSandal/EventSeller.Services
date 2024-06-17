@@ -7,6 +7,7 @@ using Microsoft.AspNetCore.Identity;
 using System.IdentityModel.Tokens.Jwt;
 using System.Security.Claims;
 using EventSeller.Services.Interfaces.Services;
+using Microsoft.EntityFrameworkCore;
 
 namespace EventSeller.Services.Service
 {
@@ -81,8 +82,8 @@ namespace EventSeller.Services.Service
         /// <exception cref="InvalidDataException">Thrown when the user does not exist or the password is incorrect.</exception>
         public async Task<TokenVM> LoginAsync(LoginUserVM user)
         {
-            
-            var existingUser = await GetUserByUserNameAsync(user.UserName) ?? await _userManager.FindByEmailAsync(user.Email);
+            var existingUser = await _userManager.Users
+                                        .FirstOrDefaultAsync(u => u.UserName == user.UserName || u.Email == user.Email);
             if (existingUser == null)
             {
                 throw new InvalidDataException("This user doesn't exists");
