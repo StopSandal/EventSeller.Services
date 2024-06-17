@@ -2,51 +2,10 @@
 using DataLayer.Model;
 using DataLayer.Models.HallSector;
 using EventSeller.Services.Interfaces;
+using EventSeller.Services.Interfaces.Services;
 
 namespace Services.Service
 {
-    /// <summary>
-    /// Represents all actions with <see cref="HallSector"/> class.
-    /// </summary>
-    /// <remarks>All actions include CRUD operations</remarks>
-    public interface IHallSectorService
-    {
-        /// <summary>
-        /// Retrieves a hall sector by its identifier.
-        /// </summary>
-        /// <param name="id">The identifier of the hall sector.</param>
-        /// <returns>A task that represents the asynchronous operation. The task result contains the hall sector.</returns>
-        Task<HallSector> GetByID(long id);
-
-        /// <summary>
-        /// Retrieves a collection of all hall sectors.
-        /// </summary>
-        /// <returns>A task that represents the asynchronous operation. The task result contains a collection of hall sectors.</returns>
-        Task<IEnumerable<HallSector>> GetHallSectors();
-
-        /// <summary>
-        /// Creates a new hall sector.
-        /// </summary>
-        /// <param name="model">The data transfer object containing hall sector details.</param>
-        /// <returns>A task that represents the asynchronous operation.</returns>
-        Task Create(AddHallSectorDto model);
-
-        /// <summary>
-        /// Updates an existing hall sector.
-        /// </summary>
-        /// <param name="id">The identifier of the hall sector to update.</param>
-        /// <param name="model">The data transfer object containing updated hall sector details.</param>
-        /// <returns>A task that represents the asynchronous operation.</returns>
-        Task Update(long id, EditHallSectorDto model);
-
-        /// <summary>
-        /// Deletes a hall sector by its identifier.
-        /// </summary>
-        /// <param name="id">The identifier of the hall sector to delete.</param>
-        /// <returns>A task that represents the asynchronous operation.</returns>
-        Task Delete(long id);
-    }
-
     /// <summary>
     /// Represents the default implementation of the <see cref="IHallSectorService"/>.
     /// </summary>

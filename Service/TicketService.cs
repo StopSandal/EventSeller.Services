@@ -2,51 +2,10 @@
 using DataLayer.Model;
 using DataLayer.Models.Ticket;
 using EventSeller.Services.Interfaces;
+using EventSeller.Services.Interfaces.Services;
 
 namespace Services.Service
 {
-    /// <summary>
-    /// Represents all actions with the <see cref="Ticket"/> class.
-    /// </summary>
-    /// <remarks>All actions include CRUD operations</remarks>
-    public interface ITicketService
-    {
-        /// <summary>
-        /// Retrieves a ticket by its identifier.
-        /// </summary>
-        /// <param name="id">The identifier of the ticket.</param>
-        /// <returns>A task that represents the asynchronous operation. The task result contains the ticket.</returns>
-        Task<Ticket> GetByID(long id);
-
-        /// <summary>
-        /// Retrieves a collection of all tickets.
-        /// </summary>
-        /// <returns>A task that represents the asynchronous operation. The task result contains a collection of tickets.</returns>
-        Task<IEnumerable<Ticket>> GetTickets();
-
-        /// <summary>
-        /// Creates a new ticket.
-        /// </summary>
-        /// <param name="model">The data transfer object containing ticket details.</param>
-        /// <returns>A task that represents the asynchronous operation.</returns>
-        Task Create(AddTicketDto model);
-
-        /// <summary>
-        /// Updates an existing ticket.
-        /// </summary>
-        /// <param name="id">The identifier of the ticket to update.</param>
-        /// <param name="model">The data transfer object containing updated ticket details.</param>
-        /// <returns>A task that represents the asynchronous operation.</returns>
-        Task Update(long id, EditTicketDto model);
-
-        /// <summary>
-        /// Deletes a ticket by its identifier.
-        /// </summary>
-        /// <param name="id">The identifier of the ticket to delete.</param>
-        /// <returns>A task that represents the asynchronous operation.</returns>
-        Task Delete(long id);
-    }
-
     /// <summary>
     /// Represents the default implementation of the <see cref="ITicketService"/>.
     /// </summary>
