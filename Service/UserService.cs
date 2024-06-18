@@ -1,13 +1,13 @@
 ﻿using AutoMapper;
 using EventSeller.DataLayer.Entities;
 using EventSeller.DataLayer.EntitiesDto.User;
-using EventSeller.DataLayer.EntitiesViewModel;
 using EventSeller.Services.Interfaces;
 using Microsoft.AspNetCore.Identity;
 using System.IdentityModel.Tokens.Jwt;
 using System.Security.Claims;
 using EventSeller.Services.Interfaces.Services;
 using Microsoft.EntityFrameworkCore;
+using EventSeller.DataLayer.EntitiesDto;
 
 namespace EventSeller.Services.Service
 {
@@ -84,7 +84,7 @@ namespace EventSeller.Services.Service
         }
         /// <inheritdoc />
         /// <exception cref="InvalidDataException">Thrown when the user does not exist or the password is incorrect.</exception>
-        public async Task<TokenVM> LoginAsync(LoginUserVM user)
+        public async Task<TokenDTO> LoginAsync(LoginUserDTO user)
         {
             var existingUser = await _userManager.Users
                                         .FirstOrDefaultAsync(u => u.UserName == user.UserName || u.Email == user.Email);
@@ -112,7 +112,7 @@ namespace EventSeller.Services.Service
             existingUser.RefreshTokenExpiryTime = DateTime.Now.AddDays(_JWTFactory.GetRefreshTokenValidityInDays());
             await _userManager.UpdateAsync(existingUser);
 
-            return new TokenVM()
+            return new TokenDTO()
             {
                 AccessToken = token,
                 RefreshToken = refreshToken
@@ -120,7 +120,7 @@ namespace EventSeller.Services.Service
         }
         /// <inheritdoc />
         /// <exception cref="InvalidOperationException">Thrown when the access token or refresh token is invalid.</exception>
-        public async Task<TokenVM> RefreshTokenAsync(TokenVM token)
+        public async Task<TokenDTO> RefreshTokenAsync(TokenDTO token)
         {
             string? accessToken = token.AccessToken;
             string? refreshToken = token.RefreshToken;
@@ -152,7 +152,7 @@ namespace EventSeller.Services.Service
             await _userManager.SetAuthenticationTokenAsync(user, LOGIN_PROVIDER, TOKEN_NAME, newAccessToken);
 
 
-            return new TokenVM
+            return new TokenDTO
             {
                 AccessToken = newAccessToken,
                 RefreshToken = newRefreshToken

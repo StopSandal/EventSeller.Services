@@ -8,7 +8,6 @@ using DataLayer.Models.Ticket;
 using DataLayer.Models.TicketSeat;
 using EventSeller.DataLayer.Entities;
 using EventSeller.DataLayer.EntitiesDto.User;
-using EventSeller.DataLayer.EntitiesViewModel;
 
 namespace Services
 {

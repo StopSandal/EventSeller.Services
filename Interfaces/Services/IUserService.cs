@@ -1,6 +1,6 @@
 ﻿using EventSeller.DataLayer.Entities;
+using EventSeller.DataLayer.EntitiesDto;
 using EventSeller.DataLayer.EntitiesDto.User;
-using EventSeller.DataLayer.EntitiesViewModel;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -45,13 +45,13 @@ namespace EventSeller.Services.Interfaces.Services
         /// </summary>
         /// <param name="user">The login view model containing user credentials.</param>
         /// <returns>A task that represents the asynchronous operation. The task result contains the token view model.</returns>
-        Task<TokenVM> LoginAsync(LoginUserVM user);
+        Task<TokenDTO> LoginAsync(LoginUserDTO user);
 
         /// <summary>
         /// Refreshes the JWT token.
         /// </summary>
         /// <param name="token">The token view model containing the access token and refresh token.</param>
         /// <returns>A task that represents the asynchronous operation. The task result contains the new token view model.</returns>
-        Task<TokenVM> RefreshTokenAsync(TokenVM token);
+        Task<TokenDTO> RefreshTokenAsync(TokenDTO token);
     }
 }
