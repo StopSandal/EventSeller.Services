@@ -109,7 +109,7 @@ namespace EventSeller.Services.Service
             //set Refresh token for user
             var refreshToken = _JWTFactory.GenerateRefreshToken();
             existingUser.RefreshToken = refreshToken;
-            existingUser.RefreshTokenExpiryTime = DateTime.Now.AddDays(_JWTFactory.GetRefreshTokenValidityInDays());
+            existingUser.RefreshTokenExpiryTime = DateTime.UtcNow.AddDays(_JWTFactory.GetRefreshTokenValidityInDays());
             await _userManager.UpdateAsync(existingUser);
 
             return new TokenDTO()
@@ -136,7 +136,7 @@ namespace EventSeller.Services.Service
 
             var user = await GetUserByUserNameAsync(username);
 
-            if (user == null || user.RefreshToken != refreshToken || user.RefreshTokenExpiryTime <= DateTime.Now)
+            if (user == null || user.RefreshToken != refreshToken || user.RefreshTokenExpiryTime <= DateTime.UtcNow)
             {
                 throw new InvalidOperationException("Invalid access token or refresh token");
             }
