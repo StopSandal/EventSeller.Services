@@ -7,7 +7,9 @@ using DataLayer.Models.PlaceHall;
 using DataLayer.Models.Ticket;
 using DataLayer.Models.TicketSeat;
 using EventSeller.DataLayer.Entities;
+using EventSeller.DataLayer.EntitiesDto;
 using EventSeller.DataLayer.EntitiesDto.User;
+using EventSeller.DataLayer.ExternalDTO.PaymentSystem;
 
 namespace Services
 {
@@ -26,6 +28,11 @@ namespace Services
             MapTicketSeat();
             MapTicket();
             MapUser();
+            MapProcessResponseToPaymentConfirmation();
+        }
+        private void MapProcessResponseToPaymentConfirmation() 
+        {
+            CreateMap<ProcessPaymentResponse, PaymentConfirmationDTO>();
         }
         private void MapUser()
         {

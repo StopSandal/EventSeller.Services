@@ -1,4 +1,5 @@
 ﻿using DataLayer.Model;
+using EventSeller.DataLayer.Entities;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -40,6 +41,10 @@ namespace EventSeller.Services.Interfaces
         /// Gets the repository for <see cref="TicketSeat"/> entities.
         /// </summary>
         IRepositoryAsync<TicketSeat> TicketSeatRepository { get; }
+        /// <summary>
+        /// Gets the repository for <see cref="TicketSeat"/> entities.
+        /// </summary>
+        IRepositoryAsync<TicketTransaction> TicketTransactionRepository { get; }
 
         /// <summary>
         /// Saves all changes made in this unit of work to the underlying database.
