@@ -169,7 +169,7 @@ namespace EventSeller.Services.Service
 
             var isAvailable = !ticket.isSold && !_bookingService.IsTicketBooked(ticket);
 
-            _logger.LogInformation("IsTicketAvailableForPurchase: Ticket availability for TicketId {TicketId} is {IsAvailable}", ticket.Id, isAvailable);
+            _logger.LogInformation("IsTicketAvailableForPurchase: Ticket availability for TicketId {TicketId} is {IsAvailable}", ticket.ID, isAvailable);
 
             return isAvailable;
         }
