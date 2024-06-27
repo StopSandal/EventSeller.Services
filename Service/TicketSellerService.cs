@@ -65,6 +65,7 @@ namespace EventSeller.Services.Service
                 Date = DateTime.UtcNow,
                 TransactionId = transactionId,
                 TransactionAmount = paymentInfo.TotalAmount,
+                UnreturnableFee = paymentInfo.BookingAmount,
                 CurrencyType = paymentInfo.CurrencyType,
                 userId = user.Id
             };
@@ -81,12 +82,14 @@ namespace EventSeller.Services.Service
         private TicketPriceInfoDTO GetFullTicketPrice(Ticket ticket)
         {
             var bookingFeePercentage = ticket.Event.EventType.BookingFeePercentage;
+            var bookingAmount = ticket.Price * (bookingFeePercentage / 100);
             return new TicketPriceInfoDTO
             {
                 BookingFeePercentage = bookingFeePercentage,
                 CurrencyType = ticket.CurrencyType,
                 TicketPrice = ticket.Price,
-                TotalAmount = ticket.Price * (1 + bookingFeePercentage / 100)
+                BookingAmount = bookingAmount,
+                TotalAmount = ticket.Price + bookingAmount
             };
         }
         public async Task<bool> IsTicketAvailableForPurchaseByIdAsync(long ticketId)
@@ -116,12 +119,13 @@ namespace EventSeller.Services.Service
             var ticketId = purchaseTicketDTO.ticketId;
             var cardId = purchaseTicketDTO.cardId;
             var ticket = await _ticketService.GetByIDAsync(ticketId);
+
             if (!IsTicketAvailableForPurchase(ticket))
                 throw new InvalidOperationException("Ticket is not available for purchase. Try later.");
             _bookingService.TemporaryBookTicketForPurchase(ticket);
 
             var paymentInfo = GetFullTicketPrice(ticket);
-            var response = await _externalPaymentService.ProcessPaymentAsync(cardId, paymentInfo.TotalAmount, paymentInfo.CurrencyType);
+            var response = await _externalPaymentService.ProcessPaymentAsync(cardId, paymentInfo.TotalAmount, paymentInfo.CurrencyType, paymentInfo.BookingAmount);
             
             var result = _mapper.Map<PaymentConfirmationDTO>(response);
             result.TicketId = ticketId;

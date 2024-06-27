@@ -28,13 +28,14 @@ namespace EventSeller.Services.Service
             _logger = logger;
         }
 
-        public async Task<ProcessPaymentResponse> ProcessPaymentAsync(long cardId, decimal amount, string currency)
+        public async Task<ProcessPaymentResponse> ProcessPaymentAsync(long cardId, decimal totalAmount, string currency, decimal unreturnableFee)
         {
             var request = new
             {
                 CardId = cardId,
-                Amount = amount,
-                Currency = currency
+                TotalAmount = totalAmount,
+                Currency = currency,
+                UnreturnableFee = unreturnableFee
             };
 
             var content = new StringContent(JsonConvert.SerializeObject(request), Encoding.UTF8, MEDIA_TYPE);

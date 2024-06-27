@@ -9,7 +9,7 @@ namespace EventSeller.DataLayer.Entities
 {
     public interface IExternalPaymentService
     {
-        public Task<ProcessPaymentResponse> ProcessPaymentAsync(long cardId, decimal amount, string currency);
+        public Task<ProcessPaymentResponse> ProcessPaymentAsync(long cardId, decimal amount, string currency, decimal unreturnableFee = 0);
         public Task ConfirmPaymentAsync(long transactionId, string confirmationCode);
         public Task CancelPaymentAsync(long transactionId);
         public Task ReturnPaymentAsync(long transactionId);
