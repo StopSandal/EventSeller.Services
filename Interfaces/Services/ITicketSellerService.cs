@@ -8,16 +8,6 @@ using System.Threading.Tasks;
 
 namespace EventSeller.Services.Interfaces.Services
 {
-    /*
-     Билет -> id -> Get Process Payment -> get answer
-                -> Set booking
-    Tranc id + confirm -> Payment confirm
-                                         -> Set sold + infinity booking
-    Tranc id -> cancel after 3 min
-            -> no booking
-    return money ??                        ->trancId
-                 -> table ticketTransaction
-    */
     public interface ITicketSellerService
     {
         public Task<TicketPriceInfoDTO> GetFullTicketPriceAsync(long ticketId);

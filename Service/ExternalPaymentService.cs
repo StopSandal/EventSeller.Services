@@ -20,6 +20,7 @@ namespace EventSeller.Services.Service
         internal const string PROCESS_PAYMENT_PATH = $"{EXTERNAL_API_PATH}/process";
         internal const string CANCEL_PAYMENT_PATH = $"{EXTERNAL_API_PATH}/cancel";
         internal const string CONFIRM_PAYMENT_PATH = $"{EXTERNAL_API_PATH}/confirm";
+        internal const string RETURN_PAYMENT_PATH = $"{EXTERNAL_API_PATH}/return";
 
         public ExternalPaymentService(HttpClient httpClient, ILogger<ExternalPaymentService> logger)
         {
@@ -66,6 +67,16 @@ namespace EventSeller.Services.Service
 
             var content = new StringContent(JsonConvert.SerializeObject(request), Encoding.UTF8, MEDIA_TYPE);
             var response = await _httpClient.PostAsync(CANCEL_PAYMENT_PATH, content);
+
+            response.EnsureSuccessStatusCode();
+        }
+
+        public async Task ReturnPaymentAsync(long transactionId)
+        {
+            var request = new { TransactionId = transactionId };
+
+            var content = new StringContent(JsonConvert.SerializeObject(request), Encoding.UTF8, MEDIA_TYPE);
+            var response = await _httpClient.PostAsync(RETURN_PAYMENT_PATH, content);
 
             response.EnsureSuccessStatusCode();
         }

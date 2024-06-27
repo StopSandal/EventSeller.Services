@@ -131,9 +131,33 @@ namespace EventSeller.Services.Service
         public async Task ReturnMoneyForPurchaseAsync(long ticketTransactionId)
         {
             var ticketTransaction = await _unitOfWork.TicketTransactionRepository.GetByIDAsync(ticketTransactionId);
-            var ticket = await _ticketService.GetByIDAsync(ticketTransaction.TicketID);
-            ticket.isSold = false;
+            if(ticketTransaction == null)
+                throw new InvalidOperationException("TicketTransaction doesn't exists");
+            if (ticketTransaction.IsReturned)
+                throw new InvalidOperationException("Ticket is already returned");
+
+            try
+            {
+                await _externalPaymentService.ReturnPaymentAsync(ticketTransaction.TransactionId);
+            }
+            catch
+            {
+                throw;
+            }
+
+            ticketTransaction.IsReturned = true;
             await _unitOfWork.SaveAsync();
+
+            var ticket = await _ticketService.GetByIDAsync(ticketTransaction.TicketID);
+
+            if(ticket == null)
+                throw new InvalidOperationException("Ticket doesn't exists, but money returned");
+
+            ticket.isSold = false;
+
+            await _unitOfWork.SaveAsync();
+
+            _bookingService.UnbookTicket(ticket);
         }
     }
 }
