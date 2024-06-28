@@ -6,6 +6,7 @@ using Microsoft.Extensions.Logging;
 using System;
 using System.Collections.Generic;
 using System.Linq;
+using System.Net.Sockets;
 using System.Text;
 using System.Threading.Tasks;
 
@@ -19,6 +20,7 @@ namespace EventSeller.Services.Service
     {
         private readonly IConfiguration _configuration;
         private readonly ITicketService _ticketService;
+        private readonly IUnitOfWork _unitOfWork;
         private readonly ILogger<BookingService> _logger;
         const string TEMPORAL_BOOKING_IN_MINUTES = "Booking:TemporalBookingForPurchaseInMinutes";
         /// <summary>
@@ -27,11 +29,12 @@ namespace EventSeller.Services.Service
         /// <param name="configuration">The application configuration.</param>
         /// <param name="ticketService">The ticket service.</param>
         /// <param name="logger">The logger.</param>
-        public BookingService(IConfiguration configuration, ITicketService ticketService, ILogger<BookingService> logger)
+        public BookingService(IConfiguration configuration, ITicketService ticketService, ILogger<BookingService> logger, IUnitOfWork unitOfWork)
         {
             _configuration = configuration;
             _ticketService = ticketService;
             _logger = logger;
+            _unitOfWork = unitOfWork;
         }
 
         /// <inheritdoc />
@@ -53,7 +56,7 @@ namespace EventSeller.Services.Service
         /// <inheritdoc />
         /// <exception cref="ArgumentNullException">Thrown when the ticket is null.</exception>
         /// <exception cref="FormatException">Thrown when the configuration value for booking minutes is invalid.</exception>
-        public void TemporaryBookTicketForPurchase(Ticket ticket)
+        public async Task TemporaryBookTicketForPurchaseAsync(Ticket ticket)
         {
             if (ticket == null)
             {
@@ -65,6 +68,7 @@ namespace EventSeller.Services.Service
             {
                 var minutesForBooking = int.Parse(_configuration[TEMPORAL_BOOKING_IN_MINUTES]);
                 ticket.BookedUntil = DateTime.UtcNow.AddMinutes(minutesForBooking);
+                await _unitOfWork.SaveAsync();
                 _logger.LogInformation("TemporaryBookTicketForPurchase: Ticket booked until {BookedUntil}", ticket.BookedUntil);
             }
             catch (FormatException ex)
@@ -75,27 +79,21 @@ namespace EventSeller.Services.Service
         }
 
         /// <inheritdoc />
-        /// <exception cref="ArgumentNullException">Thrown when the ticket is null.</exception>
-        public void UnbookTicket(Ticket ticket)
-        {
-            if (ticket == null)
-            {
-                _logger.LogError("UnbookTicket: Ticket is null");
-                throw new ArgumentNullException(nameof(ticket));
-            }
-
-            ticket.BookedUntil = null;
-            _logger.LogInformation("UnbookTicket: Ticket unbooked");
-        }
-
-        /// <inheritdoc />
         /// <exception cref="Exception">Thrown when the ticket retrieval fails.</exception>
         public async Task UnbookTicketByIdAsync(long ticketId)
         {
             try
             {
                 var ticket = await _ticketService.GetByIDAsync(ticketId);
-                UnbookTicket(ticket);
+
+                if (ticket == null)
+                {
+                    _logger.LogError("UnbookTicket: Ticket is null");
+                    throw new ArgumentNullException(nameof(ticket));
+                }
+
+                ticket.BookedUntil = null;
+                await _unitOfWork.SaveAsync();
                 _logger.LogInformation("UnbookTicketByIdAsync: Ticket with ID {TicketId} unbooked", ticketId);
             }
             catch (Exception ex)

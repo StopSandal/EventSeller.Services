@@ -62,5 +62,16 @@ namespace Services.Service
             _unitOfWork.TicketRepository.Update(item);
             await _unitOfWork.SaveAsync();
         }
+        public async Task<Ticket> GetTicketWithAllIncudesByIdAsync(long ticketId)
+        {
+            string includeProperties = "Event,Event.EventType";
+
+            var ticket = await _unitOfWork.TicketRepository.GetAsync(
+                filter: t => t.ID == ticketId,
+                includeProperties: includeProperties
+            );
+
+            return ticket.FirstOrDefault();
+        }
     }
 }

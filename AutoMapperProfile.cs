@@ -32,7 +32,16 @@ namespace Services
         }
         private void MapProcessResponseToPaymentConfirmation() 
         {
-            CreateMap<ProcessPaymentResponse, PaymentConfirmationDTO>();
+            CreateMap<ProcessPaymentResponse, PaymentConfirmationDTO>()
+                .ForAllMembers(x => x.Condition(
+                    (src, dest, prop) =>
+                    {
+                        if (prop == null) return false;
+                        if (prop.GetType() == typeof(string) && string.IsNullOrEmpty((string)prop)) return false;
+
+                        return true;
+                    }
+                ));
         }
         private void MapUser()
         {

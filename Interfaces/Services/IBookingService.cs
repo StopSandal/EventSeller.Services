@@ -13,10 +13,11 @@ namespace EventSeller.Services.Interfaces.Services
     public interface IBookingService
     {
         /// <summary>
-        /// Temporarily books a ticket for purchase.
+        /// Asynchronously temporarily books a ticket for purchase.
         /// </summary>
         /// <param name="ticket">The ticket to be temporarily booked.</param>
-        void TemporaryBookTicketForPurchase(Ticket ticket);
+        /// <returns>A task that represents the asynchronous operation.</returns>
+        Task TemporaryBookTicketForPurchaseAsync(Ticket ticket);
 
         /// <summary>
         /// Checks if a ticket is currently booked.
@@ -24,12 +25,6 @@ namespace EventSeller.Services.Interfaces.Services
         /// <param name="ticket">The ticket to check the booking status of.</param>
         /// <returns>True if the ticket is booked, otherwise false.</returns>
         bool IsTicketBooked(Ticket ticket);
-
-        /// <summary>
-        /// Unbooks a previously booked ticket.
-        /// </summary>
-        /// <param name="ticket">The ticket to be unbooked.</param>
-        void UnbookTicket(Ticket ticket);
 
         /// <summary>
         /// Asynchronously unbooks a ticket by its ID.

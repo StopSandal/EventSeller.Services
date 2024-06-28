@@ -6,6 +6,7 @@ using EventSeller.Services.Interfaces;
 using EventSeller.Services.Interfaces.Services;
 using Microsoft.Extensions.Logging;
 using System;
+using System.Net.Sockets;
 using System.Threading.Tasks;
 
 namespace EventSeller.Services.Service
@@ -56,7 +57,11 @@ namespace EventSeller.Services.Service
         public async Task CancelTicketPaymentAsync(long ticketId, long transactionId)
         {
             _logger.LogInformation("CancelTicketPaymentAsync: Cancelling ticket payment for TicketId {TicketId} and TransactionId {TransactionId}", ticketId, transactionId);
-
+            if ((await _ticketService.GetByIDAsync(ticketId)) == null)
+            {
+                _logger.LogWarning("CancelTicketPaymentAsync: Ticket is null");
+                throw new InvalidOperationException("Ticket doesn't exist");
+            }
             await _bookingService.UnbookTicketByIdAsync(ticketId);
             _logger.LogInformation("CancelTicketPaymentAsync: Ticket unbooked for TicketId {TicketId}", ticketId);
 
@@ -74,6 +79,22 @@ namespace EventSeller.Services.Service
             var confirmationCode = paymentConfirmationDTO.ConfirmationCode;
 
             _logger.LogInformation("ConfirmTicketPaymentAsync: Confirming ticket payment for TicketId {TicketId}, TransactionId {TransactionId}, and UserName {UserName}", ticketId, transactionId, userName);
+           
+            var ticket = await _ticketService.GetByIDAsync(ticketId);
+            if (ticket == null)
+            {
+                _logger.LogWarning("IsTicketAvailableForPurchaseByIdAsync: TicketId {TicketId} does not exist", ticketId);
+                throw new InvalidOperationException("Ticket doesn't exist");
+            }
+
+            var paymentInfo = await GetFullTicketPriceAsync(ticket.ID);
+            var user = await _userService.GetUserByUserNameAsync(userName);
+
+            if (user == null)
+            {
+                _logger.LogCritical("GetUserByUserNameAsync: User {UserName} does not exist", userName);
+                throw new InvalidOperationException("User doesn't exist");
+            }
 
             try
             {
@@ -86,11 +107,8 @@ namespace EventSeller.Services.Service
                 throw;
             }
 
-            var ticket = await _ticketService.GetByIDAsync(ticketId);
             ticket.isSold = true;
 
-            var paymentInfo = GetFullTicketPrice(ticket);
-            var user = await _userService.GetUserByUserNameAsync(userName);
             var newTicketTransaction = new TicketTransaction()
             {
                 TicketID = ticketId,
@@ -114,16 +132,16 @@ namespace EventSeller.Services.Service
         {
             _logger.LogInformation("GetFullTicketPriceAsync: Getting full ticket price for TicketId {TicketId}", ticketId);
 
-            var ticket = await _ticketService.GetByIDAsync(ticketId);
-            var ticketPriceInfo = GetFullTicketPrice(ticket);
+            var ticket = await _ticketService.GetTicketWithAllIncudesByIdAsync(ticketId);
+
+            if (ticket == null || ticket.Event == null || ticket.Event.EventType==null)
+            {
+                _logger.LogWarning("GetFullTicketPriceAsync: Ticket is null or one of it's parents");
+                throw new InvalidOperationException("Ticket doesn't exist or corrupted");
+            }
 
             _logger.LogInformation("GetFullTicketPriceAsync: Full ticket price retrieved for TicketId {TicketId}", ticketId);
 
-            return ticketPriceInfo;
-        }
-
-        private TicketPriceInfoDTO GetFullTicketPrice(Ticket ticket)
-        {
             var bookingFeePercentage = ticket.Event.EventType.BookingFeePercentage;
             var bookingAmount = ticket.Price * (bookingFeePercentage / 100);
 
@@ -137,6 +155,7 @@ namespace EventSeller.Services.Service
             };
         }
 
+
         /// <inheritdoc />
         /// <exception cref="InvalidOperationException">Thrown when the ticket does not exist.</exception>
         public async Task<bool> IsTicketAvailableForPurchaseByIdAsync(long ticketId)
@@ -144,17 +163,7 @@ namespace EventSeller.Services.Service
             _logger.LogInformation("IsTicketAvailableForPurchaseByIdAsync: Checking availability for TicketId {TicketId}", ticketId);
 
             var ticket = await _ticketService.GetByIDAsync(ticketId);
-            if (ticket == null)
-            {
-                _logger.LogWarning("IsTicketAvailableForPurchaseByIdAsync: TicketId {TicketId} does not exist", ticketId);
-                throw new InvalidOperationException("Ticket doesn't exist");
-            }
-
-            var isNotAvailable = ticket.isSold || _bookingService.IsTicketBooked(ticket);
-
-            _logger.LogInformation("IsTicketAvailableForPurchaseByIdAsync: Ticket availability for TicketId {TicketId} is {IsAvailable}", ticketId, !isNotAvailable);
-
-            return !isNotAvailable;
+            return IsTicketAvailableForPurchase(ticket);
         }
 
         /// <inheritdoc />
@@ -185,16 +194,22 @@ namespace EventSeller.Services.Service
 
             var ticket = await _ticketService.GetByIDAsync(ticketId);
 
+            if (ticket == null)
+            {
+                _logger.LogWarning("ProcessTicketBuyingAsync: Ticket is null");
+                throw new InvalidOperationException("Ticket doesn't exist");
+            }
+
             if (!IsTicketAvailableForPurchase(ticket))
             {
                 _logger.LogWarning("ProcessTicketBuyingAsync: TicketId {TicketId} is not available for purchase", ticketId);
                 throw new InvalidOperationException("Ticket is not available for purchase. Try later.");
             }
 
-            _bookingService.TemporaryBookTicketForPurchase(ticket);
+            await _bookingService.TemporaryBookTicketForPurchaseAsync(ticket);
             _logger.LogInformation("ProcessTicketBuyingAsync: TicketId {TicketId} booked temporarily", ticketId);
 
-            var paymentInfo = GetFullTicketPrice(ticket);
+            var paymentInfo = await GetFullTicketPriceAsync(ticket.ID);
             var response = await _externalPaymentService.ProcessPaymentAsync(cardId, paymentInfo.TotalAmount, paymentInfo.CurrencyType, paymentInfo.BookingAmount);
 
             var result = _mapper.Map<PaymentConfirmationDTO>(response);
@@ -248,7 +263,7 @@ namespace EventSeller.Services.Service
             ticket.isSold = false;
             await _unitOfWork.SaveAsync();
 
-            _bookingService.UnbookTicket(ticket);
+            await _bookingService.UnbookTicketByIdAsync(ticket.ID);
             _logger.LogInformation("ReturnMoneyForPurchaseAsync: Ticket unbooked and status updated for TicketId {TicketId}", ticketTransaction.TicketID);
         }
     }
