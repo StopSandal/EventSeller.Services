@@ -55,5 +55,12 @@ namespace EventSeller.Services.Interfaces.Services
         /// <param name="id">The identifier of the ticket.</param>
         /// <returns>A task that represents the asynchronous operation. The task result contains the ticket.</returns>
         public Task<Ticket> GetTicketWithAllIncudesByIdAsync(long ticketId);
+
+        /// <summary>
+        /// Retrieves a datetime of event or ticket start by its identifier.
+        /// </summary>
+        /// <param name="id">The identifier of the ticket.</param>
+        /// <returns>A task that represents the asynchronous operation. The task result contains datetime or null.</returns>
+        public Task<DateTime?> GetTicketEventStartDateTimeByIdAsync(long ticketId);
     }
 }

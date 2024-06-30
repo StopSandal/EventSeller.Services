@@ -72,7 +72,7 @@ namespace EventSeller.Services.Service
         /// <inheritdoc />
         /// <exception cref="InvalidOperationException">Thrown when the ticket does not exist or is already sold.</exception>
         /// <exception cref="Exception">Thrown when there is an error confirming the payment.</exception>
-        public async Task ConfirmTicketPaymentAsync(string userName, PaymentConfirmationDTO paymentConfirmationDTO)
+        public async Task<TicketTransaction> ConfirmTicketPaymentAsync(string userName, PaymentConfirmationDTO paymentConfirmationDTO)
         {
             var ticketId = paymentConfirmationDTO.TicketId;
             var transactionId = paymentConfirmationDTO.TransactionId;
@@ -124,6 +124,7 @@ namespace EventSeller.Services.Service
             await _unitOfWork.SaveAsync();
 
             _logger.LogInformation("ConfirmTicketPaymentAsync: Ticket sold and transaction saved for TicketId {TicketId}", ticketId);
+            return newTicketTransaction;
         }
 
         /// <inheritdoc />
@@ -163,24 +164,40 @@ namespace EventSeller.Services.Service
             _logger.LogInformation("IsTicketAvailableForPurchaseByIdAsync: Checking availability for TicketId {TicketId}", ticketId);
 
             var ticket = await _ticketService.GetByIDAsync(ticketId);
-            return IsTicketAvailableForPurchase(ticket);
-        }
 
-        /// <inheritdoc />
-        /// <exception cref="InvalidOperationException">Thrown when the ticket does not exist.</exception>
-        public bool IsTicketAvailableForPurchase(Ticket ticket)
-        {
             if (ticket == null)
             {
                 _logger.LogWarning("IsTicketAvailableForPurchase: Ticket is null");
                 throw new InvalidOperationException("Ticket doesn't exist");
             }
 
-            var isAvailable = !ticket.isSold && !_bookingService.IsTicketBooked(ticket);
+            var isNotAvailable = ticket.isSold || _bookingService.IsTicketBooked(ticket);
 
-            _logger.LogInformation("IsTicketAvailableForPurchase: Ticket availability for TicketId {TicketId} is {IsAvailable}", ticket.ID, isAvailable);
+            if (isNotAvailable) 
+            {
+                _logger.LogInformation("IsTicketAvailableForPurchase: Ticket availability for TicketId {TicketId} is {IsAvailable}", ticket.ID, !isNotAvailable);
 
-            return isAvailable;
+                return false;
+            }
+
+            var ticketStartTime = await _ticketService.GetTicketEventStartDateTimeByIdAsync(ticketId);
+
+            if (ticketStartTime.HasValue)
+            {
+                _logger.LogInformation("IsTicketAvailableForPurchase: Ticket {TicketId} StartTime is {ticketStartTime}. Now is {DateTime.UtcNow}", ticket.ID, ticketStartTime.Value, DateTime.UtcNow);
+
+                var isTicketNotExpired = ticketStartTime.Value > DateTime.UtcNow;
+
+                _logger.LogInformation("IsTicketAvailableForPurchase: Ticket availability for TicketId {TicketId} is {IsAvailable}", ticket.ID, isTicketNotExpired);
+
+                return isTicketNotExpired;
+            }
+            else
+            {
+                _logger.LogWarning("IsTicketAvailableForPurchase: TicketStartDateTime is null");
+            }
+            return true;
+
         }
 
         /// <inheritdoc />
@@ -199,8 +216,9 @@ namespace EventSeller.Services.Service
                 _logger.LogWarning("ProcessTicketBuyingAsync: Ticket is null");
                 throw new InvalidOperationException("Ticket doesn't exist");
             }
+            var isTicketAvailable = await IsTicketAvailableForPurchaseByIdAsync(ticketId);
 
-            if (!IsTicketAvailableForPurchase(ticket))
+            if (!isTicketAvailable )
             {
                 _logger.LogWarning("ProcessTicketBuyingAsync: TicketId {TicketId} is not available for purchase", ticketId);
                 throw new InvalidOperationException("Ticket is not available for purchase. Try later.");
@@ -239,6 +257,25 @@ namespace EventSeller.Services.Service
                 throw new InvalidOperationException("Ticket is already returned");
             }
 
+            var ticket = await _ticketService.GetByIDAsync(ticketTransaction.TicketID);
+
+            var ticketEventBegins = await _ticketService.GetTicketEventStartDateTimeByIdAsync(ticketTransaction.TicketID);
+
+            if(ticketEventBegins == null)
+            {
+                _logger.LogWarning("GetFullTicketPriceAsync: ticketEventBegins is null"); // here should be used marked action is ticked was used
+            }
+            else
+            {
+                var minutesForReturn = - ticket.Event.EventType.MinutesForMoneyReturn;
+                var noReturnTime = ticketEventBegins.Value.AddMinutes(minutesForReturn);
+                if (DateTime.UtcNow > noReturnTime)
+                {
+                    _logger.LogWarning("GetFullTicketPriceAsync: Time for return is gone");
+                    throw new InvalidOperationException("Unable to return ticket. Time for return expired.");
+                }
+            }
+
             try
             {
                 await _externalPaymentService.ReturnPaymentAsync(ticketTransaction.TransactionId);
@@ -250,17 +287,9 @@ namespace EventSeller.Services.Service
                 throw;
             }
 
-            ticketTransaction.IsReturned = true;
-            await _unitOfWork.SaveAsync();
-
-            var ticket = await _ticketService.GetByIDAsync(ticketTransaction.TicketID);
-            if (ticket == null)
-            {
-                _logger.LogWarning("ReturnMoneyForPurchaseAsync: TicketId {TicketId} does not exist", ticketTransaction.TicketID);
-                throw new InvalidOperationException("Ticket doesn't exist, but money returned");
-            }
-
             ticket.isSold = false;
+            ticketTransaction.IsReturned = true;
+            
             await _unitOfWork.SaveAsync();
 
             await _bookingService.UnbookTicketByIdAsync(ticket.ID);

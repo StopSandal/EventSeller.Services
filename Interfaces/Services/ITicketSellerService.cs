@@ -1,4 +1,5 @@
 ﻿using DataLayer.Model;
+using EventSeller.DataLayer.Entities;
 using EventSeller.DataLayer.EntitiesDto;
 using System;
 using System.Collections.Generic;
@@ -27,12 +28,6 @@ namespace EventSeller.Services.Interfaces.Services
         /// <returns>A task that represents the asynchronous operation, containing a boolean indicating whether the ticket is available for purchase.</returns>
         Task<bool> IsTicketAvailableForPurchaseByIdAsync(long ticketId);
 
-        /// <summary>
-        /// Checks if a ticket is available for purchase.
-        /// </summary>
-        /// <param name="ticket">The ticket to check.</param>
-        /// <returns>True if the ticket is available for purchase, otherwise false.</returns>
-        bool IsTicketAvailableForPurchase(Ticket ticket);
 
         /// <summary>
         /// Asynchronously processes the purchase of a ticket.
@@ -47,14 +42,14 @@ namespace EventSeller.Services.Interfaces.Services
         /// <param name="userName">The name of the user who made the payment.</param>
         /// <param name="paymentConfirmationDTO">The data transfer object containing the payment confirmation details.</param>
         /// <returns>A task that represents the asynchronous operation.</returns>
-        Task ConfirmTicketPaymentAsync(string userName, PaymentConfirmationDTO paymentConfirmationDTO);
+        Task<TicketTransaction> ConfirmTicketPaymentAsync(string userName, PaymentConfirmationDTO paymentConfirmationDTO);
 
         /// <summary>
         /// Asynchronously cancels the payment for a ticket by its ID and transaction ID.
         /// </summary>
         /// <param name="ticketId">The ID of the ticket.</param>
         /// <param name="transactionId">The ID of the transaction to cancel.</param>
-        /// <returns>A task that represents the asynchronous operation.</returns>
+        /// <returns>A task that represents the asynchronous operation, containing the payment transaction details.</returns>
         Task CancelTicketPaymentAsync(long ticketId, long transactionId);
 
         /// <summary>

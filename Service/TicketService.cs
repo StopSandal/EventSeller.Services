@@ -73,5 +73,21 @@ namespace Services.Service
 
             return ticket.FirstOrDefault();
         }
+
+        public async Task<DateTime?> GetTicketEventStartDateTimeByIdAsync(long ticketId)
+        {
+            string includeProperties = "Event";
+
+            var ticketList = await _unitOfWork.TicketRepository.GetAsync(
+                filter: t => t.ID == ticketId,
+                includeProperties: includeProperties
+            );
+            var ticket = ticketList.FirstOrDefault();
+            if (ticket.Event == null)
+            {
+                throw new InvalidOperationException("Ticket is corrupted");
+            }
+            return ticket.TicketStartDateTime ?? ticket.Event.StartEventDateTime;
+        }
     }
 }
