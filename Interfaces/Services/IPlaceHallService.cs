@@ -48,5 +48,15 @@ namespace EventSeller.Services.Interfaces.Services
         /// <param name="id">The identifier of the place hall to delete.</param>
         /// <returns>A task that represents the asynchronous operation.</returns>
         Task DeleteAsync(long id);
+        /// <summary>
+        /// Asynchronously determines whether an PlaceHall with the specified identifier exists in the data source.
+        /// </summary>
+        /// <param name="id">The identifier of the PlaceHall to search for.</param>
+        /// <returns>
+        /// A task that represents the asynchronous operation. The task result contains 
+        /// a boolean value that indicates whether an PlaceHall with the specified identifier 
+        /// exists in the data source.
+        /// </returns>
+        public Task<bool> DoesExistsByIdAsync(long id);
     }
 }

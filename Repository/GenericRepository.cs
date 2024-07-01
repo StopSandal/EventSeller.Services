@@ -58,9 +58,19 @@ namespace Services.Repository
             return await dbSet.FindAsync(id);
         }
         /// <inheritdoc/>
+        public async virtual Task<bool> DoesExistsAsync(Expression<Func<TEntity, bool>> predicate)
+        {
+            return await dbSet.AnyAsync(predicate);
+        }
+        /// <inheritdoc/>
         public async virtual Task InsertAsync(TEntity entity)
         {
             await dbSet.AddAsync(entity);
+        }
+        /// <inheritdoc/>
+        public async virtual Task InsertRangeAsync(IEnumerable<TEntity> entityList)
+        {
+            await dbSet.AddRangeAsync(entityList);
         }
         /// <inheritdoc/>
         public async virtual Task DeleteAsync(object id)

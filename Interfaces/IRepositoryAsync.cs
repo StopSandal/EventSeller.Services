@@ -56,5 +56,27 @@ namespace EventSeller.Services.Interfaces
         /// </summary>
         /// <param name="entityToUpdate">The entity to update.</param>
         public void Update(TEntity entityToUpdate);
+        /// <summary>
+        /// Asynchronously determines whether any entities in the data source satisfy the specified condition.
+        /// </summary>
+        /// <param name="predicate">An expression to test each entity for a condition.</param>
+        /// <returns>
+        /// A task that represents the asynchronous operation. The task result contains 
+        /// a boolean value that indicates whether any entity exists in the data source 
+        /// that matches the specified condition.
+        /// </returns>
+        /// <example>
+        /// <code>
+        /// bool exists = await repository.DoesExistsAsync(entity => entity.Name == "ExampleName");
+        /// </code>
+        /// This example checks if there is any entity with the name "ExampleName" in the data source.
+        /// </example>
+        public Task<bool> DoesExistsAsync(Expression<Func<TEntity, bool>> predicate);
+        /// <summary>
+        /// Inserts a many new entities into the repository.
+        /// </summary>
+        /// <param name="entityList">The entity List to insert.</param>
+        /// <returns>A task that represents the asynchronous operation.</returns>
+        public Task InsertRangeAsync(IEnumerable<TEntity> entityList);
     }
 }

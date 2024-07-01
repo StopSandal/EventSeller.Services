@@ -32,6 +32,12 @@ namespace Services.Service
             await _unitOfWork.TicketRepository.InsertAsync(_mapper.Map<Ticket>(model));
             await _unitOfWork.SaveAsync();
         }
+        /// <inheritdoc/>
+        public async Task AddTicketListAsync(IEnumerable<Ticket> ticketList)
+        {
+            await _unitOfWork.TicketRepository.InsertRangeAsync(ticketList);
+            await _unitOfWork.SaveAsync();
+        }
 
         /// <inheritdoc/>
         public async Task DeleteAsync(long id)

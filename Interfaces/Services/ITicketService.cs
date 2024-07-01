@@ -62,5 +62,11 @@ namespace EventSeller.Services.Interfaces.Services
         /// <param name="id">The identifier of the ticket.</param>
         /// <returns>A task that represents the asynchronous operation. The task result contains datetime or null.</returns>
         public Task<DateTime?> GetTicketEventStartDateTimeByIdAsync(long ticketId);
+        /// <summary>
+        /// Add a bunch of tickets.
+        /// </summary>
+        /// <param name="ticketList">Collection<see cref="IEnumerable{T}"/> of the tickets <see cref="Ticket"/> to insert .</param>
+        /// <returns>A task that represents the asynchronous operation.</returns>
+        public Task AddTicketListAsync(IEnumerable<Ticket> ticketList);
     }
 }

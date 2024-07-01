@@ -44,6 +44,11 @@ namespace Services.Service
             return _unitOfWork.PlaceHallRepository.GetByIDAsync(id);
         }
         /// <inheritdoc/>
+        public async Task<bool> DoesExistsByIdAsync(long id)
+        {
+            return await _unitOfWork.PlaceHallRepository.DoesExistsAsync(obj => obj.ID==id);
+        }
+        /// <inheritdoc/>
         public Task<IEnumerable<PlaceHall>> GetPlaceHallsAsync()
         {
             return _unitOfWork.PlaceHallRepository.GetAsync();

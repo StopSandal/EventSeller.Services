@@ -57,5 +57,10 @@ namespace Services.Service
             _unitOfWork.EventRepository.Update(item);
             await _unitOfWork.SaveAsync();
         }
+        /// <inheritdoc/>
+        public async Task<bool> DoesExistsByIdAsync(long id)
+        {
+            return await _unitOfWork.EventRepository.DoesExistsAsync(obj => obj.ID == id);
+        }
     }
 }
