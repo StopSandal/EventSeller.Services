@@ -18,8 +18,18 @@ namespace EventSeller.Services.Interfaces.Services
         /// Retrieves an event by its identifier.
         /// </summary>
         /// <param name="id">The identifier of the event.</param>
+        /// <param name="includeProperties">A comma-separated list of related entities to include in the query.</param>
         /// <returns>A task that represents the asynchronous operation. The task result contains the event.</returns>
         Task<Event> GetByIDAsync(long id);
+
+        /// <summary>
+        /// Retrieves an event by its identifier with properties.
+        /// </summary>
+        /// <param name="id">The identifier of the event.</param>
+        /// <param name="includeProperties">A comma-separated list of related entities to include in the query.</param>
+        /// <returns>A task that represents the asynchronous operation. The task result contains the event.</returns>
+        Task<Event> GetWithIncludesByIDAsync(long id, string includeProperties = null);
+
         /// <summary>
         /// Retrieves a collection of all events.
         /// </summary>

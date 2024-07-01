@@ -13,6 +13,8 @@ namespace EventSeller.Services.Service
 {
     public class TicketRegistrationService : ITicketRegistrationService
     {
+        private const string EventIncludedProps = "EventType";
+        
         private readonly ILogger<TicketRegistrationService> _logger;
         private readonly IUnitOfWork _unitOfWork;
         private readonly IPlaceHallService _placeHallService;
@@ -97,7 +99,9 @@ namespace EventSeller.Services.Service
                 throw new InvalidOperationException("Provided start or end rows are wrong");
             }
 
-            var eventWithEventType = new Event(); // stub
+            var eventId = addTicketsForHallToFillDTO.EventID;
+
+            var eventWithEventType = await _eventService.GetWithIncludesByIDAsync(eventId, EventIncludedProps);
 
             if (eventWithEventType == null || eventWithEventType.EventType == null)
             {
@@ -137,22 +141,17 @@ namespace EventSeller.Services.Service
             var ticketEndDateTime = addTicketsForHallToFillDTO.TicketEndDateTime;
             var eventID = addTicketsForHallToFillDTO.EventID;
 
-            var ticketsList = new List<Ticket>(seats.Count());
-
-            foreach (var seat in seats)
+            var ticketsList = seats.Select(seat => new Ticket
             {
-                ticketsList.Add(new Ticket
-                {
-                    Name = name,
-                    Description = description,
-                    Price = price,
-                    CurrencyType = currencyType,
-                    TicketStartDateTime = ticketStartDateTime,
-                    TicketEndDateTime = ticketEndDateTime,
-                    SeatID = seat.ID,
-                    EventID = eventID,
-                });
-            }
+                Name = name,
+                Description = description,
+                Price = price,
+                CurrencyType = currencyType,
+                TicketStartDateTime = ticketStartDateTime,
+                TicketEndDateTime = ticketEndDateTime,
+                SeatID = seat.ID,
+                EventID = eventID,
+            }).ToList();
 
             await _ticketService.AddTicketListAsync(ticketsList);
             _logger.LogInformation("{TicketsCount} tickets added successfully for HallID {HallID} and EventID {EventID}", ticketsList.Count, hallID, eventID);

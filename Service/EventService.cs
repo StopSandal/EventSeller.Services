@@ -43,6 +43,11 @@ namespace Services.Service
             return _unitOfWork.EventRepository.GetByIDAsync(id);
         }
         /// <inheritdoc/>
+        public async Task<Event?> GetWithIncludesByIDAsync(long id,string includeProperties = null)
+        {
+            return (await _unitOfWork.EventRepository.GetAsync(obj => obj.ID==id , null , includeProperties)).FirstOrDefault();
+        }
+        /// <inheritdoc/>
         public Task<IEnumerable<Event>> GetEventsAsync()
         {
             return _unitOfWork.EventRepository.GetAsync();

@@ -12,6 +12,7 @@ namespace Services.Service
     /// <inheritdoc cref="ITicketService"/>
     public class TicketService : ITicketService
     {
+        private const string TicketIncludes = "Event,Event.EventType";
         private readonly IUnitOfWork _unitOfWork;
         private readonly IMapper _mapper;
 
@@ -70,7 +71,7 @@ namespace Services.Service
         }
         public async Task<Ticket> GetTicketWithAllIncudesByIdAsync(long ticketId)
         {
-            string includeProperties = "Event,Event.EventType";
+            string includeProperties = TicketIncludes;
 
             var ticket = await _unitOfWork.TicketRepository.GetAsync(
                 filter: t => t.ID == ticketId,
