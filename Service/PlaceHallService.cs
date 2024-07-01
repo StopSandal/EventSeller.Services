@@ -3,6 +3,8 @@ using DataLayer.Model;
 using DataLayer.Models.PlaceHall;
 using EventSeller.Services.Interfaces;
 using EventSeller.Services.Interfaces.Services;
+using Microsoft.EntityFrameworkCore.Query.SqlExpressions;
+using System.Linq.Expressions;
 
 namespace Services.Service
 {
@@ -28,7 +30,7 @@ namespace Services.Service
         public async Task CreateAsync(AddPlaceHallDto model)
         {
             var item = _mapper.Map<PlaceHall>(model);
-            await ValidateUniqueFields(item, "There is already existing same PlaceHallName for PlaceAddress");
+            await ValidateUniqueFieldsAsync(item, "There is already existing same PlaceHallName for PlaceAddress");
             await _unitOfWork.PlaceHallRepository.InsertAsync(item);
             await _unitOfWork.SaveAsync();
         }
@@ -60,7 +62,7 @@ namespace Services.Service
             if (item == null)
                 throw new NullReferenceException("No PlaceHall to update");
             _mapper.Map(model, item);
-            await ValidateUniqueFields(item, "There is already existing same PlaceHallName for PlaceAddress");
+            await ValidateUniqueFieldsAsync(item, "There is already existing same PlaceHallName for PlaceAddress");
             _unitOfWork.PlaceHallRepository.Update(item);
             await _unitOfWork.SaveAsync();
         }
@@ -71,10 +73,15 @@ namespace Services.Service
         /// <param name="errorMessage">The error message to throw if validation fails.</param>
         /// <returns>A task that represents the asynchronous operation.</returns>
         /// <exception cref="InvalidOperationException">Thrown if a duplicate place hall is found.</exception>
-        private async Task ValidateUniqueFields(PlaceHall model, string errorMessage)
+        private async Task ValidateUniqueFieldsAsync(PlaceHall model, string errorMessage)
         {
             if ((await _unitOfWork.PlaceHallRepository.GetAsync(x => x.HallName == model.HallName && x.PlaceAddressID == x.PlaceAddressID)).Any())
                 throw new InvalidOperationException(errorMessage);
+        }
+        public async Task<IEnumerable<TicketSeat>> GetAllSeatsInRangeByIdAsync(long placeHallId,int minRow, int maxRow) 
+        {
+            Expression<Func<TicketSeat, bool>> filter = ts => ts.HallSector.PlaceHallID == placeHallId && ts.PlaceRow >= minRow && ts.PlaceRow <= maxRow;
+            return await _unitOfWork.TicketSeatRepository.GetAsync(filter,null, "HallSector");
         }
     }
 }

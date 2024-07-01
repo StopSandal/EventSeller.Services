@@ -58,5 +58,14 @@ namespace EventSeller.Services.Interfaces.Services
         /// exists in the data source.
         /// </returns>
         public Task<bool> DoesExistsByIdAsync(long id);
+
+        /// <summary>
+        /// Retrieves all TicketSeats within the specified PlaceHall that fall within the given row bounds.
+        /// </summary>
+        /// <param name="placeHallId">The ID of the PlaceHall to retrieve TicketSeats from.</param>
+        /// <param name="minRow">The minimum row number to include.</param>
+        /// <param name="maxRow">The maximum row number to include.</param>
+        /// <returns>A task that represents the asynchronous operation. The task result contains a collection of TicketSeat entities.</returns>
+        public Task<IEnumerable<TicketSeat>> GetAllSeatsInRangeByIdAsync(long placeHallId, int minRow, int maxRow);
     }
 }
