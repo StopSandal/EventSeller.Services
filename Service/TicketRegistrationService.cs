@@ -16,23 +16,23 @@ namespace EventSeller.Services.Service
         private const string EventIncludedProps = "EventType";
         
         private readonly ILogger<TicketRegistrationService> _logger;
-        private readonly IUnitOfWork _unitOfWork;
         private readonly IPlaceHallService _placeHallService;
         private readonly IEventService _eventService;
         private readonly ITicketService _ticketService;
+        private readonly IEventSessionService _eventSessionService;
 
         public TicketRegistrationService(
             ILogger<TicketRegistrationService> logger,
-            IUnitOfWork unitOfWork,
             IPlaceHallService placeHallService,
             IEventService eventService,
-            ITicketService ticketService)
+            ITicketService ticketService,
+            IEventSessionService eventSessionService)
         {
             _logger = logger;
-            _unitOfWork = unitOfWork;
             _placeHallService = placeHallService;
             _eventService = eventService;
             _ticketService = ticketService;
+            _eventSessionService = eventSessionService;
         }
 
         public async Task<IEnumerable<Ticket>> AddTicketsForPlaceHallByCountAsync(AddTicketsForHallByCountDTO addTicketsForHallByCountDTO)
@@ -44,10 +44,10 @@ namespace EventSeller.Services.Service
                 _logger.LogError("Ticket count cannot be lesser than 0");
                 throw new InvalidOperationException("Ticket count cannot be lesser than 0");
             }
-
-            if (!await _eventService.DoesExistsByIdAsync(addTicketsForHallByCountDTO.EventID))
+            var eventId = addTicketsForHallByCountDTO.addEventSessionDTO.EventID;
+            if (!await _eventService.DoesExistsByIdAsync(eventId))
             {
-                _logger.LogError("Event with ID {EventID} does not exist", addTicketsForHallByCountDTO.EventID);
+                _logger.LogError("Event with ID {EventID} does not exist", eventId);
                 throw new InvalidOperationException("Event doesn't exist");
             }
 
@@ -56,15 +56,13 @@ namespace EventSeller.Services.Service
                 _logger.LogError("Hall with ID {HallID} does not exist", addTicketsForHallByCountDTO.HallID);
                 throw new InvalidOperationException("Hall doesn't exist");
             }
+            var eventSession = await _eventSessionService.CreateAsync(addTicketsForHallByCountDTO.addEventSessionDTO);
 
             var name = addTicketsForHallByCountDTO.Name;
             var description = addTicketsForHallByCountDTO.Description;
             var price = addTicketsForHallByCountDTO.Price;
             var currencyType = addTicketsForHallByCountDTO.CurrencyType;
-            var ticketStartDateTime = addTicketsForHallByCountDTO.TicketStartDateTime;
-            var ticketEndDateTime = addTicketsForHallByCountDTO.TicketEndDateTime;
             var hallID = addTicketsForHallByCountDTO.HallID;
-            var eventID = addTicketsForHallByCountDTO.EventID;
 
             var ticketList = Enumerable.Range(0, addTicketsForHallByCountDTO.TicketsCount)
                                        .Select(_ => new Ticket
@@ -73,15 +71,12 @@ namespace EventSeller.Services.Service
                                            Description = description,
                                            Price = price,
                                            CurrencyType = currencyType,
-                                           TicketStartDateTime = ticketStartDateTime,
-                                           TicketEndDateTime = ticketEndDateTime,
-                                           HallID = hallID,
-                                           EventID = eventID,
+                                           EventSessionID = eventSession.Id
                                        })
                                        .ToList();
 
             await _ticketService.AddTicketListAsync(ticketList);
-            _logger.LogInformation("{TicketsCount} tickets added successfully for HallID {HallID} and EventID {EventID}", addTicketsForHallByCountDTO.TicketsCount, hallID, eventID);
+            _logger.LogInformation("{TicketsCount} tickets added successfully for HallID {HallID} and EventID {EventID}", addTicketsForHallByCountDTO.TicketsCount, hallID, eventId);
 
             return ticketList;
         }
@@ -99,7 +94,7 @@ namespace EventSeller.Services.Service
                 throw new InvalidOperationException("Provided start or end rows are wrong");
             }
 
-            var eventId = addTicketsForHallToFillDTO.EventID;
+            var eventId = addTicketsForHallToFillDTO.addEventSessionDTO.EventID;
 
             var eventWithEventType = await _eventService.GetWithIncludesByIDAsync(eventId, EventIncludedProps);
 
@@ -125,6 +120,8 @@ namespace EventSeller.Services.Service
                 throw new InvalidOperationException("Hall doesn't exist");
             }
 
+            var eventSession = await _eventSessionService.CreateAsync(addTicketsForHallToFillDTO.addEventSessionDTO);
+
             var seats = await _placeHallService.GetAllSeatsInRangeByIdAsync(hallID, startRow, endRow);
 
             if (!seats.Any())
@@ -137,9 +134,6 @@ namespace EventSeller.Services.Service
             var description = addTicketsForHallToFillDTO.Description;
             var price = addTicketsForHallToFillDTO.Price;
             var currencyType = addTicketsForHallToFillDTO.CurrencyType;
-            var ticketStartDateTime = addTicketsForHallToFillDTO.TicketStartDateTime;
-            var ticketEndDateTime = addTicketsForHallToFillDTO.TicketEndDateTime;
-            var eventID = addTicketsForHallToFillDTO.EventID;
 
             var ticketsList = seats.Select(seat => new Ticket
             {
@@ -147,14 +141,12 @@ namespace EventSeller.Services.Service
                 Description = description,
                 Price = price,
                 CurrencyType = currencyType,
-                TicketStartDateTime = ticketStartDateTime,
-                TicketEndDateTime = ticketEndDateTime,
                 SeatID = seat.ID,
-                EventID = eventID,
+                EventSessionID = eventSession.Id
             }).ToList();
 
             await _ticketService.AddTicketListAsync(ticketsList);
-            _logger.LogInformation("{TicketsCount} tickets added successfully for HallID {HallID} and EventID {EventID}", ticketsList.Count, hallID, eventID);
+            _logger.LogInformation("{TicketsCount} tickets added successfully for HallID {HallID} and EventID {EventID}", ticketsList.Count, hallID, eventId);
 
             return ticketsList;
         }

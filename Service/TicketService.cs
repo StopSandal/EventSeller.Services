@@ -12,7 +12,6 @@ namespace Services.Service
     /// <inheritdoc cref="ITicketService"/>
     public class TicketService : ITicketService
     {
-        private const string TicketIncludes = "Event,Event.EventType";
         private readonly IUnitOfWork _unitOfWork;
         private readonly IMapper _mapper;
 
@@ -69,32 +68,14 @@ namespace Services.Service
             _unitOfWork.TicketRepository.Update(item);
             await _unitOfWork.SaveAsync();
         }
-        public async Task<Ticket> GetTicketWithAllIncudesByIdAsync(long ticketId)
+        public async Task<Ticket> GetTicketWithIncudesByIdAsync(long ticketId,string includes)
         {
-            string includeProperties = TicketIncludes;
-
             var ticket = await _unitOfWork.TicketRepository.GetAsync(
                 filter: t => t.ID == ticketId,
-                includeProperties: includeProperties
+                includeProperties: includes
             );
 
             return ticket.FirstOrDefault();
-        }
-
-        public async Task<DateTime?> GetTicketEventStartDateTimeByIdAsync(long ticketId)
-        {
-            string includeProperties = "Event";
-
-            var ticketList = await _unitOfWork.TicketRepository.GetAsync(
-                filter: t => t.ID == ticketId,
-                includeProperties: includeProperties
-            );
-            var ticket = ticketList.FirstOrDefault();
-            if (ticket.Event == null)
-            {
-                throw new InvalidOperationException("Ticket is corrupted");
-            }
-            return ticket.TicketStartDateTime ?? ticket.Event.StartEventDateTime;
         }
     }
 }

@@ -45,6 +45,14 @@ namespace EventSeller.Services.Interfaces
         /// Gets the repository for <see cref="TicketSeat"/> entities.
         /// </summary>
         IRepositoryAsync<TicketTransaction> TicketTransactionRepository { get; }
+        /// <summary>
+        /// Gets the repository for <see cref="EventType"/> entities.
+        /// </summary>
+        IRepositoryAsync<EventType> EventTypeRepository { get; }
+        /// <summary>
+        /// Gets the repository for <see cref="EventSession"/> entities.
+        /// </summary>
+        IRepositoryAsync<EventSession> EventSessionRepository { get; }
 
         /// <summary>
         /// Saves all changes made in this unit of work to the underlying database.

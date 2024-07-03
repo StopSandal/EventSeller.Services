@@ -16,7 +16,10 @@ namespace EventSeller.Services.Service
     /// </summary>
     public class TicketSellerService : ITicketSellerService
     {
+        private const string TicketIncludesToEventType = "EventSession,EventSession.Event,EventSession.Event.EventType";
+
         private readonly ITicketService _ticketService;
+        private readonly IEventSessionService _eventSessionService;
         private readonly IBookingService _bookingService;
         private readonly IExternalPaymentService _externalPaymentService;
         private readonly IUnitOfWork _unitOfWork;
@@ -28,6 +31,7 @@ namespace EventSeller.Services.Service
         /// Initializes a new instance of the <see cref="TicketSellerService"/> class.
         /// </summary>
         /// <param name="ticketService">The ticket service.</param>
+        /// <param name="eventSessionService">The event session service.</param>
         /// <param name="unitOfWork">The unit of work.</param>
         /// <param name="bookingService">The booking service.</param>
         /// <param name="externalPaymentService">The external payment service.</param>
@@ -41,7 +45,8 @@ namespace EventSeller.Services.Service
             IExternalPaymentService externalPaymentService,
             IMapper mapper,
             IUserService userService,
-            ILogger<TicketSellerService> logger)
+            ILogger<TicketSellerService> logger,
+            IEventSessionService eventSessionService)
         {
             _ticketService = ticketService;
             _unitOfWork = unitOfWork;
@@ -50,6 +55,7 @@ namespace EventSeller.Services.Service
             _mapper = mapper;
             _userService = userService;
             _logger = logger;
+            _eventSessionService = eventSessionService;
         }
 
         /// <inheritdoc />
@@ -133,9 +139,9 @@ namespace EventSeller.Services.Service
         {
             _logger.LogInformation("GetFullTicketPriceAsync: Getting full ticket price for TicketId {TicketId}", ticketId);
 
-            var ticket = await _ticketService.GetTicketWithAllIncudesByIdAsync(ticketId);
+            var ticket = await _ticketService.GetTicketWithIncudesByIdAsync(ticketId, TicketIncludesToEventType);
 
-            if (ticket == null || ticket.Event == null || ticket.Event.EventType==null)
+            if (ticket == null || ticket.EventSession == null || ticket.EventSession.Event == null || ticket.EventSession.Event.EventType==null)
             {
                 _logger.LogWarning("GetFullTicketPriceAsync: Ticket is null or one of it's parents");
                 throw new InvalidOperationException("Ticket doesn't exist or corrupted");
@@ -143,7 +149,7 @@ namespace EventSeller.Services.Service
 
             _logger.LogInformation("GetFullTicketPriceAsync: Full ticket price retrieved for TicketId {TicketId}", ticketId);
 
-            var bookingFeePercentage = ticket.Event.EventType.BookingFeePercentage;
+            var bookingFeePercentage = ticket.EventSession.Event.EventType.BookingFeePercentage;
             var bookingAmount = ticket.Price * (bookingFeePercentage / 100);
 
             return new TicketPriceInfoDTO
@@ -180,23 +186,21 @@ namespace EventSeller.Services.Service
                 return false;
             }
 
-            var ticketStartTime = await _ticketService.GetTicketEventStartDateTimeByIdAsync(ticketId);
+            var ticketSession = await _eventSessionService.GetByIDAsync(ticket.EventSessionID);
 
-            if (ticketStartTime.HasValue)
+            if (ticketSession == null) 
             {
-                _logger.LogInformation("IsTicketAvailableForPurchase: Ticket {TicketId} StartTime is {ticketStartTime}. Now is {DateTime.UtcNow}", ticket.ID, ticketStartTime.Value, DateTime.UtcNow);
-
-                var isTicketNotExpired = ticketStartTime.Value > DateTime.UtcNow;
-
-                _logger.LogInformation("IsTicketAvailableForPurchase: Ticket availability for TicketId {TicketId} is {IsAvailable}", ticket.ID, isTicketNotExpired);
-
-                return isTicketNotExpired;
+                _logger.LogWarning("IsTicketAvailableForPurchase: EventSession is null");
+                throw new InvalidOperationException("Ticket doesn't exist");
             }
-            else
-            {
-                _logger.LogWarning("IsTicketAvailableForPurchase: TicketStartDateTime is null");
-            }
-            return true;
+            var ticketStartTime = ticketSession.StartSessionDateTime;
+            _logger.LogInformation("IsTicketAvailableForPurchase: Ticket {TicketId} StartTime is {ticketStartTime}. Now is {DateTime.UtcNow}", ticket.ID, ticketStartTime, DateTime.UtcNow);
+
+            var isTicketActive = ticketStartTime > DateTime.UtcNow;
+
+            _logger.LogInformation("IsTicketAvailableForPurchase: Ticket availability for TicketId {TicketId} is {IsAvailable}", ticket.ID, isTicketActive);
+
+            return isTicketActive;
 
         }
 
@@ -257,25 +261,26 @@ namespace EventSeller.Services.Service
                 throw new InvalidOperationException("Ticket is already returned");
             }
 
-            var ticket = await _ticketService.GetByIDAsync(ticketTransaction.TicketID);
+            var ticketId = ticketTransaction.TicketID;
+            var ticket = await _ticketService.GetTicketWithIncudesByIdAsync(ticketId, TicketIncludesToEventType);
 
-            var ticketEventBegins = await _ticketService.GetTicketEventStartDateTimeByIdAsync(ticketTransaction.TicketID);
-
-            if(ticketEventBegins == null)
+            if (ticket == null || ticket.EventSession == null || ticket.EventSession.Event == null || ticket.EventSession.Event.EventType == null)
             {
-                _logger.LogWarning("GetFullTicketPriceAsync: ticketEventBegins is null"); // here should be used marked action is ticked was used
-            }
-            else
-            {
-                var minutesForReturn = - ticket.Event.EventType.MinutesForMoneyReturn;
-                var noReturnTime = ticketEventBegins.Value.AddMinutes(minutesForReturn);
-                if (DateTime.UtcNow > noReturnTime)
-                {
-                    _logger.LogWarning("GetFullTicketPriceAsync: Time for return is gone");
-                    throw new InvalidOperationException("Unable to return ticket. Time for return expired.");
-                }
+                _logger.LogWarning("ReturnMoneyForPurchaseAsync: Ticket is null or one of it's parents");
+                throw new InvalidOperationException("Ticket doesn't exist or corrupted");
             }
 
+            var ticketEventBegins = ticket.EventSession.StartSessionDateTime;
+
+            var minutesForReturn = - ticket.EventSession.Event.EventType.MinutesForMoneyReturn;
+            var noReturnTime = ticketEventBegins.AddMinutes(minutesForReturn);
+
+            if (DateTime.UtcNow > noReturnTime)
+            {
+                _logger.LogWarning("GetFullTicketPriceAsync: Time for return is gone");
+                throw new InvalidOperationException("Unable to return ticket. Time for return expired.");
+            }
+            
             try
             {
                 await _externalPaymentService.ReturnPaymentAsync(ticketTransaction.TransactionId);

@@ -52,16 +52,11 @@ namespace EventSeller.Services.Interfaces.Services
         /// <summary>
         /// Retrieves a ticket with it's parent properties by its identifier.
         /// </summary>
-        /// <param name="id">The identifier of the ticket.</param>
+        /// <param name="ticketId">The identifier of the ticket.</param>
+        /// <param name="includes">A comma-separated list of related entities to include in the query.</param>
         /// <returns>A task that represents the asynchronous operation. The task result contains the ticket.</returns>
-        public Task<Ticket> GetTicketWithAllIncudesByIdAsync(long ticketId);
+        public Task<Ticket> GetTicketWithIncudesByIdAsync(long ticketId, string includes);
 
-        /// <summary>
-        /// Retrieves a datetime of event or ticket start by its identifier.
-        /// </summary>
-        /// <param name="id">The identifier of the ticket.</param>
-        /// <returns>A task that represents the asynchronous operation. The task result contains datetime or null.</returns>
-        public Task<DateTime?> GetTicketEventStartDateTimeByIdAsync(long ticketId);
         /// <summary>
         /// Add a bunch of tickets.
         /// </summary>

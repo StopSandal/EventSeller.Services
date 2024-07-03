@@ -15,6 +15,8 @@ namespace Services
     {
         private readonly SellerContext context;
         private IRepositoryAsync<Event> eventRepository;
+        private IRepositoryAsync<EventType> eventTypeRepository;
+        private IRepositoryAsync<EventSession> eventSessionRepository;
         private IRepositoryAsync<HallSector> hallSectorRepository;
         private IRepositoryAsync<PlaceAddress> placeAddressRepository;
         private IRepositoryAsync<PlaceHall> placeHallRepository;
@@ -110,6 +112,30 @@ namespace Services
                     this.ticketTransactionRepository = new GenericRepository<TicketTransaction>(context);
                 }
                 return ticketTransactionRepository;
+            }
+        }
+        /// <inheritdoc />
+        public IRepositoryAsync<EventType> EventTypeRepository
+        {
+            get
+            {
+                if (this.eventTypeRepository == null)
+                {
+                    this.eventTypeRepository = new GenericRepository<EventType>(context);
+                }
+                return eventTypeRepository;
+            }
+        }
+        /// <inheritdoc />
+        public IRepositoryAsync<EventSession> EventSessionRepository
+        {
+            get
+            {
+                if (this.eventSessionRepository == null)
+                {
+                    this.eventSessionRepository = new GenericRepository<EventSession>(context);
+                }
+                return eventSessionRepository;
             }
         }
 
