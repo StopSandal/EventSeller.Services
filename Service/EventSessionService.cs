@@ -7,6 +7,7 @@ using EventSeller.Services.Interfaces.Services;
 using System;
 using System.Collections.Generic;
 using System.Linq;
+using System.Linq.Expressions;
 using System.Text;
 using System.Threading.Tasks;
 
@@ -55,6 +56,11 @@ namespace EventSeller.Services.Service
             _mapper.Map(model, item);
             _unitOfWork.EventSessionRepository.Update(item);
             await _unitOfWork.SaveAsync();
+        }
+        /// <inheritdoc/>
+        public async Task<IEnumerable<TField>> GetFieldValuesAsync<TField>(Expression<Func<EventSession, bool>> filter, Expression<Func<EventSession, TField>> selector)
+        {
+            return await _unitOfWork.EventSessionRepository.GetFieldValuesAsync(filter, selector);
         }
     }
 }

@@ -1,8 +1,11 @@
 ﻿using AutoMapper;
 using DataLayer.Model;
+using DataLayer.Model.EF;
 using DataLayer.Models.Ticket;
 using EventSeller.Services.Interfaces;
 using EventSeller.Services.Interfaces.Services;
+using Microsoft.EntityFrameworkCore;
+using System.Linq.Expressions;
 
 namespace Services.Service
 {
@@ -68,6 +71,7 @@ namespace Services.Service
             _unitOfWork.TicketRepository.Update(item);
             await _unitOfWork.SaveAsync();
         }
+        /// <inheritdoc/>
         public async Task<Ticket> GetTicketWithIncudesByIdAsync(long ticketId,string includes)
         {
             var ticket = await _unitOfWork.TicketRepository.GetAsync(
@@ -76,6 +80,16 @@ namespace Services.Service
             );
 
             return ticket.FirstOrDefault();
+        }
+        /// <inheritdoc/>
+        public async Task<IEnumerable<TField>> GetFieldValuesAsync<TField>(Expression<Func<Ticket, bool>> filter, Expression<Func<Ticket, TField>> selector)
+        {
+            return await _unitOfWork.TicketRepository.GetFieldValuesAsync(filter, selector);
+        }
+        /// <inheritdoc/>
+        public async Task<int> GetTicketCountAsync(Expression<Func<Ticket,bool>> filter)
+        {
+            return await _unitOfWork.TicketRepository.GetCountAsync(filter);
         }
     }
 }

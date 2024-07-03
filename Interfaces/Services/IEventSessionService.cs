@@ -4,6 +4,7 @@ using EventSeller.DataLayer.EntitiesDto.EventSession;
 using System;
 using System.Collections.Generic;
 using System.Linq;
+using System.Linq.Expressions;
 using System.Text;
 using System.Threading.Tasks;
 
@@ -42,5 +43,13 @@ namespace EventSeller.Services.Interfaces.Services
         /// <param name="id">The identifier of the session to delete.</param>
         /// <returns>A task that represents the asynchronous operation.</returns>
         Task DeleteAsync(long id);
+        /// <summary>
+        /// Retrieves a collection of values for a specific field from event session that match the filter.
+        /// </summary>
+        /// <typeparam name="TField">The type of the field to retrieve.</typeparam>
+        /// <param name="filter">An expression to filter the event sessions.</param>
+        /// <param name="selector">An expression to select the field to retrieve.</param>
+        /// <returns>A task that represents the asynchronous operation. The task result contains a collection of field values.</returns>
+        public Task<IEnumerable<TField>> GetFieldValuesAsync<TField>(Expression<Func<EventSession, bool>> filter, Expression<Func<EventSession, TField>> selector);
     }
 }

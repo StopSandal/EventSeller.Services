@@ -93,5 +93,20 @@ namespace Services.Repository
             dbSet.Attach(entityToUpdate);
             context.Entry(entityToUpdate).State = EntityState.Modified;
         }
+        /// <inheritdoc/>
+        public virtual async Task<IEnumerable<TField>> GetFieldValuesAsync<TField>(Expression<Func<TEntity, bool>> filter, Expression<Func<TEntity, TField>> selector)
+        {
+            return await context.Set<TEntity>()
+                .Where(filter)
+                .Select(selector)
+                .ToListAsync();
+        }
+        /// <inheritdoc/>
+        public virtual async Task<int> GetCountAsync(Expression<Func<TEntity, bool>> filter)
+        {
+            return await context.Set<TEntity>()
+                .Where(filter)
+                .CountAsync();
+        }
     }
 }

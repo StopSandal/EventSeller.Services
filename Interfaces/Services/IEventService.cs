@@ -3,6 +3,7 @@ using DataLayer.Models.Event;
 using System;
 using System.Collections.Generic;
 using System.Linq;
+using System.Linq.Expressions;
 using System.Text;
 using System.Threading.Tasks;
 
@@ -64,5 +65,13 @@ namespace EventSeller.Services.Interfaces.Services
         /// exists in the data source.
         /// </returns>
         public Task<bool> DoesExistsByIdAsync(long id);
+        /// <summary>
+        /// Retrieves a collection of values for a specific field from event that match the filter.
+        /// </summary>
+        /// <typeparam name="TField">The type of the field to retrieve.</typeparam>
+        /// <param name="filter">An expression to filter the events.</param>
+        /// <param name="selector">An expression to select the field to retrieve.</param>
+        /// <returns>A task that represents the asynchronous operation. The task result contains a collection of field values.</returns>
+        public Task<IEnumerable<TField>> GetFieldValuesAsync<TField>(Expression<Func<Event, bool>> filter, Expression<Func<Event, TField>> selector);
     }
 }

@@ -3,6 +3,7 @@ using DataLayer.Model;
 using DataLayer.Models.Event;
 using EventSeller.Services.Interfaces;
 using EventSeller.Services.Interfaces.Services;
+using System.Linq.Expressions;
 
 namespace Services.Service
 {
@@ -66,6 +67,11 @@ namespace Services.Service
         public async Task<bool> DoesExistsByIdAsync(long id)
         {
             return await _unitOfWork.EventRepository.DoesExistsAsync(obj => obj.ID == id);
+        }
+        /// <inheritdoc/>
+        public async Task<IEnumerable<TField>> GetFieldValuesAsync<TField>(Expression<Func<Event, bool>> filter, Expression<Func<Event, TField>> selector)
+        {
+            return await _unitOfWork.EventRepository.GetFieldValuesAsync(filter, selector);
         }
     }
 }

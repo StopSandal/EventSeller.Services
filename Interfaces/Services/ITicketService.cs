@@ -3,6 +3,7 @@ using DataLayer.Models.Ticket;
 using System;
 using System.Collections.Generic;
 using System.Linq;
+using System.Linq.Expressions;
 using System.Text;
 using System.Threading.Tasks;
 
@@ -63,5 +64,19 @@ namespace EventSeller.Services.Interfaces.Services
         /// <param name="ticketList">Collection<see cref="IEnumerable{T}"/> of the tickets <see cref="Ticket"/> to insert .</param>
         /// <returns>A task that represents the asynchronous operation.</returns>
         public Task AddTicketListAsync(IEnumerable<Ticket> ticketList);
+        /// <summary>
+        /// Asynchronously counts the number of tickets that match the specified filter.
+        /// </summary>
+        /// <param name="filter">An expression to filter the tickets.</param>
+        /// <returns>A task that represents the asynchronous operation. The task result contains the count of matching tickets.</returns>
+        public Task<int> GetTicketCountAsync(Expression<Func<Ticket, bool>> filter);
+        /// <summary>
+        /// Retrieves a collection of values for a specific field from ticket that match the filter.
+        /// </summary>
+        /// <typeparam name="TField">The type of the field to retrieve.</typeparam>
+        /// <param name="filter">An expression to filter the tickets.</param>
+        /// <param name="selector">An expression to select the field to retrieve.</param>
+        /// <returns>A task that represents the asynchronous operation. The task result contains a collection of field values.</returns>
+        public Task<IEnumerable<TField>> GetFieldValuesAsync<TField>(Expression<Func<Ticket, bool>> filter, Expression<Func<Ticket, TField>> selector);
     }
 }
