@@ -232,14 +232,23 @@ namespace EventSeller.Services.Service
             _logger.LogInformation("ProcessTicketBuyingAsync: TicketId {TicketId} booked temporarily", ticketId);
 
             var paymentInfo = await GetFullTicketPriceAsync(ticket.ID);
-            var response = await _externalPaymentService.ProcessPaymentAsync(cardId, paymentInfo.TotalAmount, paymentInfo.CurrencyType, paymentInfo.BookingAmount);
+            try
+            {
+                var response = await _externalPaymentService.ProcessPaymentAsync(cardId, paymentInfo.TotalAmount, paymentInfo.CurrencyType, paymentInfo.BookingAmount);
+                _logger.LogInformation("ProcessTicketBuyingAsync: Payment was successfully processed");
+                var result = _mapper.Map<PaymentConfirmationDTO>(response);
+                result.TicketId = ticketId;
 
-            var result = _mapper.Map<PaymentConfirmationDTO>(response);
-            result.TicketId = ticketId;
+                _logger.LogInformation("ProcessTicketBuyingAsync: Ticket buying processed successfully for TicketId {TicketId}", ticketId);
 
-            _logger.LogInformation("ProcessTicketBuyingAsync: Ticket buying processed successfully for TicketId {TicketId}", ticketId);
-
-            return result;
+                return result;
+            }
+            catch
+            {
+                _logger.LogInformation("ProcessTicketBuyingAsync: Payment was processed with error");
+                await _bookingService.UnbookTicketByIdAsync(ticket.ID);
+                throw;
+            }
         }
 
         /// <inheritdoc />
