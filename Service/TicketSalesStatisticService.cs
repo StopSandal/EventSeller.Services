@@ -1,11 +1,10 @@
 ﻿using DataLayer.Model;
+using EventSeller.DataLayer.Entities;
 using EventSeller.DataLayer.EntitiesDto.Statistics;
+using EventSeller.Services.Helpers;
 using EventSeller.Services.Interfaces.Services;
-using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
+using Microsoft.Extensions.Logging;
+using System.Linq.Expressions;
 
 namespace EventSeller.Services.Service
 {
@@ -14,59 +13,83 @@ namespace EventSeller.Services.Service
         private readonly ITicketService _ticketService;
         private readonly IEventService _eventService;
         private readonly IEventSessionService _eventSessionService;
-        public Task<SalesStatisticsDTO> GetSalesStatisticForDayAsync(DateTime dayDate)
+        private readonly ILogger<TicketSalesStatisticService> _logger;
+        private readonly Expression<Func<Ticket, bool>> soldFilter = ticket => ticket.isSold;
+
+        private const string TicketEventSessionPropertyInclude = nameof(EventSession);
+        private const string TicketEventPropertyInclude = $"{nameof(EventSession)}.{nameof(Event)}";
+
+        public TicketSalesStatisticService(ITicketService ticketService, IEventService eventService, IEventSessionService eventSessionService, ILogger<TicketSalesStatisticService> logger)
         {
-            throw new NotImplementedException();
+            _ticketService = ticketService;
+            _eventService = eventService;
+            _eventSessionService = eventSessionService;
+            _logger = logger;
         }
 
         public async Task<SalesStatisticsDTO> GetSalesStatisticForEventAsync(long eventId)
         {
-            var eventSessionsIds = await _eventSessionService.GetFieldValuesAsync(obj => obj.EventID==eventId, obj => obj.Id);
-
-            var ticketsIds = await _ticketService.GetFieldValuesAsync(ticket => eventSessionsIds.Contains(ticket.EventSessionID), obj => obj.ID);
-
-            return await GetTicketsStatisticAsync(ticketsIds);
+            return await GetTicketsStatisticAsync(ticket => ticket.EventSession.EventID == eventId, [TicketEventSessionPropertyInclude] );
+        }
+        public async Task<SalesStatisticsDTO> GetSalesStatisticForEventAndSessionAsync(long eventId, long eventSessionId)
+        {
+            return await GetTicketsStatisticAsync(
+                ticket => ticket.EventSession.EventID == eventId 
+                && ticket.EventSessionID == eventSessionId
+                , [TicketEventSessionPropertyInclude]);
         }
 
-        public async Task<SalesStatisticsDTO> GetSalesStatisticForEventAsync(IEnumerable<long> eventIds)
+        public async Task<SalesStatisticsDTO> GetSalesStatisticForEventsAsync(IEnumerable<long> eventIds)
         {
-            var eventSessionsIds = await _eventSessionService.GetFieldValuesAsync(obj => eventIds.Contains(obj.EventID), obj => obj.Id);
-
-            var ticketsIds = await _ticketService.GetFieldValuesAsync(ticket => eventSessionsIds.Contains(ticket.EventSessionID), obj => obj.ID);
-
-            return await GetTicketsStatisticAsync(ticketsIds);
+            return await GetTicketsStatisticAsync(ticket => eventIds.Contains(ticket.EventSession.EventID), [TicketEventSessionPropertyInclude]);
         }
 
         public async Task<SalesStatisticsDTO> GetSalesStatisticForEventSessionAsync(long eventSessionId)
         {
-            var ticketsIds = await _ticketService.GetFieldValuesAsync(ticket => ticket.EventSessionID==eventSessionId, obj => obj.ID);
-
-            return await GetTicketsStatisticAsync(ticketsIds);
+            return await GetTicketsStatisticAsync(ticket => ticket.EventSessionID == eventSessionId);
         }
 
-        public Task<SalesStatisticsDTO> GetSalesStatisticForEventTypeAsync(long eventTypeId)
+        public async Task<SalesStatisticsDTO> GetSalesStatisticForEventSessionsAsync(IEnumerable<long> eventSessionIds)
         {
-            throw new NotImplementedException();
+            return await GetTicketsStatisticAsync(ticket => eventSessionIds.Contains(ticket.EventSessionID));
+        }
+
+        public async Task<SalesStatisticsDTO> GetSalesStatisticForEventTypeAsync(long eventTypeId)
+        {
+            return await GetTicketsStatisticAsync(ticket =>ticket.EventSession.Event.EventTypeID==eventTypeId, [TicketEventSessionPropertyInclude,TicketEventPropertyInclude]);
         }
 
         public async Task<SalesStatisticsDTO> GetSalesStatisticForPeriodAsync(DateTime firstPeriod, DateTime secondPeriod)
         {
-            //var ticketsIds = await _ticketService.GetFieldValuesAsync(ticket => ticket.)
+            return await GetTicketsStatisticAsync(
+                ticket => ticket.EventSession.StartSessionDateTime > firstPeriod 
+                && ticket.EventSession.StartSessionDateTime <= secondPeriod
+                , [TicketEventSessionPropertyInclude]);
         }
 
-        public Task<SalesStatisticsDTO> GetSalesStatisticForWeekAsync(DateTime weekStartDate)
+        public async Task<SalesStatisticsDTO> GetSalesStatisticForWeekAsync(DateTime weekStartDate)
         {
-            throw new NotImplementedException();
+            var weekEndDate = weekStartDate.Date.AddDays(7);
+            return await GetSalesStatisticForPeriodAsync(weekStartDate, weekEndDate);
         }
-        private async Task<SalesStatisticsDTO> GetTicketsStatisticAsync(IEnumerable<long> ticketsIds) 
+        public async Task<SalesStatisticsDTO> GetSalesStatisticForDayAsync(DateTime dayDate)
+        {
+            var dayStartTime = dayDate.Date;
+            var dayEndTime = dayStartTime.AddDays(1);
+            return await GetSalesStatisticForPeriodAsync(dayStartTime, dayEndTime);
+        }
+
+        private async Task<SalesStatisticsDTO> GetTicketsStatisticAsync(Expression<Func<Ticket,bool>> ticketFilter, IEnumerable<string> includes = null)
         {
             var statisticDTO = new SalesStatisticsDTO();
 
-            statisticDTO.TotalTickets =  ticketsIds.Count();
-            statisticDTO.Sold = await _ticketService.GetTicketCountAsync(ticket => ticket.isSold);
+            statisticDTO.TotalTickets = await _ticketService.GetTicketCountAsync(ticketFilter, includes);
+
+            var soldTicketsFilter = ticketFilter.AddAlso(ticket => ticket.isSold);
+
+            statisticDTO.Sold = await _ticketService.GetTicketCountAsync(soldTicketsFilter,includes);
 
             return statisticDTO;
-
         }
     }
 }

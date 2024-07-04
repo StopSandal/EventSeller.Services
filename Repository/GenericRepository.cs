@@ -4,6 +4,7 @@ using Microsoft.EntityFrameworkCore;
 using System.Linq.Expressions;
 using System.Reflection;
 using EventSeller.Services.Interfaces;
+using static Microsoft.EntityFrameworkCore.DbLoggerCategory;
 
 namespace Services.Repository
 {
@@ -102,11 +103,24 @@ namespace Services.Repository
                 .ToListAsync();
         }
         /// <inheritdoc/>
-        public virtual async Task<int> GetCountAsync(Expression<Func<TEntity, bool>> filter)
+        public virtual async Task<int> GetCountAsync(Expression<Func<TEntity, bool>> filter = null, IEnumerable<string> includeProperties = null)
         {
-            return await context.Set<TEntity>()
-                .Where(filter)
-                .CountAsync();
+            IQueryable<TEntity> query = dbSet;
+
+            if (filter != null)
+            {
+                query = query.Where(filter);
+            }
+
+            if(includeProperties != null)
+            {
+                foreach (var includeProperty in includeProperties)
+                {
+                    query = query.Include(includeProperty);
+                }
+            }
+
+            return await query.CountAsync();
         }
     }
 }

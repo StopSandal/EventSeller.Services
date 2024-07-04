@@ -90,7 +90,8 @@ namespace EventSeller.Services.Interfaces
         /// Asynchronously counts the number of entities that match the specified filter.
         /// </summary>
         /// <param name="filter">An expression to filter the entities.</param>
+        /// <param name="includeProperties">A list of related entities props to include in the query.</param>
         /// <returns>A task that represents the asynchronous operation. The task result contains the count of matching entities.</returns>
-        public Task<int> GetCountAsync(Expression<Func<TEntity, bool>> filter);
+        public Task<int> GetCountAsync(Expression<Func<TEntity, bool>> filter = null, IEnumerable<string> includeProperties = null);
     }
 }

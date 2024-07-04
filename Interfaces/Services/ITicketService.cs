@@ -67,9 +67,9 @@ namespace EventSeller.Services.Interfaces.Services
         /// <summary>
         /// Asynchronously counts the number of tickets that match the specified filter.
         /// </summary>
-        /// <param name="filter">An expression to filter the tickets.</param>
+        /// <param name="includeProperties">A list of related entities to include in the query.</param>
         /// <returns>A task that represents the asynchronous operation. The task result contains the count of matching tickets.</returns>
-        public Task<int> GetTicketCountAsync(Expression<Func<Ticket, bool>> filter);
+        public Task<int> GetTicketCountAsync(Expression<Func<Ticket, bool>> filter = null, IEnumerable<string> includeProperties = null);
         /// <summary>
         /// Retrieves a collection of values for a specific field from ticket that match the filter.
         /// </summary>

@@ -87,9 +87,9 @@ namespace Services.Service
             return await _unitOfWork.TicketRepository.GetFieldValuesAsync(filter, selector);
         }
         /// <inheritdoc/>
-        public async Task<int> GetTicketCountAsync(Expression<Func<Ticket,bool>> filter)
+        public async Task<int> GetTicketCountAsync(Expression<Func<Ticket,bool>> filter = null, IEnumerable<string> includeProperties = null)
         {
-            return await _unitOfWork.TicketRepository.GetCountAsync(filter);
+            return await _unitOfWork.TicketRepository.GetCountAsync(filter,includeProperties);
         }
     }
 }
