@@ -1,4 +1,5 @@
-﻿using System;
+﻿using EventSeller.DataLayer.EntitiesDto.Statistics;
+using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
@@ -9,7 +10,7 @@ namespace EventSeller.Services.Interfaces.Services
     public interface IEventPopularityService
     {
         Task<object> GetEventsPopularityByPeriod(DateTime startDateTime, DateTime endDateTime);
-        Task<object> GetEventTypePopularity(long eventTypeId);
+        Task<PopularityStatisticDTO> GetEventTypePopularity(long eventTypeId);
         Task<object> GetMostPopularEvent();
         Task<object> GetMostRealizableEvent();
     }

@@ -4,7 +4,6 @@ using DataLayer.Model.EF;
 using DataLayer.Models.Ticket;
 using EventSeller.Services.Interfaces;
 using EventSeller.Services.Interfaces.Services;
-using Microsoft.EntityFrameworkCore;
 using System.Linq.Expressions;
 
 namespace Services.Service

@@ -1,6 +1,7 @@
 ﻿using DataLayer.Model;
 using DataLayer.Models.PlaceHall;
 using EventSeller.DataLayer.Entities;
+using EventSeller.DataLayer.EntitiesDto.EventType;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -26,14 +27,14 @@ namespace EventSeller.Services.Interfaces.Services
         /// Retrieves a collection of all event types.
         /// </summary>
         /// <returns>A task that represents the asynchronous operation. The task result contains a collection of event types.</returns>
-        Task<IEnumerable<EventType>> GetPlaceHallsAsync();
+        Task<IEnumerable<EventType>> GetEventTypesAsync();
 
         /// <summary>
         /// Creates a new event type.
         /// </summary>
         /// <param name="model">The data transfer object containing event type details.</param>
         /// <returns>A task that represents the asynchronous operation.</returns>
-        Task CreateAsync(AddEventTypeDto model);
+        Task CreateAsync(AddEventTypeDTO model);
 
         /// <summary>
         /// Updates an existing event type.
@@ -41,7 +42,7 @@ namespace EventSeller.Services.Interfaces.Services
         /// <param name="id">The identifier of the event type to update.</param>
         /// <param name="model">The data transfer object containing updated event type details.</param>
         /// <returns>A task that represents the asynchronous operation.</returns>
-        Task UpdateAsync(long id, EditEventTypeDto model);
+        Task UpdateAsync(long id, EditEventTypeDTO model);
 
         /// <summary>
         /// Deletes a event type by its identifier.

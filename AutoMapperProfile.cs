@@ -9,6 +9,7 @@ using DataLayer.Models.TicketSeat;
 using EventSeller.DataLayer.Entities;
 using EventSeller.DataLayer.EntitiesDto;
 using EventSeller.DataLayer.EntitiesDto.EventSession;
+using EventSeller.DataLayer.EntitiesDto.EventType;
 using EventSeller.DataLayer.EntitiesDto.User;
 using EventSeller.DataLayer.ExternalDTO.PaymentSystem;
 
@@ -31,6 +32,23 @@ namespace Services
             MapTicket();
             MapUser();
             MapProcessResponseToPaymentConfirmation();
+        }
+        private void MapEventType()
+        {
+            // AddEventTypeDTO -> EventType
+            CreateMap<AddEventTypeDTO, EventType>();
+
+            // EditEventTypeDTO -> EventType
+            CreateMap<EditEventTypeDTO, EventType>()
+                .ForAllMembers(x => x.Condition(
+                    (src, dest, prop) =>
+                    {
+                        if (prop == null) return false;
+                        if (prop.GetType() == typeof(string) && string.IsNullOrEmpty((string)prop)) return false;
+
+                        return true;
+                    }
+                ));
         }
         private void MapEventSession()
         {

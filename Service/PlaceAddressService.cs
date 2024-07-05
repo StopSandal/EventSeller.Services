@@ -39,14 +39,14 @@ namespace Services.Service
             await _unitOfWork.SaveAsync();
         }
         /// <inheritdoc/>
-        public Task<PlaceAddress> GetByIDAsync(long id)
+        public async Task<PlaceAddress> GetByIDAsync(long id)
         {
-            return _unitOfWork.PlaceAddressRepository.GetByIDAsync(id);
+            return await _unitOfWork.PlaceAddressRepository.GetByIDAsync(id);
         }
         /// <inheritdoc/>
-        public Task<IEnumerable<PlaceAddress>> GetPlaceAddressesAsync()
+        public async Task<IEnumerable<PlaceAddress>> GetPlaceAddressesAsync()
         {
-            return _unitOfWork.PlaceAddressRepository.GetAsync();
+            return await _unitOfWork.PlaceAddressRepository.GetAsync();
         }
         /// <inheritdoc/>
         public async Task UpdateAsync(long id, EditPlaceAddressDto model)

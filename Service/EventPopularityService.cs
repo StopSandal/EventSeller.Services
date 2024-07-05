@@ -24,9 +24,10 @@ namespace EventSeller.Services.Service
             throw new NotImplementedException();
         }
 
-        public Task<object> GetEventTypePopularity(long eventTypeId)
+        public async Task<PopularityStatisticDTO> GetEventTypePopularity(long eventTypeId)
         {
-            var statics = GetTicketsStatisticAsync(ticket => ticket.EventSession.Event.EventTypeID == eventTypeId, [TicketEventSessionPropertyInclude, TicketEventPropertyInclude]);
+            var statistics = await GetTicketsStatisticAsync(ticket => ticket.EventSession.Event.EventTypeID == eventTypeId, [TicketEventSessionPropertyInclude, TicketEventPropertyInclude]);
+            return statistics;
             
         }
 
