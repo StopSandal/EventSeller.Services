@@ -122,5 +122,46 @@ namespace Services.Repository
 
             return await query.CountAsync();
         }
+
+        /// <inheritdoc/>
+        public virtual async Task<decimal> GetAverageAsync(Expression<Func<TEntity, decimal>> selector, Expression<Func<TEntity, bool>> filter = null, IEnumerable<string> includeProperties = null)
+        {
+            IQueryable<TEntity> query = dbSet;
+
+            if (filter != null)
+            {
+                query = query.Where(filter);
+            }
+
+            if (includeProperties != null)
+            {
+                foreach (var includeProperty in includeProperties)
+                {
+                    query = query.Include(includeProperty);
+                }
+            }
+
+            return await query.AverageAsync(selector);
+        }
+        /// <inheritdoc/>
+        public virtual async Task<decimal> GetSumAsync(Expression<Func<TEntity, decimal>> selector, Expression<Func<TEntity, bool>> filter = null, IEnumerable<string> includeProperties = null)
+        {
+            IQueryable<TEntity> query = dbSet;
+
+            if (filter != null)
+            {
+                query = query.Where(filter);
+            }
+
+            if (includeProperties != null)
+            {
+                foreach (var includeProperty in includeProperties)
+                {
+                    query = query.Include(includeProperty);
+                }
+            }
+
+            return await query.SumAsync(selector);
+        }
     }
 }

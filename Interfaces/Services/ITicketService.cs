@@ -78,5 +78,19 @@ namespace EventSeller.Services.Interfaces.Services
         /// <param name="selector">An expression to select the field to retrieve.</param>
         /// <returns>A task that represents the asynchronous operation. The task result contains a collection of field values.</returns>
         public Task<IEnumerable<TField>> GetFieldValuesAsync<TField>(Expression<Func<Ticket, bool>> filter, Expression<Func<Ticket, TField>> selector);
+        /// <summary>
+        /// Retrieves average price of filtered tickets.
+        /// </summary>
+        /// <param name="filter">An expression to filter the tickets.</param>
+        /// <param name="includeProperties">A list of related entities to include in the query.</param>
+        /// <returns>A task that represents the asynchronous operation. The task result average price.</returns>
+        public Task<decimal> GetTicketAveragePriceAsync(Expression<Func<Ticket, bool>> filter = null, IEnumerable<string> includeProperties = null);
+        /// <summary>
+        /// Retrieves average price of filtered tickets.
+        /// </summary>
+        /// <param name="filter">An expression to filter the tickets.</param>
+        /// <param name="includeProperties">A list of related entities to include in the query.</param>
+        /// <returns>A task that represents the asynchronous operation. The task result average price.</returns>
+        public Task<decimal> GetTicketTotalPriceAsync(Expression<Func<Ticket, bool>> filter = null, IEnumerable<string> includeProperties = null);
     }
 }

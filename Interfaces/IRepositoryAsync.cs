@@ -93,5 +93,21 @@ namespace EventSeller.Services.Interfaces
         /// <param name="includeProperties">A list of related entities props to include in the query.</param>
         /// <returns>A task that represents the asynchronous operation. The task result contains the count of matching entities.</returns>
         public Task<int> GetCountAsync(Expression<Func<TEntity, bool>> filter = null, IEnumerable<string> includeProperties = null);
+        /// <summary>
+        /// Asynchronously calculates the average of a selected field for the entities that match the specified filter.
+        /// </summary>
+        /// <param name="selector">An expression to select the field to average.</param>
+        /// <param name="filter">An optional filter expression to filter the entities.</param>
+        /// <param name="includeProperties">An optional list of navigation properties to include.</param>
+        /// <returns>The average of the selected field, or 0 if no entities match the filter.</returns>
+        public Task<decimal> GetAverageAsync(Expression<Func<TEntity, decimal>> selector, Expression<Func<TEntity, bool>> filter = null, IEnumerable<string> includeProperties = null);
+        /// <summary>
+        /// Asynchronously calculates the sum of a selected field for the entities that match the specified filter.
+        /// </summary>
+        /// <param name="selector">An expression to select the field to sum.</param>
+        /// <param name="filter">An optional filter expression to filter the entities.</param>
+        /// <param name="includeProperties">An optional list of navigation properties to include.</param>
+        /// <returns>The sum of the selected field, or 0 if no entities match the filter.</returns>
+        public Task<decimal> GetSumAsync(Expression<Func<TEntity, decimal>> selector, Expression<Func<TEntity, bool>> filter = null, IEnumerable<string> includeProperties = null);
     }
 }

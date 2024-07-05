@@ -91,5 +91,15 @@ namespace Services.Service
         {
             return await _unitOfWork.TicketRepository.GetCountAsync(filter,includeProperties);
         }
+        /// <inheritdoc/>
+        public async Task<decimal> GetTicketAveragePriceAsync(Expression<Func<Ticket, bool>> filter = null, IEnumerable<string> includeProperties = null)
+        {
+            return await _unitOfWork.TicketRepository.GetAverageAsync(ticket => ticket.Price, filter);
+        }
+        /// <inheritdoc/>
+        public async Task<decimal> GetTicketTotalPriceAsync(Expression<Func<Ticket, bool>> filter = null, IEnumerable<string> includeProperties = null)
+        {
+            return await _unitOfWork.TicketRepository.GetSumAsync(ticket => ticket.Price, filter);
+        }
     }
 }
