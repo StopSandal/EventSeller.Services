@@ -1,9 +1,8 @@
 ﻿using AutoMapper;
-using DataLayer.Model;
-using DataLayer.Models.PlaceHall;
+using EventSeller.DataLayer.Entities;
+using EventSeller.DataLayer.EntitiesDto.PlaceHall;
 using EventSeller.Services.Interfaces;
 using EventSeller.Services.Interfaces.Services;
-using Microsoft.EntityFrameworkCore.Query.SqlExpressions;
 using System.Linq.Expressions;
 
 namespace Services.Service

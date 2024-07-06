@@ -1,4 +1,4 @@
-﻿using DataLayer.Model;
+﻿
 using EventSeller.DataLayer.Entities;
 using EventSeller.Services.Interfaces;
 using EventSeller.Services.Interfaces.Services;

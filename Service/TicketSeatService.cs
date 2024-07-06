@@ -1,6 +1,6 @@
 ﻿using AutoMapper;
-using DataLayer.Model;
-using DataLayer.Models.TicketSeat;
+using EventSeller.DataLayer.Entities;
+using EventSeller.DataLayer.EntitiesDto.TicketSeat;
 using EventSeller.Services.Interfaces;
 using EventSeller.Services.Interfaces.Services;
 

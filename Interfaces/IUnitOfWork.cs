@@ -1,6 +1,5 @@
 ﻿using DataLayer.Model;
 using EventSeller.DataLayer.Entities;
-using EventSeller.DataLayer.Entities;
 using EventSeller.Services.Interfaces.Services;
 using System;
 using System.Collections.Generic;

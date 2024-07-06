@@ -1,11 +1,9 @@
 ﻿using EventSeller.DataLayer.Entities;
 using DataLayer.Model.EF;
-using EventSeller.DataLayer.Entities;
 using EventSeller.Services.Interfaces;
 using EventSeller.Services.Interfaces.Services;
 using EventSeller.Services.Repository;
 using Services.Repository;
-using DataLayer.Model;
 
 
 namespace Services
@@ -143,7 +141,7 @@ namespace Services
             }
         }
         /// <inheritdoc />
-        public IAnalyticsRepositoryAsync AnalyticsRepositoryAsync
+        public IAnalyticsRepositoryAsync AnalyticsRepository
         {
             get
             {

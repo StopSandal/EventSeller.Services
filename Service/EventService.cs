@@ -1,6 +1,6 @@
 ﻿using AutoMapper;
-using DataLayer.Model;
-using DataLayer.Models.Event;
+using EventSeller.DataLayer.Entities;
+using EventSeller.DataLayer.EntitiesDto.Event;
 using EventSeller.Services.Interfaces;
 using EventSeller.Services.Interfaces.Services;
 using System.Linq.Expressions;

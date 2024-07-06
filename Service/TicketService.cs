@@ -1,7 +1,7 @@
 ﻿using AutoMapper;
 using DataLayer.Model;
-using DataLayer.Model.EF;
-using DataLayer.Models.Ticket;
+using EventSeller.DataLayer.Entities;
+using EventSeller.DataLayer.EntitiesDto.Ticket;
 using EventSeller.Services.Interfaces;
 using EventSeller.Services.Interfaces.Services;
 using System.Linq.Expressions;

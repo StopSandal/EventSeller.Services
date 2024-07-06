@@ -1,6 +1,6 @@
 ﻿using AutoMapper;
-using DataLayer.Model;
-using DataLayer.Models.PlaceAddress;
+using EventSeller.DataLayer.Entities;
+using EventSeller.DataLayer.EntitiesDto.PlaceAddress;
 using EventSeller.Services.Interfaces;
 using EventSeller.Services.Interfaces.Services;
 

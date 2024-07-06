@@ -1,5 +1,5 @@
-﻿using DataLayer.Model;
-using DataLayer.Models.HallSector;
+﻿using EventSeller.DataLayer.Entities;
+using EventSeller.DataLayer.EntitiesDto.HallSector;
 using System;
 using System.Collections.Generic;
 using System.Linq;

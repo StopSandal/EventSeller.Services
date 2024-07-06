@@ -1,17 +1,16 @@
 ﻿using AutoMapper;
-using DataLayer.Model;
-using DataLayer.Models.Event;
-using DataLayer.Models.HallSector;
-using DataLayer.Models.PlaceAddress;
-using DataLayer.Models.PlaceHall;
-using DataLayer.Models.Ticket;
-using DataLayer.Models.TicketSeat;
 using EventSeller.DataLayer.Entities;
-using EventSeller.DataLayer.EntitiesDto;
+using EventSeller.DataLayer.EntitiesDto.Event;
+using EventSeller.DataLayer.EntitiesDto.HallSector;
+using EventSeller.DataLayer.EntitiesDto.PlaceAddress;
+using EventSeller.DataLayer.EntitiesDto.PlaceHall;
+using EventSeller.DataLayer.EntitiesDto.Ticket;
+using EventSeller.DataLayer.EntitiesDto.TicketSeat;
 using EventSeller.DataLayer.EntitiesDto.EventSession;
 using EventSeller.DataLayer.EntitiesDto.EventType;
 using EventSeller.DataLayer.EntitiesDto.User;
 using EventSeller.DataLayer.ExternalDTO.PaymentSystem;
+using EventSeller.DataLayer.EntitiesDto;
 
 namespace Services
 {

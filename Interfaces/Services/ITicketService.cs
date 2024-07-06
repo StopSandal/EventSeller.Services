@@ -1,5 +1,5 @@
-﻿using DataLayer.Model;
-using DataLayer.Models.Ticket;
+﻿using EventSeller.DataLayer.Entities;
+using EventSeller.DataLayer.EntitiesDto.Ticket;
 using System;
 using System.Collections.Generic;
 using System.Linq;

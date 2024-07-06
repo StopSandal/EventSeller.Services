@@ -1,6 +1,4 @@
-﻿using DataLayer.Model;
-using DataLayer.Models.PlaceHall;
-using EventSeller.DataLayer.Entities;
+﻿using EventSeller.DataLayer.Entities;
 using EventSeller.DataLayer.EntitiesDto.EventType;
 using System;
 using System.Collections.Generic;

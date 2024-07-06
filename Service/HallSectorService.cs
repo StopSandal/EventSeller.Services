@@ -1,6 +1,6 @@
 ﻿using AutoMapper;
-using DataLayer.Model;
-using DataLayer.Models.HallSector;
+using EventSeller.DataLayer.Entities;
+using EventSeller.DataLayer.EntitiesDto.HallSector;
 using EventSeller.Services.Interfaces;
 using EventSeller.Services.Interfaces.Services;
 

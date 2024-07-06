@@ -1,15 +1,10 @@
 ﻿using AutoMapper;
 using EventSeller.DataLayer.Entities;
 using DataLayer.Model.EF;
-using EventSeller.DataLayer.Entities;
-using EventSeller.DataLayer.EntitiesDto.Event;
-using EventSeller.DataLayer.EntitiesDto.EventType;
 using EventSeller.DataLayer.EntitiesDto.Statistics;
 using EventSeller.Services.Interfaces.Services;
 using Microsoft.EntityFrameworkCore;
-using System;
-using System.Collections.Generic;
-using System.Linq;
+
 using System.Linq.Expressions;
 using System.Text;
 using System.Threading.Tasks;

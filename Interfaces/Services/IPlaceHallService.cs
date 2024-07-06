@@ -1,5 +1,5 @@
-﻿using DataLayer.Model;
-using DataLayer.Models.PlaceHall;
+﻿using EventSeller.DataLayer.Entities;
+using EventSeller.DataLayer.EntitiesDto.PlaceHall;
 using System;
 using System.Collections.Generic;
 using System.Linq;
