@@ -1,8 +1,11 @@
-﻿using DataLayer.Model;
+﻿using EventSeller.DataLayer.Entities;
 using DataLayer.Model.EF;
 using EventSeller.DataLayer.Entities;
 using EventSeller.Services.Interfaces;
+using EventSeller.Services.Interfaces.Services;
+using EventSeller.Services.Repository;
 using Services.Repository;
+using DataLayer.Model;
 
 
 namespace Services
@@ -23,6 +26,7 @@ namespace Services
         private IRepositoryAsync<Ticket> ticketRepository;
         private IRepositoryAsync<TicketSeat> ticketSeatRepository;
         private IRepositoryAsync<TicketTransaction> ticketTransactionRepository;
+        private IAnalyticsRepositoryAsync analyticsRepository;
         /// <summary>
         /// Initializes a new instance of the <see cref="UnitOfWork"/> class with the specified context.
         /// </summary>
@@ -136,6 +140,18 @@ namespace Services
                     this.eventSessionRepository = new GenericRepository<EventSession>(context);
                 }
                 return eventSessionRepository;
+            }
+        }
+        /// <inheritdoc />
+        public IAnalyticsRepositoryAsync AnalyticsRepositoryAsync
+        {
+            get
+            {
+                if (this.analyticsRepository == null)
+                {
+                    this.analyticsRepository = new AnalyticsRepositoryAsync(context);
+                }
+                return analyticsRepository;
             }
         }
 

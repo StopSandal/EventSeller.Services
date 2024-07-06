@@ -1,5 +1,7 @@
 ﻿using DataLayer.Model;
 using EventSeller.DataLayer.Entities;
+using EventSeller.DataLayer.Entities;
+using EventSeller.Services.Interfaces.Services;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -53,6 +55,10 @@ namespace EventSeller.Services.Interfaces
         /// Gets the repository for <see cref="EventSession"/> entities.
         /// </summary>
         IRepositoryAsync<EventSession> EventSessionRepository { get; }
+        /// <summary>
+        /// Repository that responsible for specific queries for analytics.
+        /// </summary>
+        IAnalyticsRepositoryAsync AnalyticsRepository { get; }
 
         /// <summary>
         /// Saves all changes made in this unit of work to the underlying database.

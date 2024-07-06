@@ -1,9 +1,10 @@
-﻿using DataLayer.Model;
+﻿using EventSeller.DataLayer.Entities;
 using EventSeller.DataLayer.Entities;
 using EventSeller.DataLayer.EntitiesDto.Statistics;
 using EventSeller.Services.Helpers;
+using EventSeller.Services.Interfaces;
 using EventSeller.Services.Interfaces.Services;
-using System.Linq.Expressions;
+using Microsoft.Extensions.Logging;
 
 
 namespace EventSeller.Services.Service
@@ -11,57 +12,77 @@ namespace EventSeller.Services.Service
 
     public class EventPopularityService : IEventPopularityService
     {
-        private readonly ITicketService _ticketService;
-        private readonly IEventSessionService _eventSessionService;
-        private readonly IEventService _eventService;
-        private readonly Expression<Func<Ticket, bool>> ticketSoldFilter = ticket => ticket.isSold;
+        private readonly IUnitOfWork _unitOfWork;
+        private readonly ILogger<EventPopularityService> _logger;
 
-        private const string TicketEventSessionPropertyInclude = nameof(EventSession);
-        private const string TicketEventPropertyInclude = $"{nameof(EventSession)}.{nameof(Event)}";
-
-        public Task<object> GetEventsPopularityByPeriod(DateTime startDateTime, DateTime endDateTime)
+        public EventPopularityService(IUnitOfWork unitOfWork, ILogger<EventPopularityService> logger)
         {
-            throw new NotImplementedException();
+            _unitOfWork = unitOfWork;
+            _logger = logger;
         }
 
-        public async Task<PopularityStatisticDTO> GetEventTypePopularity(long eventTypeId)
+        /// <inheritdoc />
+        public async Task<IEnumerable<EventPopularityStatistic>> GetEventsPopularityByPeriod(DateTime startDateTime, DateTime endDateTime)
         {
-            var statistics = await GetTicketsStatisticAsync(ticket => ticket.EventSession.Event.EventTypeID == eventTypeId, [TicketEventSessionPropertyInclude, TicketEventPropertyInclude]);
-            return statistics;
-            
+            _logger.LogInformation($"Getting events popularity by period from {startDateTime} to {endDateTime}");
+            var result = await _unitOfWork.AnalyticsRepository.GetEventsWithMaxPopularityAsync(
+                obj => obj.StartEventDateTime >= startDateTime && obj.EndEventDateTime <= endDateTime,
+                obj => obj.PopularityStatistic.Popularity
+            );
+            _logger.LogInformation($"Retrieved {result?.Count() ?? 0} events popularity statistics for the specified period.");
+            return result;
         }
 
-        public Task<object> GetMostPopularEvent()
+        /// <inheritdoc />
+        public async Task<EventTypePopularityStatisticDTO> GetEventTypeStatistic(long eventTypeId)
         {
-            throw new NotImplementedException();
-        }
-
-        public Task<object> GetMostRealizableEvent()
-        {
-            throw new NotImplementedException();
-        }
-        private async Task<PopularityStatisticDTO> GetTicketsStatisticAsync(Expression<Func<Ticket, bool>> ticketFilter, IEnumerable<string> includes = null)
-        {
-            var statisticDTO = new PopularityStatisticDTO();
-
-            var totalSold = await _ticketService.GetTicketCountAsync(ticketFilter, includes);
-
-            if(totalSold == 0)
+            _logger.LogInformation($"Getting event type statistic for event type ID: {eventTypeId}");
+            var result = await _unitOfWork.AnalyticsRepository.GetEventTypeWithMaxPopularityAsync(eventType => eventType.Id == eventTypeId);
+            if (result == null)
             {
-                throw new InvalidDataException("Total sold tickets for that is zero");
+                _logger.LogWarning($"No event type found with ID: {eventTypeId}");
             }
+            else
+            {
+                _logger.LogInformation($"Retrieved popularity statistic for event type ID: {eventTypeId}");
+            }
+            return result;
+        }
 
-            var soldTicketsFilter = ticketFilter.AddAlso(ticket => ticket.isSold);
+        /// <inheritdoc />
+        public async Task<IEnumerable<EventPopularityStatistic>> GetMostPopularEvents(int topCount)
+        {
+            _logger.LogInformation($"Getting top {topCount} most popular events");
+            var result = await _unitOfWork.AnalyticsRepository.GetEventsWithMaxPopularityAsync(null, obj => obj.PopularityStatistic.Popularity, topCount);
+            _logger.LogInformation($"Retrieved {result?.Count() ?? 0} most popular events.");
+            return result;
+        }
 
-            var soldCount = await _ticketService.GetTicketCountAsync(soldTicketsFilter, includes);
+        /// <inheritdoc />
+        public async Task<IEnumerable<EventTypePopularityStatisticDTO>> GetMostPopularEventTypes(int topCount)
+        {
+            _logger.LogInformation($"Getting top {topCount} most popular event types");
+            var result = await _unitOfWork.AnalyticsRepository.GetEventTypesWithPopularityAsync(null, obj => obj.PopularityStatistic.Popularity, topCount);
+            _logger.LogInformation($"Retrieved {result?.Count() ?? 0} most popular event types.");
+            return result;
+        }
 
-            statisticDTO.Realization = soldCount / totalSold;
+        /// <inheritdoc />
+        public async Task<IEnumerable<EventPopularityStatistic>> GetMostRealizableEvents(int topCount)
+        {
+            _logger.LogInformation($"Getting top {topCount} most realizable events");
+            var result = await _unitOfWork.AnalyticsRepository.GetEventsWithMaxPopularityAsync(null, obj => obj.PopularityStatistic.Realization, topCount);
+            _logger.LogInformation($"Retrieved {result?.Count() ?? 0} most realizable events.");
+            return result;
+        }
 
-            var getTotalIncome = await _ticketService.GetTicketTotalPriceAsync(soldTicketsFilter, includes);
-            
-            statisticDTO.Popularity = getTotalIncome * statisticDTO.Realization;
-
-            return statisticDTO;
+        /// <inheritdoc />
+        public async Task<IEnumerable<EventTypePopularityStatisticDTO>> GetMostRealizableEventTypes(int topCount)
+        {
+            _logger.LogInformation($"Getting top {topCount} most realizable event types");
+            var result = await _unitOfWork.AnalyticsRepository.GetEventTypesWithPopularityAsync(null, obj => obj.PopularityStatistic.Realization, topCount);
+            _logger.LogInformation($"Retrieved {result?.Count() ?? 0} most realizable event types.");
+            return result;
         }
     }
 }

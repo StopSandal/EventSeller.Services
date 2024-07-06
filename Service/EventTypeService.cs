@@ -1,14 +1,16 @@
 ﻿using AutoMapper;
-using DataLayer.Model;
+using EventSeller.DataLayer.Entities;
 using EventSeller.DataLayer.Entities;
 using EventSeller.DataLayer.EntitiesDto.EventType;
+using EventSeller.Services.Interfaces;
+using EventSeller.Services.Interfaces.Services;
 using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 
-namespace EventSeller.Services.Interfaces.Services
+namespace EventSeller.Services.Service
 {
     public class EventTypeService : IEventTypeService
     {
@@ -44,7 +46,7 @@ namespace EventSeller.Services.Interfaces.Services
 
         public async Task<IEnumerable<EventType>> GetEventTypesAsync()
         {
-            return  await _unitOfWork.EventTypeRepository.GetAsync();
+            return await _unitOfWork.EventTypeRepository.GetAsync();
         }
 
         public async Task UpdateAsync(long id, EditEventTypeDTO model)
