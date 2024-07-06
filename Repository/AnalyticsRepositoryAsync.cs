@@ -35,25 +35,31 @@ namespace EventSeller.Services.Repository
                 .Select(eventEntity => new
                 {
                     Event = eventEntity,
-                    TotalSold = eventEntity.EventSessions
+                    TotalTickets = eventEntity.EventSessions
                         .SelectMany(es => es.Tickets)
                         .Count(),
                     SoldCount = eventEntity.EventSessions
                         .SelectMany(es => es.Tickets)
                         .Count(ticket => ticket.isSold),
+                    PossibleIncome = eventEntity.EventSessions
+                        .SelectMany(es => es.Tickets)
+                        .Sum(ticket => ticket.Price),
                     TotalIncome = eventEntity.EventSessions
                         .SelectMany(es => es.Tickets)
                         .Where(ticket => ticket.isSold)
                         .Sum(ticket => ticket.Price)
                 })
-                .Where(e => e.TotalSold > 0)
+                .Where(e => e.TotalTickets > 0)
                 .Select(e => new EventPopularityStatistic
                 {
                     EventItem = e.Event,
                     PopularityStatistic = new PopularityStatisticDTO
                     {
-                        Realization = (decimal)e.SoldCount / e.TotalSold,
-                        Popularity = ((decimal)e.SoldCount / e.TotalSold) * e.TotalIncome
+                        Realization = (decimal)e.SoldCount / e.TotalTickets,
+                        TotalIncome = e.TotalIncome,
+                        TotalSold = e.SoldCount,
+                        Monetization = e.TotalIncome / e.PossibleIncome,
+                        Popularity = (e.SoldCount / e.TotalTickets) * (e.TotalIncome / e.PossibleIncome)
                     }
                 });
 
@@ -88,7 +94,7 @@ namespace EventSeller.Services.Repository
                 .Select(eventTypeEntity => new
                 {
                     EventType = eventTypeEntity,
-                    TotalSold = eventTypeEntity.Event
+                    TotalTickets = eventTypeEntity.Event
                         .SelectMany(e => e.EventSessions)
                         .SelectMany(es => es.Tickets)
                         .Count(),
@@ -96,20 +102,27 @@ namespace EventSeller.Services.Repository
                         .SelectMany(e => e.EventSessions)
                         .SelectMany(es => es.Tickets)
                         .Count(ticket => ticket.isSold),
+                    PossibleIncome = eventTypeEntity.Event
+                        .SelectMany(e => e.EventSessions)
+                        .SelectMany(es => es.Tickets)
+                        .Sum(ticket => ticket.Price),
                     TotalIncome = eventTypeEntity.Event
                         .SelectMany(e => e.EventSessions)
                         .SelectMany(es => es.Tickets)
                         .Where(ticket => ticket.isSold)
                         .Sum(ticket => ticket.Price)
                 })
-                .Where(e => e.TotalSold > 0)
+                .Where(e => e.TotalTickets > 0)
                 .Select(e => new EventTypePopularityStatisticDTO
                 {
                     EventTypeItem = e.EventType,
                     PopularityStatistic = new PopularityStatisticDTO
                     {
-                        Realization = (decimal)e.SoldCount / e.TotalSold,
-                        Popularity = ((decimal)e.SoldCount / e.TotalSold) * e.TotalIncome
+                        Realization = (decimal)e.SoldCount / e.TotalTickets,
+                        TotalIncome = e.TotalIncome,
+                        TotalSold = e.SoldCount,
+                        Monetization = e.TotalIncome / e.PossibleIncome,
+                        Popularity = (e.SoldCount / e.TotalTickets) * (e.TotalIncome / e.PossibleIncome)
                     }
                 });
 
@@ -136,11 +149,12 @@ namespace EventSeller.Services.Repository
         {
             var events = _context.Set<EventType>()
                             .Where(eventTypeFilter);
+
             var eventsWithPopularity = await events
                 .Select(eventTypeEntity => new
                 {
                     EventType = eventTypeEntity,
-                    TotalSold = eventTypeEntity.Event
+                    TotalTickets = eventTypeEntity.Event
                         .SelectMany(e => e.EventSessions)
                         .SelectMany(es => es.Tickets)
                         .Count(),
@@ -148,20 +162,27 @@ namespace EventSeller.Services.Repository
                         .SelectMany(e => e.EventSessions)
                         .SelectMany(es => es.Tickets)
                         .Count(ticket => ticket.isSold),
+                    PossibleIncome = eventTypeEntity.Event
+                        .SelectMany(e => e.EventSessions)
+                        .SelectMany(es => es.Tickets)
+                        .Sum(ticket => ticket.Price),
                     TotalIncome = eventTypeEntity.Event
                         .SelectMany(e => e.EventSessions)
                         .SelectMany(es => es.Tickets)
                         .Where(ticket => ticket.isSold)
                         .Sum(ticket => ticket.Price)
                 })
-                .Where(e => e.TotalSold > 0)
+                .Where(e => e.TotalTickets > 0)
                 .Select(e => new EventTypePopularityStatisticDTO
                 {
                     EventTypeItem = e.EventType,
                     PopularityStatistic = new PopularityStatisticDTO
                     {
-                        Realization = (decimal)e.SoldCount / e.TotalSold,
-                        Popularity = ((decimal)e.SoldCount / e.TotalSold) * e.TotalIncome
+                        Realization = (decimal)e.SoldCount / e.TotalTickets,
+                        TotalIncome = e.TotalIncome,
+                        TotalSold = e.SoldCount,
+                        Monetization = e.TotalIncome / e.PossibleIncome,
+                        Popularity = (e.SoldCount / e.TotalTickets) * (e.TotalIncome / e.PossibleIncome)
                     }
                 })
                 .FirstOrDefaultAsync();
