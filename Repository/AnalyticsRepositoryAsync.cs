@@ -4,12 +4,9 @@ using DataLayer.Model.EF;
 using EventSeller.DataLayer.EntitiesDto.Statistics;
 using EventSeller.Services.Interfaces.Services;
 using Microsoft.EntityFrameworkCore;
-
 using System.Linq.Expressions;
-using System.Text;
-using System.Threading.Tasks;
-using static Microsoft.EntityFrameworkCore.DbLoggerCategory;
-using DataLayer.Model;
+using System.Linq;
+
 
 namespace EventSeller.Services.Repository
 {
@@ -192,6 +189,46 @@ namespace EventSeller.Services.Repository
                 throw new InvalidDataException("No events found with sold tickets.");
             }
 
+            return eventsWithPopularity;
+        }
+        public async Task<IEnumerable<DaysStatistics>> GetDaysWithTrafficAsync<TField>(Expression<Func<EventSession, bool>>? eventsFilter = null, Expression<Func<DaysStatistics, TField>>? orderBy = null, int maxCount = 0)
+        {
+            IQueryable<EventSession> eventSessions = _context.Set<EventSession>();
+
+            if (eventsFilter != null)
+            {
+                eventSessions = eventSessions.Where(eventsFilter);
+            }
+
+            var query = eventSessions
+                .SelectMany(item => item.Tickets.Select(ticket => ticket.isSold).Where(x => x), (item, ticket) => new { item, ticket })
+                .GroupBy(x => x.item.StartSessionDateTime.Date)
+                .Select(g => new DaysStatistics
+                {
+                    Date = g.Key,
+                    DayOfWeek = g.Key.DayOfWeek.ToString(),
+                    TotalTraffic = g.Count()
+                });
+
+
+
+
+            if (maxCount > 0)
+            {
+                query.Take(maxCount);
+            }
+
+            var eventsWithPopularity = await query.ToListAsync();
+
+            if (eventsWithPopularity == null)
+            {
+                throw new InvalidDataException("No days found.");
+            }
+
+            if (orderBy != null)
+            {
+                eventsWithPopularity.OrderByDescending(orderBy);
+            }
             return eventsWithPopularity;
         }
     }
