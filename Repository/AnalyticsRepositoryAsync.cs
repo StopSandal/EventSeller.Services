@@ -191,7 +191,7 @@ namespace EventSeller.Services.Repository
 
             return eventsWithPopularity;
         }
-        public async Task<IEnumerable<DaysStatistics>> GetDaysWithTrafficAsync<TField>(Expression<Func<EventSession, bool>>? eventsFilter = null, Expression<Func<DaysStatistics, TField>>? orderBy = null, int maxCount = 0)
+        public async Task<IEnumerable<DaysStatistics>> GetDaysWithTrafficAsync<TField>(Expression<Func<DaysStatistics, TField>> orderBy, Expression<Func<EventSession, bool>>? eventsFilter = null,  int maxCount = 0)
         {
             IQueryable<EventSession> eventSessions = _context.Set<EventSession>();
 
@@ -210,25 +210,18 @@ namespace EventSeller.Services.Repository
                     TotalTraffic = g.Count()
                 });
 
-
-
-
             if (maxCount > 0)
             {
                 query.Take(maxCount);
             }
 
-            var eventsWithPopularity = await query.ToListAsync();
+            var eventsWithPopularity = await query.OrderByDescending(orderBy).ToListAsync();
 
             if (eventsWithPopularity == null)
             {
                 throw new InvalidDataException("No days found.");
             }
 
-            if (orderBy != null)
-            {
-                eventsWithPopularity.OrderByDescending(orderBy);
-            }
             return eventsWithPopularity;
         }
     }

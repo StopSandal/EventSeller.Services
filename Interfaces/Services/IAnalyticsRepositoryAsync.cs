@@ -39,6 +39,6 @@ namespace EventSeller.Services.Interfaces.Services
         /// <param name="eventTypeFilter">A filter expression for the event type.</param>
         /// <returns>The popularity statistics for the event type with the highest popularity.</returns>
         public Task<EventTypePopularityStatisticDTO> GetEventTypeWithMaxPopularityAsync(Expression<Func<EventType, bool>> eventTypeFilter);
-        public Task<IEnumerable<DaysStatistics>> GetDaysWithTrafficAsync<TField>(Expression<Func<EventSession, bool>>? eventsFilter = null, Func<DaysStatistics, TField>? orderBy = null, int maxCount = 0);
+        public Task<IEnumerable<DaysStatistics>> GetDaysWithTrafficAsync<TField>( Expression<Func<DaysStatistics, TField>> orderBy, Expression<Func<EventSession, bool>>? eventsFilter = null, int maxCount = 0);
     }
 }

@@ -20,19 +20,20 @@ namespace EventSeller.Services.Service
         }
         public async Task<IEnumerable<DaysStatistics>> GetDaysTrafficAsync<TField>(Expression<Func<DaysStatistics,TField>> orderBy, int maxCount) 
         {
-            return await _unitOfWork.AnalyticsRepository.GetDaysWithTrafficAsync(null, orderBy, maxCount);
+            return await _unitOfWork.AnalyticsRepository.GetDaysWithTrafficAsync(orderBy, null,  maxCount);
         }
         public async Task<IEnumerable<DaysStatistics>> GetDaysTrafficAtPeriodAsync<TField>(DateTime startPeriod, DateTime endPeriod, Expression<Func<DaysStatistics, TField>> orderBy, int maxCount = 0)
         {
-            return await _unitOfWork.AnalyticsRepository.GetDaysWithTrafficAsync(null, orderBy, maxCount);
+            Expression<Func<EventSession,bool>> dateFilter = obj => obj.StartSessionDateTime >= startPeriod && obj.StartSessionDateTime < endPeriod;
+            return await _unitOfWork.AnalyticsRepository.GetDaysWithTrafficAsync(orderBy, dateFilter, maxCount);
         }
         public async Task<IEnumerable<DaysStatistics>> GetDaysTrafficAtHallAsync<TField>(long placeHallId, Expression<Func<DaysStatistics, TField>> orderBy, int maxCount = 0)
         {
-            return await _unitOfWork.AnalyticsRepository.GetDaysWithTrafficAsync(obj => obj.HallID==placeHallId, orderBy, maxCount);
+            return await _unitOfWork.AnalyticsRepository.GetDaysWithTrafficAsync(orderBy, obj => obj.HallID==placeHallId, maxCount);
         }
         public async Task<IEnumerable<DaysStatistics>> GetDaysTrafficAtPlaceAsync<TField>(long placeAddressId, Expression<Func<DaysStatistics, TField>> orderBy, int maxCount = 0)
         {
-            return await _unitOfWork.AnalyticsRepository.GetDaysWithTrafficAsync(obj => obj.Hall.PlaceAddressID == placeAddressId, orderBy, maxCount);
+            return await _unitOfWork.AnalyticsRepository.GetDaysWithTrafficAsync(orderBy, obj => obj.Hall.PlaceAddressID == placeAddressId, maxCount);
         }
     }
 }
