@@ -1,11 +1,9 @@
-﻿using AutoMapper;
-using EventSeller.DataLayer.Entities;
+﻿using EventSeller.DataLayer.Entities;
 using DataLayer.Model.EF;
 using EventSeller.DataLayer.EntitiesDto.Statistics;
-using EventSeller.Services.Interfaces.Services;
 using Microsoft.EntityFrameworkCore;
 using System.Linq.Expressions;
-using System.Linq;
+using EventSeller.Services.Interfaces.Services;
 
 
 namespace EventSeller.Services.Repository
@@ -251,7 +249,7 @@ namespace EventSeller.Services.Repository
                         TotalIncome = e.TotalIncome,
                         TotalSold = e.TotalSold,
                         Monetization = e.TotalIncome / e.PossibleIncome,
-                        Popularity = (e.TotalSold / e.TotalTickets) * (e.TotalIncome / e.PossibleIncome)
+                        Popularity = ((decimal)e.TotalSold / e.TotalTickets) * (e.TotalIncome / e.PossibleIncome)
                     },
                     SeatId = e.SeatId
                 });

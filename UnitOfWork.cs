@@ -1,9 +1,9 @@
 ﻿using EventSeller.DataLayer.Entities;
 using DataLayer.Model.EF;
 using EventSeller.Services.Interfaces;
-using EventSeller.Services.Interfaces.Services;
 using EventSeller.Services.Repository;
 using Services.Repository;
+using EventSeller.Services.Interfaces.Services;
 
 
 namespace Services
