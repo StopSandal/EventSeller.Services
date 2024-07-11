@@ -1,11 +1,6 @@
 ﻿using EventSeller.DataLayer.ExternalDTO.PaymentSystem;
-using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
 
-namespace EventSeller.DataLayer.Entities
+namespace EventSeller.Services.Interfaces.Services
 {
     /// <summary>
     /// Defines methods for processing, confirming, canceling, and returning payments through an external payment system.

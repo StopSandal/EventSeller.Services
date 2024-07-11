@@ -1,15 +1,9 @@
 ﻿using AutoMapper;
-using DataLayer.Model;
 using EventSeller.DataLayer.Entities;
 using EventSeller.DataLayer.EntitiesDto.EventSession;
 using EventSeller.Services.Interfaces;
 using EventSeller.Services.Interfaces.Services;
-using System;
-using System.Collections.Generic;
-using System.Linq;
 using System.Linq.Expressions;
-using System.Text;
-using System.Threading.Tasks;
 
 namespace EventSeller.Services.Service
 {
@@ -49,7 +43,7 @@ namespace EventSeller.Services.Service
         }
 
         public async Task UpdateAsync(long id, EditEventSessionDTO model)
-        { 
+        {
             var item = await _unitOfWork.EventSessionRepository.GetByIDAsync(id);
             if (item == null)
                 throw new NullReferenceException("No Ticket to update");

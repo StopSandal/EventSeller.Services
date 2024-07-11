@@ -4,7 +4,7 @@ using EventSeller.DataLayer.EntitiesDto.HallSector;
 using EventSeller.Services.Interfaces;
 using EventSeller.Services.Interfaces.Services;
 
-namespace Services.Service
+namespace EventSeller.Services.Service
 {
     /// <summary>
     /// Represents the default implementation of the <see cref="IHallSectorService"/>.
@@ -66,7 +66,7 @@ namespace Services.Service
         /// <param name="errorMessage">The error message to throw if validation fails.</param>
         /// <returns>A task that represents the asynchronous operation.</returns>
         /// <exception cref="InvalidOperationException">Thrown if a duplicate hall sector is found.</exception>
-        private async Task ValidateUniqueFields(HallSector model,string errorMessage)
+        private async Task ValidateUniqueFields(HallSector model, string errorMessage)
         {
             if ((await _unitOfWork.HallSectorRepository.GetAsync(x => x.SectorName == model.SectorName && x.PlaceHallID == x.PlaceHallID)).Any())
                 throw new InvalidOperationException(errorMessage);

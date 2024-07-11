@@ -1,6 +1,4 @@
-﻿using DataLayer.Model;
-using EventSeller.DataLayer.Entities;
-using EventSeller.Services.Interfaces.Services;
+﻿using EventSeller.DataLayer.Entities;
 
 namespace EventSeller.Services.Interfaces
 {

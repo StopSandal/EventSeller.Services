@@ -1,18 +1,18 @@
 ﻿using AutoMapper;
 using EventSeller.DataLayer.Entities;
+using EventSeller.DataLayer.EntitiesDto;
 using EventSeller.DataLayer.EntitiesDto.Event;
+using EventSeller.DataLayer.EntitiesDto.EventSession;
+using EventSeller.DataLayer.EntitiesDto.EventType;
 using EventSeller.DataLayer.EntitiesDto.HallSector;
 using EventSeller.DataLayer.EntitiesDto.PlaceAddress;
 using EventSeller.DataLayer.EntitiesDto.PlaceHall;
 using EventSeller.DataLayer.EntitiesDto.Ticket;
 using EventSeller.DataLayer.EntitiesDto.TicketSeat;
-using EventSeller.DataLayer.EntitiesDto.EventSession;
-using EventSeller.DataLayer.EntitiesDto.EventType;
 using EventSeller.DataLayer.EntitiesDto.User;
 using EventSeller.DataLayer.ExternalDTO.PaymentSystem;
-using EventSeller.DataLayer.EntitiesDto;
 
-namespace Services
+namespace EventSeller.Services
 {
     internal class AutoMapperProfile : Profile
     {
@@ -66,7 +66,7 @@ namespace Services
                     }
                 ));
         }
-        private void MapProcessResponseToPaymentConfirmation() 
+        private void MapProcessResponseToPaymentConfirmation()
         {
             CreateMap<ProcessPaymentResponse, PaymentConfirmationDTO>()
                 .ForAllMembers(x => x.Condition(

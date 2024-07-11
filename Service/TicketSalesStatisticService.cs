@@ -1,5 +1,4 @@
-﻿using DataLayer.Model;
-using EventSeller.DataLayer.Entities;
+﻿using EventSeller.DataLayer.Entities;
 using EventSeller.DataLayer.EntitiesDto.Statistics;
 using EventSeller.Services.Helpers;
 using EventSeller.Services.Interfaces.Services;
@@ -29,12 +28,12 @@ namespace EventSeller.Services.Service
 
         public async Task<SalesStatisticsDTO> GetSalesStatisticForEventAsync(long eventId)
         {
-            return await GetTicketsStatisticAsync(ticket => ticket.EventSession.EventID == eventId, [TicketEventSessionPropertyInclude] );
+            return await GetTicketsStatisticAsync(ticket => ticket.EventSession.EventID == eventId, [TicketEventSessionPropertyInclude]);
         }
         public async Task<SalesStatisticsDTO> GetSalesStatisticForEventAndSessionAsync(long eventId, long eventSessionId)
         {
             return await GetTicketsStatisticAsync(
-                ticket => ticket.EventSession.EventID == eventId 
+                ticket => ticket.EventSession.EventID == eventId
                 && ticket.EventSessionID == eventSessionId
                 , [TicketEventSessionPropertyInclude]);
         }
@@ -56,13 +55,13 @@ namespace EventSeller.Services.Service
 
         public async Task<SalesStatisticsDTO> GetSalesStatisticForEventTypeAsync(long eventTypeId)
         {
-            return await GetTicketsStatisticAsync(ticket =>ticket.EventSession.Event.EventTypeID==eventTypeId, [TicketEventSessionPropertyInclude,TicketEventPropertyInclude]);
+            return await GetTicketsStatisticAsync(ticket => ticket.EventSession.Event.EventTypeID == eventTypeId, [TicketEventSessionPropertyInclude, TicketEventPropertyInclude]);
         }
 
         public async Task<SalesStatisticsDTO> GetSalesStatisticForPeriodAsync(DateTime firstPeriod, DateTime secondPeriod)
         {
             return await GetTicketsStatisticAsync(
-                ticket => ticket.EventSession.StartSessionDateTime > firstPeriod 
+                ticket => ticket.EventSession.StartSessionDateTime > firstPeriod
                 && ticket.EventSession.StartSessionDateTime <= secondPeriod
                 , [TicketEventSessionPropertyInclude]);
         }
@@ -79,7 +78,7 @@ namespace EventSeller.Services.Service
             return await GetSalesStatisticForPeriodAsync(dayStartTime, dayEndTime);
         }
 
-        private async Task<SalesStatisticsDTO> GetTicketsStatisticAsync(Expression<Func<Ticket,bool>> ticketFilter, IEnumerable<string> includes = null)
+        private async Task<SalesStatisticsDTO> GetTicketsStatisticAsync(Expression<Func<Ticket, bool>> ticketFilter, IEnumerable<string> includes = null)
         {
             var statisticDTO = new SalesStatisticsDTO();
 
@@ -87,7 +86,7 @@ namespace EventSeller.Services.Service
 
             var soldTicketsFilter = ticketFilter.AddAlso(ticket => ticket.isSold);
 
-            statisticDTO.Sold = await _ticketService.GetTicketCountAsync(soldTicketsFilter,includes);
+            statisticDTO.Sold = await _ticketService.GetTicketCountAsync(soldTicketsFilter, includes);
 
             return statisticDTO;
         }

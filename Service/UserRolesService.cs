@@ -1,7 +1,7 @@
 ﻿using EventSeller.DataLayer.Entities;
+using EventSeller.Services.Interfaces.Services;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.EntityFrameworkCore;
-using EventSeller.Services.Interfaces.Services;
 
 namespace EventSeller.Services.Service
 {

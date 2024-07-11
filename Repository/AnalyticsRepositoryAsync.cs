@@ -1,9 +1,9 @@
-﻿using EventSeller.DataLayer.Entities;
-using DataLayer.Model.EF;
+﻿using EventSeller.DataLayer.EF;
+using EventSeller.DataLayer.Entities;
 using EventSeller.DataLayer.EntitiesDto.Statistics;
+using EventSeller.Services.Interfaces;
 using Microsoft.EntityFrameworkCore;
 using System.Linq.Expressions;
-using EventSeller.Services.Interfaces.Services;
 
 
 namespace EventSeller.Services.Repository
@@ -58,7 +58,7 @@ namespace EventSeller.Services.Repository
                     }
                 });
 
-            if(orderBy != null)
+            if (orderBy != null)
             {
                 query.OrderByDescending(orderBy);
             }
@@ -189,7 +189,7 @@ namespace EventSeller.Services.Repository
 
             return eventsWithPopularity;
         }
-        public async Task<IEnumerable<DaysStatistics>> GetDaysWithTrafficAsync<TField>(Expression<Func<DaysStatistics, TField>> orderBy, Expression<Func<EventSession, bool>>? eventsFilter = null,  int maxCount = 0)
+        public async Task<IEnumerable<DaysStatistics>> GetDaysWithTrafficAsync<TField>(Expression<Func<DaysStatistics, TField>> orderBy, Expression<Func<EventSession, bool>>? eventsFilter = null, int maxCount = 0)
         {
             IQueryable<EventSession> eventSessions = _context.Set<EventSession>();
 
@@ -348,7 +348,7 @@ namespace EventSeller.Services.Repository
                 query = query.Take(maxCount);
             }
 
-           var finalResult = await query.ToListAsync();
+            var finalResult = await query.ToListAsync();
 
             var resultEntities = finalResult
                 .GroupBy(sp => sp.EventId)

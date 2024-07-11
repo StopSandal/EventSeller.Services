@@ -1,19 +1,17 @@
-﻿using DataLayer.Model.EF;
-using DataLayer.Model;
+﻿using EventSeller.DataLayer.EF;
+using EventSeller.Services.Interfaces;
 using Microsoft.EntityFrameworkCore;
 using System.Linq.Expressions;
-using System.Reflection;
-using EventSeller.Services.Interfaces;
-using static Microsoft.EntityFrameworkCore.DbLoggerCategory;
 
-namespace Services.Repository
+namespace EventSeller.Services.Repository
 {
     /// <summary>
     /// A generic implementation of <see cref="IRepositoryAsync{TEntity}"/> interface.
     /// </summary>
     /// <typeparam name="TEntity">The type of the entity.</typeparam>
     /// <inheritdoc cref="IRepositoryAsync{TEntity}"/>
-    public class GenericRepository<TEntity> : IRepositoryAsync<TEntity> where TEntity : class { 
+    public class GenericRepository<TEntity> : IRepositoryAsync<TEntity> where TEntity : class
+    {
         internal SellerContext context;
         internal DbSet<TEntity> dbSet;
         /// <summary>
@@ -23,7 +21,7 @@ namespace Services.Repository
         public GenericRepository(SellerContext context)
         {
             this.context = context;
-            this.dbSet = context.Set<TEntity>();
+            dbSet = context.Set<TEntity>();
         }
         /// <inheritdoc/>
         public virtual async Task<IEnumerable<TEntity>> GetAsync(
@@ -112,7 +110,7 @@ namespace Services.Repository
                 query = query.Where(filter);
             }
 
-            if(includeProperties != null)
+            if (includeProperties != null)
             {
                 foreach (var includeProperty in includeProperties)
                 {

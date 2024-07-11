@@ -1,12 +1,9 @@
-﻿using EventSeller.DataLayer.Entities;
-using EventSeller.DataLayer.ExternalDTO;
+﻿using EventSeller.DataLayer.ExternalDTO;
 using EventSeller.DataLayer.ExternalDTO.PaymentSystem;
+using EventSeller.Services.Interfaces.Services;
 using Microsoft.Extensions.Logging;
 using Newtonsoft.Json;
-using System.Net.Http;
 using System.Text;
-using System.Text.Json;
-using System.Threading.Tasks;
 
 namespace EventSeller.Services.Service
 {

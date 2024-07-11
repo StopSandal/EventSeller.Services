@@ -4,7 +4,7 @@ using EventSeller.DataLayer.EntitiesDto.TicketSeat;
 using EventSeller.Services.Interfaces;
 using EventSeller.Services.Interfaces.Services;
 
-namespace Services.Service
+namespace EventSeller.Services.Service
 {
     /// <summary>
     /// Represents the default implementation of the <see cref="ITicketSeatService"/>.

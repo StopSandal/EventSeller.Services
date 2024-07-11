@@ -8,7 +8,7 @@ namespace EventSeller.Services.Service
     public class TicketRegistrationService : ITicketRegistrationService
     {
         private const string EventIncludedProps = "EventType";
-        
+
         private readonly ILogger<TicketRegistrationService> _logger;
         private readonly IPlaceHallService _placeHallService;
         private readonly IEventService _eventService;

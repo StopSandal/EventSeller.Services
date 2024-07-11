@@ -1,13 +1,13 @@
 ﻿using AutoMapper;
 using EventSeller.DataLayer.Entities;
+using EventSeller.DataLayer.EntitiesDto;
 using EventSeller.DataLayer.EntitiesDto.User;
 using EventSeller.Services.Interfaces;
+using EventSeller.Services.Interfaces.Services;
 using Microsoft.AspNetCore.Identity;
+using Microsoft.EntityFrameworkCore;
 using System.IdentityModel.Tokens.Jwt;
 using System.Security.Claims;
-using EventSeller.Services.Interfaces.Services;
-using Microsoft.EntityFrameworkCore;
-using EventSeller.DataLayer.EntitiesDto;
 
 namespace EventSeller.Services.Service
 {
@@ -37,7 +37,7 @@ namespace EventSeller.Services.Service
         /// <exception cref="InvalidOperationException">Thrown when the username or email is already in use.</exception>
         public async Task CreateUserAsync(AddUserDto addUserDto)
         {
-            if(await GetUserByUserNameAsync(addUserDto.UserName) != null)
+            if (await GetUserByUserNameAsync(addUserDto.UserName) != null)
             {
                 throw new InvalidOperationException("This UserName is already taken.");
             }
@@ -51,7 +51,7 @@ namespace EventSeller.Services.Service
                 Email = addUserDto.Email
             };
 
-            var result = await _userManager.CreateAsync(user,addUserDto.Password);
+            var result = await _userManager.CreateAsync(user, addUserDto.Password);
             if (!result.Succeeded)
             {
                 throw new InvalidOperationException($"Password doesn't meet requirements {result.Errors}");
@@ -67,7 +67,7 @@ namespace EventSeller.Services.Service
         public async Task DeleteAsync(string id)
         {
             var user = await _userManager.FindByIdAsync(id);
-            if(user == null) 
+            if (user == null)
             {
                 throw new InvalidOperationException("User doesn't exists");
             }
@@ -92,10 +92,10 @@ namespace EventSeller.Services.Service
             {
                 throw new InvalidDataException("This user doesn't exists");
             }
-            
+
             var result = await _signInManager.CheckPasswordSignInAsync(existingUser, user.Password, false);
-            
-            if(!result.Succeeded) 
+
+            if (!result.Succeeded)
             {
                 throw new InvalidDataException("Password is wrong.");
             }
@@ -178,7 +178,7 @@ namespace EventSeller.Services.Service
         /// <returns>A task that represents the asynchronous operation. The task result contains the claims.</returns>
         private async Task<IEnumerable<Claim>> GetUserClaimsAsync(User user)
         {
-            
+
             var claims = new List<Claim>()
             {
                 new Claim(ClaimTypes.Name, user.UserName),

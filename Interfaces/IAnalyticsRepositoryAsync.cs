@@ -1,9 +1,8 @@
 ﻿using EventSeller.DataLayer.Entities;
 using EventSeller.DataLayer.EntitiesDto.Statistics;
-using Microsoft.EntityFrameworkCore;
 using System.Linq.Expressions;
 
-namespace EventSeller.Services.Interfaces.Services
+namespace EventSeller.Services.Interfaces
 {
     /// <summary>
     /// Interface for the Analytics Repository, providing methods to retrieve event and event type popularity statistics.
@@ -34,7 +33,7 @@ namespace EventSeller.Services.Interfaces.Services
         /// <param name="eventTypeFilter">A filter expression for the event type.</param>
         /// <returns>The popularity statistics for the event type with the highest popularity.</returns>
         public Task<EventTypePopularityStatisticDTO> GetEventTypeWithMaxPopularityAsync(Expression<Func<EventType, bool>> eventTypeFilter);
-        public Task<IEnumerable<DaysStatistics>> GetDaysWithTrafficAsync<TField>( Expression<Func<DaysStatistics, TField>> orderBy, Expression<Func<EventSession, bool>>? eventsFilter = null, int maxCount = 0);
+        public Task<IEnumerable<DaysStatistics>> GetDaysWithTrafficAsync<TField>(Expression<Func<DaysStatistics, TField>> orderBy, Expression<Func<EventSession, bool>>? eventsFilter = null, int maxCount = 0);
         public Task<IEnumerable<SeatPopularityDTO>> GetSeatPopularityAsync<TField>(Expression<Func<SeatPopularityDTO, TField>> orderBy, Expression<Func<TicketSeat, bool>>? eventsFilter = null, int maxCount = 0);
         public Task<IEnumerable<SeatPopularityDTO>> GetSeatPopularityForEventAsync<TField>(Expression<Func<SeatPopularityDTO, TField>> orderBy, Expression<Func<Ticket, bool>> ticketsFilter, Expression<Func<TicketSeat, bool>>? seatsFilter = null, int maxCount = 0);
         public Task<IEnumerable<EventSeatPopularityDTO>> GetSeatPopularityForEventsGroupsAsync<TField>(Func<SeatPopularityDTO, TField> orderBy, Expression<Func<Ticket, bool>> ticketsFilter, Expression<Func<TicketSeat, bool>>? seatsFilter = null, int maxCount = 0);

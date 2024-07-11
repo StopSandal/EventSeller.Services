@@ -5,7 +5,7 @@ using EventSeller.Services.Interfaces;
 using EventSeller.Services.Interfaces.Services;
 using System.Linq.Expressions;
 
-namespace Services.Service
+namespace EventSeller.Services.Service
 {
     /// <summary>
     /// Represents the default implementation of the <see cref="IPlaceHallService"/>.
@@ -47,7 +47,7 @@ namespace Services.Service
         /// <inheritdoc/>
         public async Task<bool> DoesExistsByIdAsync(long id)
         {
-            return await _unitOfWork.PlaceHallRepository.DoesExistsAsync(obj => obj.ID==id);
+            return await _unitOfWork.PlaceHallRepository.DoesExistsAsync(obj => obj.ID == id);
         }
         /// <inheritdoc/>
         public Task<IEnumerable<PlaceHall>> GetPlaceHallsAsync()
@@ -77,10 +77,10 @@ namespace Services.Service
             if ((await _unitOfWork.PlaceHallRepository.GetAsync(x => x.HallName == model.HallName && x.PlaceAddressID == x.PlaceAddressID)).Any())
                 throw new InvalidOperationException(errorMessage);
         }
-        public async Task<IEnumerable<TicketSeat>> GetAllSeatsInRangeByIdAsync(long placeHallId,int minRow, int maxRow) 
+        public async Task<IEnumerable<TicketSeat>> GetAllSeatsInRangeByIdAsync(long placeHallId, int minRow, int maxRow)
         {
             Expression<Func<TicketSeat, bool>> filter = ts => ts.HallSector.PlaceHallID == placeHallId && ts.PlaceRow >= minRow && ts.PlaceRow <= maxRow;
-            return await _unitOfWork.TicketSeatRepository.GetAsync(filter,null, "HallSector");
+            return await _unitOfWork.TicketSeatRepository.GetAsync(filter, null, "HallSector");
         }
     }
 }

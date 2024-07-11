@@ -1,9 +1,4 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Linq.Expressions;
-using System.Text;
-using System.Threading.Tasks;
+﻿using System.Linq.Expressions;
 
 namespace EventSeller.Services.Helpers
 {
@@ -31,7 +26,7 @@ namespace EventSeller.Services.Helpers
 
             return Expression.Lambda<T>(combinedExpression, firstExpression.Parameters);
         }
-        public static Expression<T> AddAlso<T>(this 
+        public static Expression<T> AddAlso<T>(this
             Expression<T> firstExpression,
             Expression<T> secondExpression)
         {

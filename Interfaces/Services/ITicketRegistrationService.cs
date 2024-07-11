@@ -1,5 +1,4 @@
-﻿using DataLayer.Model;
-using EventSeller.DataLayer.Entities;
+﻿using EventSeller.DataLayer.Entities;
 using EventSeller.DataLayer.EntitiesDto.Ticket;
 
 namespace EventSeller.Services.Interfaces.Services

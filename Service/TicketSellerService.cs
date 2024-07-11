@@ -1,13 +1,9 @@
 ﻿using AutoMapper;
-using DataLayer.Model;
 using EventSeller.DataLayer.Entities;
 using EventSeller.DataLayer.EntitiesDto;
 using EventSeller.Services.Interfaces;
 using EventSeller.Services.Interfaces.Services;
 using Microsoft.Extensions.Logging;
-using System;
-using System.Net.Sockets;
-using System.Threading.Tasks;
 
 namespace EventSeller.Services.Service
 {
@@ -85,7 +81,7 @@ namespace EventSeller.Services.Service
             var confirmationCode = paymentConfirmationDTO.ConfirmationCode;
 
             _logger.LogInformation("ConfirmTicketPaymentAsync: Confirming ticket payment for TicketId {TicketId}, TransactionId {TransactionId}, and UserName {UserName}", ticketId, transactionId, userName);
-           
+
             var ticket = await _ticketService.GetByIDAsync(ticketId);
             if (ticket == null)
             {
@@ -141,7 +137,7 @@ namespace EventSeller.Services.Service
 
             var ticket = await _ticketService.GetTicketWithIncudesByIdAsync(ticketId, TicketIncludesToEventType);
 
-            if (ticket == null || ticket.EventSession == null || ticket.EventSession.Event == null || ticket.EventSession.Event.EventType==null)
+            if (ticket == null || ticket.EventSession == null || ticket.EventSession.Event == null || ticket.EventSession.Event.EventType == null)
             {
                 _logger.LogWarning("GetFullTicketPriceAsync: Ticket is null or one of it's parents");
                 throw new InvalidOperationException("Ticket doesn't exist or corrupted");
@@ -179,7 +175,7 @@ namespace EventSeller.Services.Service
 
             var isNotAvailable = ticket.isSold || _bookingService.IsTicketBooked(ticket);
 
-            if (isNotAvailable) 
+            if (isNotAvailable)
             {
                 _logger.LogInformation("IsTicketAvailableForPurchase: Ticket availability for TicketId {TicketId} is {IsAvailable}", ticket.ID, !isNotAvailable);
 
@@ -188,7 +184,7 @@ namespace EventSeller.Services.Service
 
             var ticketSession = await _eventSessionService.GetByIDAsync(ticket.EventSessionID);
 
-            if (ticketSession == null) 
+            if (ticketSession == null)
             {
                 _logger.LogWarning("IsTicketAvailableForPurchase: EventSession is null");
                 throw new InvalidOperationException("Ticket doesn't exist");
@@ -222,7 +218,7 @@ namespace EventSeller.Services.Service
             }
             var isTicketAvailable = await IsTicketAvailableForPurchaseByIdAsync(ticketId);
 
-            if (!isTicketAvailable )
+            if (!isTicketAvailable)
             {
                 _logger.LogWarning("ProcessTicketBuyingAsync: TicketId {TicketId} is not available for purchase", ticketId);
                 throw new InvalidOperationException("Ticket is not available for purchase. Try later.");
@@ -281,7 +277,7 @@ namespace EventSeller.Services.Service
 
             var ticketEventBegins = ticket.EventSession.StartSessionDateTime;
 
-            var minutesForReturn = - ticket.EventSession.Event.EventType.MinutesForMoneyReturn;
+            var minutesForReturn = -ticket.EventSession.Event.EventType.MinutesForMoneyReturn;
             var noReturnTime = ticketEventBegins.AddMinutes(minutesForReturn);
 
             if (DateTime.UtcNow > noReturnTime)
@@ -289,7 +285,7 @@ namespace EventSeller.Services.Service
                 _logger.LogWarning("GetFullTicketPriceAsync: Time for return is gone");
                 throw new InvalidOperationException("Unable to return ticket. Time for return expired.");
             }
-            
+
             try
             {
                 await _externalPaymentService.ReturnPaymentAsync(ticketTransaction.TransactionId);
@@ -303,7 +299,7 @@ namespace EventSeller.Services.Service
 
             ticket.isSold = false;
             ticketTransaction.IsReturned = true;
-            
+
             await _unitOfWork.SaveAsync();
 
             await _bookingService.UnbookTicketByIdAsync(ticket.ID);

@@ -5,7 +5,7 @@ using EventSeller.Services.Interfaces;
 using EventSeller.Services.Interfaces.Services;
 using System.Linq.Expressions;
 
-namespace Services.Service
+namespace EventSeller.Services.Service
 {
     /// <summary>
     /// Represents the default implementation of the <see cref="IEventService"/>.
@@ -29,7 +29,7 @@ namespace Services.Service
         /// <inheritdoc/>
         public async Task CreateAsync(AddEventDto model)
         {
-            await _unitOfWork.EventRepository.InsertAsync( _mapper.Map<Event>(model) );
+            await _unitOfWork.EventRepository.InsertAsync(_mapper.Map<Event>(model));
             await _unitOfWork.SaveAsync();
         }
         /// <inheritdoc/>
@@ -44,9 +44,9 @@ namespace Services.Service
             return _unitOfWork.EventRepository.GetByIDAsync(id);
         }
         /// <inheritdoc/>
-        public async Task<Event?> GetWithIncludesByIDAsync(long id,string includeProperties = null)
+        public async Task<Event?> GetWithIncludesByIDAsync(long id, string includeProperties = null)
         {
-            return (await _unitOfWork.EventRepository.GetAsync(obj => obj.ID==id , null , includeProperties)).FirstOrDefault();
+            return (await _unitOfWork.EventRepository.GetAsync(obj => obj.ID == id, null, includeProperties)).FirstOrDefault();
         }
         /// <inheritdoc/>
         public Task<IEnumerable<Event>> GetEventsAsync()
