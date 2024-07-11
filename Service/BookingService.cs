@@ -17,7 +17,7 @@ namespace EventSeller.Services.Service
         private readonly ITicketService _ticketService;
         private readonly IUnitOfWork _unitOfWork;
         private readonly ILogger<BookingService> _logger;
-        const string TEMPORAL_BOOKING_IN_MINUTES = "Booking:TemporalBookingForPurchaseInMinutes";
+        const string TemporalBookingInMinutes = "Booking:TemporalBookingForPurchaseInMinutes";
         /// <summary>
         /// Initializes a new instance of the <see cref="BookingService"/> class.
         /// </summary>
@@ -61,7 +61,7 @@ namespace EventSeller.Services.Service
 
             try
             {
-                var minutesForBooking = int.Parse(_configuration[TEMPORAL_BOOKING_IN_MINUTES]);
+                var minutesForBooking = int.Parse(_configuration[TemporalBookingInMinutes]);
                 ticket.BookedUntil = DateTime.UtcNow.AddMinutes(minutesForBooking);
                 await _unitOfWork.SaveAsync();
                 _logger.LogInformation("TemporaryBookTicketForPurchase: Ticket booked until {BookedUntil}", ticket.BookedUntil);

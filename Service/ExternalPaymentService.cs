@@ -1,5 +1,6 @@
 ﻿using EventSeller.DataLayer.ExternalDTO;
 using EventSeller.DataLayer.ExternalDTO.PaymentSystem;
+using EventSeller.Services.Helpers.Constants;
 using EventSeller.Services.Interfaces.Services;
 using Microsoft.Extensions.Logging;
 using Newtonsoft.Json;
@@ -15,13 +16,7 @@ namespace EventSeller.Services.Service
     {
         private readonly HttpClient _httpClient;
         private readonly ILogger<ExternalPaymentService> _logger;
-        private const string MEDIA_TYPE = "application/json";
 
-        private const string EXTERNAL_API_PATH = "http://localhost:5289/api/payment";
-        internal const string PROCESS_PAYMENT_PATH = $"{EXTERNAL_API_PATH}/process";
-        internal const string CANCEL_PAYMENT_PATH = $"{EXTERNAL_API_PATH}/cancel";
-        internal const string CONFIRM_PAYMENT_PATH = $"{EXTERNAL_API_PATH}/confirm";
-        internal const string RETURN_PAYMENT_PATH = $"{EXTERNAL_API_PATH}/return";
 
         /// <summary>
         /// Initializes a new instance of the <see cref="ExternalPaymentService"/> class.
@@ -45,16 +40,16 @@ namespace EventSeller.Services.Service
                 UnreturnableFee = unreturnableFee
             };
 
-            var content = new StringContent(JsonConvert.SerializeObject(request), Encoding.UTF8, MEDIA_TYPE);
+            var content = new StringContent(JsonConvert.SerializeObject(request), Encoding.UTF8, ExternalPaymentsConstants.MediaType);
 
             _logger.LogInformation("ProcessPaymentAsync: Sending payment process request for CardId {CardId}", cardId);
-            var response = await _httpClient.PostAsync(PROCESS_PAYMENT_PATH, content);
+            var response = await _httpClient.PostAsync(ExternalPaymentsConstants.ProcessPaymentPath, content);
 
             if (response.IsSuccessStatusCode)
             {
                 var responseContent = await response.Content.ReadAsStringAsync();
                 _logger.LogInformation("ProcessPaymentAsync: Response {response}", responseContent);
-                var result = JsonConvert.DeserializeObject<JSONRootObjectResponse<ProcessPaymentResponse>>(responseContent);
+                var result = JsonConvert.DeserializeObject<ProcessPaymentResponseRootObject>(responseContent);
 
                 _logger.LogInformation("ProcessPaymentAsync: Payment processed successfully for CardId {CardId}", cardId);
                 return result.ProcessPaymentResponse;
@@ -76,9 +71,9 @@ namespace EventSeller.Services.Service
                 ConfirmationCode = confirmationCode
             };
 
-            var content = new StringContent(JsonConvert.SerializeObject(request), Encoding.UTF8, MEDIA_TYPE);
+            var content = new StringContent(JsonConvert.SerializeObject(request), Encoding.UTF8, ExternalPaymentsConstants.MediaType);
 
-            var response = await _httpClient.PostAsync(CONFIRM_PAYMENT_PATH, content);
+            var response = await _httpClient.PostAsync(ExternalPaymentsConstants.ConfirmPaymentPath, content);
 
             if (response.IsSuccessStatusCode)
             {
@@ -95,7 +90,7 @@ namespace EventSeller.Services.Service
         public async Task CancelPaymentAsync(long transactionId)
         {
             HttpContent content = null;
-            var callPath = $"{CANCEL_PAYMENT_PATH}/{transactionId}";
+            var callPath = $"{ExternalPaymentsConstants.CancelPaymentPath}/{transactionId}";
 
             _logger.LogInformation("CancelPaymentAsync: Sending payment cancellation request for TransactionId {TransactionId}", transactionId);
             var response = await _httpClient.PostAsync(callPath, content);
@@ -113,7 +108,7 @@ namespace EventSeller.Services.Service
         /// <inheritdoc />
         public async Task ReturnPaymentAsync(long transactionId)
         {
-            var callPath = $"{RETURN_PAYMENT_PATH}/{transactionId}";
+            var callPath = $"{ExternalPaymentsConstants.ReturnPaymentPath}/{transactionId}";
             HttpContent content = null;
 
             _logger.LogInformation("ReturnPaymentAsync: Sending payment return request for TransactionId {TransactionId}", transactionId);

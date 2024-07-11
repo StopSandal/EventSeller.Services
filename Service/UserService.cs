@@ -2,6 +2,7 @@
 using EventSeller.DataLayer.Entities;
 using EventSeller.DataLayer.EntitiesDto;
 using EventSeller.DataLayer.EntitiesDto.User;
+using EventSeller.Services.Helpers.Constants;
 using EventSeller.Services.Interfaces;
 using EventSeller.Services.Interfaces.Services;
 using Microsoft.AspNetCore.Identity;
@@ -16,10 +17,6 @@ namespace EventSeller.Services.Service
     /// </summary>
     public class UserService : IUserService
     {
-        private const string LOGIN_PROVIDER = "Server";
-        private const string TOKEN_NAME = "JWT";
-        private const string USER_BASE_ROLE = "Basic";
-
         private readonly UserManager<User> _userManager;
         private readonly SignInManager<User> _signInManager;
         private readonly IMapper _mapper;
@@ -56,7 +53,7 @@ namespace EventSeller.Services.Service
             {
                 throw new InvalidOperationException($"Password doesn't meet requirements {result.Errors}");
             }
-            await _userManager.AddToRoleAsync(user, USER_BASE_ROLE);
+            await _userManager.AddToRoleAsync(user, UsersConstants.UserBaseRole);
             if (!result.Succeeded)
             {
                 throw new InvalidOperationException($"Can't assign basic user role {result.Errors}");
@@ -104,8 +101,8 @@ namespace EventSeller.Services.Service
             var claims = await GetUserClaimsAsync(existingUser);
             var token = _JWTFactory.GenerateToken(claims);
             //set JWT token
-            await _userManager.RemoveAuthenticationTokenAsync(existingUser, LOGIN_PROVIDER, TOKEN_NAME);
-            await _userManager.SetAuthenticationTokenAsync(existingUser, LOGIN_PROVIDER, TOKEN_NAME, token);
+            await _userManager.RemoveAuthenticationTokenAsync(existingUser, UsersConstants.LoginProvider, UsersConstants.TokenName);
+            await _userManager.SetAuthenticationTokenAsync(existingUser, UsersConstants.LoginProvider, UsersConstants.TokenName, token);
             //set Refresh token for user
             var refreshToken = _JWTFactory.GenerateRefreshToken();
             existingUser.RefreshToken = refreshToken;
@@ -148,8 +145,8 @@ namespace EventSeller.Services.Service
 
             // reset JWT token
             var newAccessToken = _JWTFactory.GenerateToken(await GetUserClaimsAsync(user));
-            await _userManager.RemoveAuthenticationTokenAsync(user, LOGIN_PROVIDER, TOKEN_NAME);
-            await _userManager.SetAuthenticationTokenAsync(user, LOGIN_PROVIDER, TOKEN_NAME, newAccessToken);
+            await _userManager.RemoveAuthenticationTokenAsync(user, UsersConstants.LoginProvider, UsersConstants.TokenName);
+            await _userManager.SetAuthenticationTokenAsync(user, UsersConstants.LoginProvider, UsersConstants.TokenName, newAccessToken);
 
 
             return new TokenDTO

@@ -7,11 +7,12 @@ namespace EventSeller.Services.Helpers
 {
     public class ExcelFileExporter : IExcelFileExport
     {
+        private const string ExcelSheetName = "Statistics";
         public async Task<Stream> ExportFileAsync<TClass>(TClass statistics)
         {
             ExcelPackage.LicenseContext = LicenseContext.NonCommercial;
             using var package = new ExcelPackage();
-            var worksheet = package.Workbook.Worksheets.Add("Statistics");
+            var worksheet = package.Workbook.Worksheets.Add(ExcelSheetName);
 
             int currentRow = 1;
             int currentCol = 1;
