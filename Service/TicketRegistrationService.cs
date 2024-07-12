@@ -2,9 +2,16 @@
 using EventSeller.DataLayer.EntitiesDto.Ticket;
 using EventSeller.Services.Interfaces.Services;
 using Microsoft.Extensions.Logging;
+using System;
+using System.Collections.Generic;
+using System.Linq;
+using System.Threading.Tasks;
 
 namespace EventSeller.Services.Service
 {
+    /// <summary>
+    /// Represents the service for ticket registration operations.
+    /// </summary>
     public class TicketRegistrationService : ITicketRegistrationService
     {
         private const string EventIncludedProps = "EventType";
@@ -15,6 +22,14 @@ namespace EventSeller.Services.Service
         private readonly ITicketService _ticketService;
         private readonly IEventSessionService _eventSessionService;
 
+        /// <summary>
+        /// Initializes a new instance of the <see cref="TicketRegistrationService"/> class.
+        /// </summary>
+        /// <param name="logger">The logger.</param>
+        /// <param name="placeHallService">The place hall service.</param>
+        /// <param name="eventService">The event service.</param>
+        /// <param name="ticketService">The ticket service.</param>
+        /// <param name="eventSessionService">The event session service.</param>
         public TicketRegistrationService(
             ILogger<TicketRegistrationService> logger,
             IPlaceHallService placeHallService,
@@ -29,6 +44,7 @@ namespace EventSeller.Services.Service
             _eventSessionService = eventSessionService;
         }
 
+        /// <inheritdoc/>
         public async Task<IEnumerable<Ticket>> AddTicketsForPlaceHallByCountAsync(AddTicketsForHallByCountDTO addTicketsForHallByCountDTO)
         {
             _logger.LogInformation("Starting AddTicketsForPlaceHallByCountAsync with {TicketsCount} tickets", addTicketsForHallByCountDTO.TicketsCount);
@@ -38,6 +54,7 @@ namespace EventSeller.Services.Service
                 _logger.LogError("Ticket count cannot be lesser than 0");
                 throw new InvalidOperationException("Ticket count cannot be lesser than 0");
             }
+
             var eventId = addTicketsForHallByCountDTO.addEventSessionDTO.EventID;
             if (!await _eventService.DoesExistsByIdAsync(eventId))
             {
@@ -50,6 +67,7 @@ namespace EventSeller.Services.Service
                 _logger.LogError("Hall with ID {HallID} does not exist", addTicketsForHallByCountDTO.HallID);
                 throw new InvalidOperationException("Hall doesn't exist");
             }
+
             var eventSession = await _eventSessionService.CreateAsync(addTicketsForHallByCountDTO.addEventSessionDTO);
 
             var name = addTicketsForHallByCountDTO.Name;
@@ -59,15 +77,15 @@ namespace EventSeller.Services.Service
             var hallID = addTicketsForHallByCountDTO.HallID;
 
             var ticketList = Enumerable.Range(0, addTicketsForHallByCountDTO.TicketsCount)
-                                       .Select(_ => new Ticket
-                                       {
-                                           Name = name,
-                                           Description = description,
-                                           Price = price,
-                                           CurrencyType = currencyType,
-                                           EventSessionID = eventSession.Id
-                                       })
-                                       .ToList();
+                .Select(_ => new Ticket
+                {
+                    Name = name,
+                    Description = description,
+                    Price = price,
+                    CurrencyType = currencyType,
+                    EventSessionID = eventSession.Id
+                })
+                .ToList();
 
             await _ticketService.AddTicketListAsync(ticketList);
             _logger.LogInformation("{TicketsCount} tickets added successfully for HallID {HallID} and EventID {EventID}", addTicketsForHallByCountDTO.TicketsCount, hallID, eventId);
@@ -75,6 +93,7 @@ namespace EventSeller.Services.Service
             return ticketList;
         }
 
+        /// <inheritdoc/>
         public async Task<IEnumerable<Ticket>> AddTicketsForPlaceHallForAllSeatsAsync(AddTicketsForHallToFillDTO addTicketsForHallToFillDTO)
         {
             _logger.LogInformation("Starting AddTicketsForPlaceHallForAllSeatsAsync");

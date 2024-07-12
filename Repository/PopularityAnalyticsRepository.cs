@@ -7,15 +7,24 @@ using System.Linq.Expressions;
 
 namespace EventSeller.Services.Repository
 {
+    /// <summary>
+    /// Implements the <see cref="IPopularityAnalyticsRepository"/> interface to provide methods for retrieving popularity analytics data.
+    /// </summary>
     public class PopularityAnalyticsRepository : IPopularityAnalyticsRepository
     {
         private readonly SellerContext _context;
-
+        
+        /// <summary>
+        /// Initializes a new instance of the <see cref="PopularityAnalyticsRepository"/> class with the specified database context.
+        /// </summary>
+        /// <param name="context">The database context.</param>
         public PopularityAnalyticsRepository(SellerContext context)
         {
             _context = context;
         }
 
+        /// <inheritdoc />
+        /// <exception cref="InvalidDataException">Thrown when no events are found with sold tickets.</exception>
         public async Task<IEnumerable<EventPopularityStatistic>> GetEventsWithMaxPopularityAsync(Expression<Func<Event, bool>>? eventsFilter = null, Expression<Func<EventPopularityStatistic, decimal>>? orderBy = null, int maxCount = 0)
         {
             IQueryable<Event> events = _context.Set<Event>();
@@ -75,6 +84,9 @@ namespace EventSeller.Services.Repository
                 })
                 .OrderByDescending(orderBy.Compile());
         }
+
+        /// <inheritdoc />
+        /// <exception cref="InvalidDataException">Thrown when no event types are found with sold tickets.</exception>
         public async Task<IEnumerable<EventTypePopularityStatisticDTO>> GetEventTypesWithPopularityAsync(Expression<Func<EventType, bool>>? eventsFilter = null, Expression<Func<EventTypePopularityStatisticDTO, decimal>>? orderBy = null, int maxCount = 0)
         {
             IQueryable<EventType> eventTypes = _context.Set<EventType>();
@@ -136,6 +148,9 @@ namespace EventSeller.Services.Repository
 
             return resultEntities;
         }
+
+        /// <inheritdoc />
+        /// <exception cref="InvalidDataException">Thrown when no tickets for seats are found.</exception>
         public async Task<IEnumerable<SeatPopularityDTO>> GetSeatPopularityAsync<TField>(Expression<Func<SeatPopularityDTO, TField>> orderBy, Expression<Func<TicketSeat, bool>>? ticketSeatsFilter = null, int maxCount = 0)
         {
             IQueryable<TicketSeat> seats = _context.Set<TicketSeat>();
@@ -186,6 +201,9 @@ namespace EventSeller.Services.Repository
 
             return resultEntities;
         }
+
+        /// <inheritdoc />
+        /// <exception cref="InvalidDataException">Thrown when no seats for the event are found.</exception>
         public async Task<IEnumerable<SeatPopularityDTO>> GetSeatPopularityForEventAsync<TField>(Expression<Func<SeatPopularityDTO, TField>> orderBy, Expression<Func<Ticket, bool>> ticketsFilter, Expression<Func<TicketSeat, bool>>? seatsFilter = null, int maxCount = 0)
         {
             IQueryable<TicketSeat> seats = _context.Set<TicketSeat>();
@@ -238,6 +256,9 @@ namespace EventSeller.Services.Repository
                 })
                 .OrderByDescending(orderBy.Compile());
         }
+
+        /// <inheritdoc />
+        /// <exception cref="InvalidDataException">Thrown when no sectors for the event are found.</exception>
         public async Task<IEnumerable<EventSeatPopularityDTO>> GetSeatPopularityForEventsGroupsAsync<TField>(Func<SeatPopularityDTO, TField> orderBy, Expression<Func<Ticket, bool>> ticketsFilter, Expression<Func<TicketSeat, bool>>? seatsFilter = null, int maxCount = 0)
         {
             IQueryable<TicketSeat> seats = _context.Set<TicketSeat>();
@@ -289,6 +310,8 @@ namespace EventSeller.Services.Repository
 
             return resultEntities;
         }
+        /// <inheritdoc />
+        /// <exception cref="InvalidDataException">Thrown when no sectors are found.</exception>
         public async Task<IEnumerable<SectorPopularityDTO>> GetSectorsPopularityAsync<TField>(Expression<Func<SectorPopularityDTO, TField>> orderBy, Expression<Func<HallSector, bool>>? sectorsFilter = null, int maxCount = 0)
         {
             IQueryable<HallSector> sectors = _context.Set<HallSector>();
@@ -342,6 +365,8 @@ namespace EventSeller.Services.Repository
                             })
                             .OrderByDescending(orderBy.Compile());
         }
+        /// <inheritdoc />
+        /// <exception cref="InvalidDataException">Thrown when no sectors for the event are found.</exception>
         public async Task<IEnumerable<SectorPopularityDTO>> GetSectorsPopularityForEventAsync<TField>(Expression<Func<SectorPopularityDTO, TField>> orderBy, Expression<Func<Ticket, bool>> ticketsFilter, Expression<Func<HallSector, bool>>? sectorsFilter = null, int maxCount = 0)
         {
             IQueryable<HallSector> sectors = _context.Set<HallSector>();
@@ -394,6 +419,9 @@ namespace EventSeller.Services.Repository
                 })
                 .OrderByDescending(orderBy.Compile());
         }
+
+        /// <inheritdoc />
+        /// <exception cref="InvalidDataException">Thrown when no sectors for the event are found.</exception>
         public async Task<IEnumerable<EventSectorPopularityDTO>> GetSectorsPopularityForEventsGroupsAsync<TField>(Func<SectorPopularityDTO, TField> orderBy, Expression<Func<Ticket, bool>> ticketsFilter, Expression<Func<HallSector, bool>>? sectorsFilter = null, int maxCount = 0)
         {
             IQueryable<HallSector> sectors = _context.Set<HallSector>();
