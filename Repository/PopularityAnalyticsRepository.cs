@@ -1,18 +1,17 @@
 ﻿using EventSeller.DataLayer.EF;
 using EventSeller.DataLayer.Entities;
 using EventSeller.DataLayer.EntitiesDto.Statistics;
-using EventSeller.Services.Interfaces;
+using EventSeller.Services.Interfaces.Repositories;
 using Microsoft.EntityFrameworkCore;
 using System.Linq.Expressions;
 
-
 namespace EventSeller.Services.Repository
 {
-    internal class AnalyticsRepositoryAsync : IAnalyticsRepositoryAsync
+    public class PopularityAnalyticsRepository : IPopularityAnalyticsRepository
     {
         private readonly SellerContext _context;
 
-        public AnalyticsRepositoryAsync(SellerContext context)
+        public PopularityAnalyticsRepository(SellerContext context)
         {
             _context = context;
         }
@@ -30,38 +29,19 @@ namespace EventSeller.Services.Repository
                 .Select(eventEntity => new
                 {
                     Event = eventEntity,
-                    TotalTickets = eventEntity.EventSessions
-                        .SelectMany(es => es.Tickets)
-                        .Count(),
-                    SoldCount = eventEntity.EventSessions
-                        .SelectMany(es => es.Tickets)
-                        .Count(ticket => ticket.isSold),
-                    PossibleIncome = eventEntity.EventSessions
-                        .SelectMany(es => es.Tickets)
-                        .Sum(ticket => ticket.Price),
-                    TotalIncome = eventEntity.EventSessions
-                        .SelectMany(es => es.Tickets)
-                        .Where(ticket => ticket.isSold)
-                        .Sum(ticket => ticket.Price)
+                    Tickets = eventEntity.EventSessions.SelectMany(x => x.Tickets).AsQueryable().ToList()
                 })
-                .Where(e => e.TotalTickets > 0)
-                .Select(e => new EventPopularityStatistic
+                .Where(e => e.Tickets.Any())
+                .Select(events => new
                 {
-                    EventItem = e.Event,
-                    PopularityStatistic = new PopularityStatisticDTO
-                    {
-                        Realization = (decimal)e.SoldCount / e.TotalTickets,
-                        TotalIncome = e.TotalIncome,
-                        TotalSold = e.SoldCount,
-                        Monetization = e.TotalIncome / e.PossibleIncome,
-                        Popularity = (e.SoldCount / e.TotalTickets) * (e.TotalIncome / e.PossibleIncome)
-                    }
+                    EventItem = events.Event,
+                    TotalTickets = events.Tickets.Count(),
+                    TotalSold = events.Tickets.Count(ticket => ticket.isSold),
+                    PossibleIncome = events.Tickets.Sum(ticket => ticket.Price),
+                    TotalIncome = events.Tickets.Where(ticket => ticket.isSold).Sum(ticket => ticket.Price)
+
                 });
 
-            if (orderBy != null)
-            {
-                query.OrderByDescending(orderBy);
-            }
 
             if (maxCount > 0)
             {
@@ -70,12 +50,30 @@ namespace EventSeller.Services.Repository
 
             var eventsWithPopularity = await query.ToListAsync();
 
-            if (eventsWithPopularity == null)
+            if (eventsWithPopularity == null || !eventsWithPopularity.Any())
             {
-                throw new InvalidDataException("No events found with sold tickets.");
+                throw new InvalidDataException("No seats found.");
             }
 
-            return eventsWithPopularity;
+            if (orderBy == null)
+            {
+                orderBy = x => x.PopularityStatistic.Popularity;
+            }
+
+            return eventsWithPopularity
+                .Select(e => new EventPopularityStatistic
+                {
+                    PopularityStatistic = new PopularityStatisticDTO
+                    {
+                        Realization = (decimal)e.TotalSold / e.TotalTickets,
+                        TotalIncome = e.TotalIncome,
+                        TotalSold = e.TotalSold,
+                        Monetization = e.TotalIncome / e.PossibleIncome,
+                        Popularity = ((decimal)e.TotalSold / e.TotalTickets) * (e.TotalIncome / e.PossibleIncome)
+                    },
+                    EventItem = e.EventItem
+                })
+                .OrderByDescending(orderBy.Compile());
         }
         public async Task<IEnumerable<EventTypePopularityStatisticDTO>> GetEventTypesWithPopularityAsync(Expression<Func<EventType, bool>>? eventsFilter = null, Expression<Func<EventTypePopularityStatisticDTO, decimal>>? orderBy = null, int maxCount = 0)
         {
@@ -83,91 +81,44 @@ namespace EventSeller.Services.Repository
 
             if (eventsFilter != null)
             {
-                eventTypes.Where(eventsFilter);
+                eventTypes = eventTypes.Where(eventsFilter);
             }
+
             var query = eventTypes
                 .Select(eventTypeEntity => new
                 {
                     EventType = eventTypeEntity,
-                    TotalTickets = eventTypeEntity.Event
-                        .SelectMany(e => e.EventSessions)
-                        .SelectMany(es => es.Tickets)
-                        .Count(),
-                    SoldCount = eventTypeEntity.Event
-                        .SelectMany(e => e.EventSessions)
-                        .SelectMany(es => es.Tickets)
-                        .Count(ticket => ticket.isSold),
-                    PossibleIncome = eventTypeEntity.Event
-                        .SelectMany(e => e.EventSessions)
-                        .SelectMany(es => es.Tickets)
-                        .Sum(ticket => ticket.Price),
-                    TotalIncome = eventTypeEntity.Event
-                        .SelectMany(e => e.EventSessions)
-                        .SelectMany(es => es.Tickets)
-                        .Where(ticket => ticket.isSold)
-                        .Sum(ticket => ticket.Price)
+                    Tickets = eventTypeEntity.Event.SelectMany(e => e.EventSessions).SelectMany(es => es.Tickets).ToList()
                 })
-                .Where(e => e.TotalTickets > 0)
-                .Select(e => new EventTypePopularityStatisticDTO
+                .Where(e => e.Tickets.Any())
+                .Select(e => new
                 {
-                    EventTypeItem = e.EventType,
-                    PopularityStatistic = new PopularityStatisticDTO
-                    {
-                        Realization = (decimal)e.SoldCount / e.TotalTickets,
-                        TotalIncome = e.TotalIncome,
-                        TotalSold = e.SoldCount,
-                        Monetization = e.TotalIncome / e.PossibleIncome,
-                        Popularity = (e.SoldCount / e.TotalTickets) * (e.TotalIncome / e.PossibleIncome)
-                    }
-                });
-
-            if (orderBy != null)
-            {
-                query.OrderByDescending(orderBy);
-            }
+                    EventType = e.EventType,
+                    TotalTickets = e.Tickets.Count,
+                    SoldCount = e.Tickets.Count(ticket => ticket.isSold),
+                    PossibleIncome = e.Tickets.Sum(ticket => ticket.Price),
+                    TotalIncome = e.Tickets.Where(ticket => ticket.isSold).Sum(ticket => ticket.Price)
+                })
+                .Where(e => e.TotalTickets > 0);
 
             if (maxCount > 0)
             {
-                query.Take(maxCount);
+                query = query.Take(maxCount);
             }
 
             var eventsWithPopularity = await query.ToListAsync();
 
-            if (eventsWithPopularity == null)
+            if (eventsWithPopularity == null || !eventsWithPopularity.Any())
             {
                 throw new InvalidDataException("No event types found with sold tickets.");
             }
 
-            return eventsWithPopularity;
-        }
-        public async Task<EventTypePopularityStatisticDTO> GetEventTypeWithMaxPopularityAsync(Expression<Func<EventType, bool>> eventTypeFilter)
-        {
-            var events = _context.Set<EventType>()
-                            .Where(eventTypeFilter);
+            if (orderBy == null)
+            {
+                orderBy = x => x.PopularityStatistic.Popularity;
+            }
 
-            var eventsWithPopularity = await events
-                .Select(eventTypeEntity => new
-                {
-                    EventType = eventTypeEntity,
-                    TotalTickets = eventTypeEntity.Event
-                        .SelectMany(e => e.EventSessions)
-                        .SelectMany(es => es.Tickets)
-                        .Count(),
-                    SoldCount = eventTypeEntity.Event
-                        .SelectMany(e => e.EventSessions)
-                        .SelectMany(es => es.Tickets)
-                        .Count(ticket => ticket.isSold),
-                    PossibleIncome = eventTypeEntity.Event
-                        .SelectMany(e => e.EventSessions)
-                        .SelectMany(es => es.Tickets)
-                        .Sum(ticket => ticket.Price),
-                    TotalIncome = eventTypeEntity.Event
-                        .SelectMany(e => e.EventSessions)
-                        .SelectMany(es => es.Tickets)
-                        .Where(ticket => ticket.isSold)
-                        .Sum(ticket => ticket.Price)
-                })
-                .Where(e => e.TotalTickets > 0)
+            var resultEntities = eventsWithPopularity
                 .Select(e => new EventTypePopularityStatisticDTO
                 {
                     EventTypeItem = e.EventType,
@@ -176,51 +127,14 @@ namespace EventSeller.Services.Repository
                         Realization = (decimal)e.SoldCount / e.TotalTickets,
                         TotalIncome = e.TotalIncome,
                         TotalSold = e.SoldCount,
-                        Monetization = e.TotalIncome / e.PossibleIncome,
-                        Popularity = (e.SoldCount / e.TotalTickets) * (e.TotalIncome / e.PossibleIncome)
+                        Monetization = e.PossibleIncome == 0 ? 0 : e.TotalIncome / e.PossibleIncome,
+                        Popularity = (decimal)e.SoldCount / e.TotalTickets * (e.PossibleIncome == 0 ? 0 : e.TotalIncome / e.PossibleIncome)
                     }
                 })
-                .FirstOrDefaultAsync();
+                .OrderByDescending(orderBy.Compile())
+                .ToList();
 
-            if (eventsWithPopularity == null)
-            {
-                throw new InvalidDataException("No events found with sold tickets.");
-            }
-
-            return eventsWithPopularity;
-        }
-        public async Task<IEnumerable<DaysStatistics>> GetDaysWithTrafficAsync<TField>(Expression<Func<DaysStatistics, TField>> orderBy, Expression<Func<EventSession, bool>>? eventsFilter = null, int maxCount = 0)
-        {
-            IQueryable<EventSession> eventSessions = _context.Set<EventSession>();
-
-            if (eventsFilter != null)
-            {
-                eventSessions = eventSessions.Where(eventsFilter);
-            }
-
-            var query = eventSessions
-                .SelectMany(item => item.Tickets.Select(ticket => ticket.isSold).Where(x => x), (item, ticket) => new { item, ticket })
-                .GroupBy(x => x.item.StartSessionDateTime.Date)
-                .Select(g => new DaysStatistics
-                {
-                    Date = g.Key,
-                    DayOfWeek = g.Key.DayOfWeek.ToString(),
-                    TotalTraffic = g.Count()
-                });
-
-            if (maxCount > 0)
-            {
-                query.Take(maxCount);
-            }
-
-            var eventsWithPopularity = await query.OrderByDescending(orderBy).ToListAsync();
-
-            if (eventsWithPopularity == null)
-            {
-                throw new InvalidDataException("No days found.");
-            }
-
-            return eventsWithPopularity;
+            return resultEntities;
         }
         public async Task<IEnumerable<SeatPopularityDTO>> GetSeatPopularityAsync<TField>(Expression<Func<SeatPopularityDTO, TField>> orderBy, Expression<Func<TicketSeat, bool>>? ticketSeatsFilter = null, int maxCount = 0)
         {
@@ -232,41 +146,45 @@ namespace EventSeller.Services.Repository
             }
 
             var query = seats
-                .Select(_ => new
+                .Select(seat => new
                 {
-                    TotalTickets = _.Tickets.Count(),
-                    TotalSold = _.Tickets.Count(x => x.isSold),
-                    PossibleIncome = _.Tickets.Sum(x => x.Price),
-                    TotalIncome = _.Tickets.Where(x => x.isSold).Sum(x => x.Price),
-                    SeatId = _.ID
+                    TotalTickets = seat.Tickets.Count,
+                    TotalSold = seat.Tickets.Count(x => x.isSold),
+                    PossibleIncome = seat.Tickets.Sum(x => x.Price),
+                    TotalIncome = seat.Tickets.Select(x => new { x.Price, x.isSold }).Where(x => x.isSold).Sum(x => x.Price),
+                    SeatId = seat.ID
                 })
-                .Where(e => e.TotalTickets > 0)
+                .Where(e => e.TotalTickets > 0);
+
+            if (maxCount > 0)
+            {
+                query = query.Take(maxCount);
+            }
+
+            var statisticsList = await query.ToListAsync();
+
+            if (statisticsList == null || !statisticsList.Any())
+            {
+                throw new InvalidDataException("No Tickets for seats found.");
+            }
+
+            var resultEntities = statisticsList
                 .Select(e => new SeatPopularityDTO
                 {
+                    SeatId = e.SeatId,
                     PopularityStatistic = new PopularityStatisticDTO
                     {
                         Realization = (decimal)e.TotalSold / e.TotalTickets,
                         TotalIncome = e.TotalIncome,
                         TotalSold = e.TotalSold,
-                        Monetization = e.TotalIncome / e.PossibleIncome,
-                        Popularity = ((decimal)e.TotalSold / e.TotalTickets) * (e.TotalIncome / e.PossibleIncome)
-                    },
-                    SeatId = e.SeatId
-                });
+                        Monetization = e.PossibleIncome == 0 ? 0 : e.TotalIncome / e.PossibleIncome,
+                        Popularity = (decimal)e.TotalSold / e.TotalTickets * (e.PossibleIncome == 0 ? 0 : e.TotalIncome / e.PossibleIncome)
+                    }
+                })
+                .OrderByDescending(orderBy.Compile())
+                .ToList();
 
-            if (maxCount > 0)
-            {
-                query.Take(maxCount);
-            }
-
-            var statisticsList = await query.OrderByDescending(orderBy).ToListAsync();
-
-            if (statisticsList == null)
-            {
-                throw new InvalidDataException("No Tickets for seats found.");
-            }
-
-            return statisticsList;
+            return resultEntities;
         }
         public async Task<IEnumerable<SeatPopularityDTO>> GetSeatPopularityForEventAsync<TField>(Expression<Func<SeatPopularityDTO, TField>> orderBy, Expression<Func<Ticket, bool>> ticketsFilter, Expression<Func<TicketSeat, bool>>? seatsFilter = null, int maxCount = 0)
         {
@@ -313,8 +231,8 @@ namespace EventSeller.Services.Repository
                         Realization = (decimal)e.TotalSold / e.TotalTickets,
                         TotalIncome = e.TotalIncome,
                         TotalSold = e.TotalSold,
-                        Monetization = e.TotalIncome / e.PossibleIncome,
-                        Popularity = ((decimal)e.TotalSold / e.TotalTickets) * (e.TotalIncome / e.PossibleIncome)
+                        Monetization = e.PossibleIncome == 0 ? 0 : e.TotalIncome / e.PossibleIncome,
+                        Popularity = (decimal)e.TotalSold / e.TotalTickets * (e.PossibleIncome == 0 ? 0 : e.TotalIncome / e.PossibleIncome)
                     },
                     SeatId = e.SeatId
                 })
@@ -394,33 +312,35 @@ namespace EventSeller.Services.Repository
                     TotalIncome = _.Tickets.Where(x => x.isSold).Sum(x => x.Price),
                     SectorId = _.Sector.ID
                 })
-                .Where(e => e.TotalTickets > 0)
-                .Select(e => new SectorPopularityDTO
-                {
-                    PopularityStatistic = new PopularityStatisticDTO
-                    {
-                        Realization = (decimal)e.TotalSold / e.TotalTickets,
-                        TotalIncome = e.TotalIncome,
-                        TotalSold = e.TotalSold,
-                        Monetization = e.TotalIncome / e.PossibleIncome,
-                        Popularity = (e.TotalSold / e.TotalTickets) * (e.TotalIncome / e.PossibleIncome)
-                    },
-                    SectorId = e.SectorId
-                });
+                .Where(e => e.TotalTickets > 0);
+
 
             if (maxCount > 0)
             {
                 query.Take(maxCount);
             }
 
-            var statisticsList = await query.OrderByDescending(orderBy).ToListAsync();
+            var statisticsList = await query.ToListAsync();
 
             if (statisticsList == null)
             {
                 throw new InvalidDataException("No Tickets for sector found.");
             }
 
-            return statisticsList;
+            return statisticsList
+                            .Select(e => new SectorPopularityDTO
+                            {
+                                PopularityStatistic = new PopularityStatisticDTO
+                                {
+                                    Realization = (decimal)e.TotalSold / e.TotalTickets,
+                                    TotalIncome = e.TotalIncome,
+                                    TotalSold = e.TotalSold,
+                                    Monetization = e.TotalIncome / e.PossibleIncome,
+                                    Popularity = (e.TotalSold / e.TotalTickets) * (e.TotalIncome / e.PossibleIncome)
+                                },
+                                SectorId = e.SectorId
+                            })
+                            .OrderByDescending(orderBy.Compile());
         }
         public async Task<IEnumerable<SectorPopularityDTO>> GetSectorsPopularityForEventAsync<TField>(Expression<Func<SectorPopularityDTO, TField>> orderBy, Expression<Func<Ticket, bool>> ticketsFilter, Expression<Func<HallSector, bool>>? sectorsFilter = null, int maxCount = 0)
         {
@@ -484,7 +404,8 @@ namespace EventSeller.Services.Repository
             }
 
             var query = sectors
-                .SelectMany(sector => sector.TicketSeats.SelectMany(x => x.Tickets).AsQueryable().Where(ticketsFilter), (sector, ticket) => new { sector, ticket })
+                .SelectMany(sector => sector.TicketSeats.SelectMany(x => x.Tickets).AsQueryable().Where(ticketsFilter)
+                    , (sector, ticket) => new { sector, ticket })
                 .GroupBy(st => new { st.sector.ID, st.ticket.EventSession.EventID })
                 .Select(g => new
                 {

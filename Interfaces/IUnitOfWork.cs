@@ -1,4 +1,5 @@
 ﻿using EventSeller.DataLayer.Entities;
+using EventSeller.Services.Interfaces.Repositories;
 
 namespace EventSeller.Services.Interfaces
 {
@@ -48,9 +49,19 @@ namespace EventSeller.Services.Interfaces
         /// </summary>
         IRepositoryAsync<EventSession> EventSessionRepository { get; }
         /// <summary>
-        /// Repository that responsible for specific queries for analytics.
+        /// Gets the repository for traffic analytics.
         /// </summary>
-        IAnalyticsRepositoryAsync AnalyticsRepository { get; }
+        ITrafficAnalyticsRepository TrafficAnalyticsRepository { get; }
+
+        /// <summary>
+        /// Gets the repository for sales analytics.
+        /// </summary>
+        ISalesAnalyticsRepository SalesAnalyticsRepository { get; }
+
+        /// <summary>
+        /// Gets the repository for popularity analytics.
+        /// </summary>
+        IPopularityAnalyticsRepository PopularityAnalyticsRepository { get; }
 
         /// <summary>
         /// Saves all changes made in this unit of work to the underlying database.

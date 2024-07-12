@@ -1,5 +1,5 @@
 ﻿using EventSeller.DataLayer.EF;
-using EventSeller.Services.Interfaces;
+using EventSeller.Services.Interfaces.Repositories;
 using Microsoft.EntityFrameworkCore;
 using System.Linq.Expressions;
 

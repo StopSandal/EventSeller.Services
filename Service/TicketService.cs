@@ -3,7 +3,6 @@ using EventSeller.DataLayer.Entities;
 using EventSeller.DataLayer.EntitiesDto.Ticket;
 using EventSeller.Services.Interfaces;
 using EventSeller.Services.Interfaces.Services;
-using System.Linq.Expressions;
 
 namespace EventSeller.Services.Service
 {
@@ -79,25 +78,6 @@ namespace EventSeller.Services.Service
 
             return ticket.FirstOrDefault();
         }
-        /// <inheritdoc/>
-        public async Task<IEnumerable<TField>> GetFieldValuesAsync<TField>(Expression<Func<Ticket, bool>> filter, Expression<Func<Ticket, TField>> selector)
-        {
-            return await _unitOfWork.TicketRepository.GetFieldValuesAsync(filter, selector);
-        }
-        /// <inheritdoc/>
-        public async Task<int> GetTicketCountAsync(Expression<Func<Ticket, bool>> filter = null, IEnumerable<string> includeProperties = null)
-        {
-            return await _unitOfWork.TicketRepository.GetCountAsync(filter, includeProperties);
-        }
-        /// <inheritdoc/>
-        public async Task<decimal> GetTicketAveragePriceAsync(Expression<Func<Ticket, bool>> filter = null, IEnumerable<string> includeProperties = null)
-        {
-            return await _unitOfWork.TicketRepository.GetAverageAsync(ticket => ticket.Price, filter);
-        }
-        /// <inheritdoc/>
-        public async Task<decimal> GetTicketTotalPriceAsync(Expression<Func<Ticket, bool>> filter = null, IEnumerable<string> includeProperties = null)
-        {
-            return await _unitOfWork.TicketRepository.GetSumAsync(ticket => ticket.Price, filter);
-        }
+
     }
 }

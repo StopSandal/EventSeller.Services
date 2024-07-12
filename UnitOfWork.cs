@@ -1,6 +1,7 @@
 ﻿using EventSeller.DataLayer.EF;
 using EventSeller.DataLayer.Entities;
 using EventSeller.Services.Interfaces;
+using EventSeller.Services.Interfaces.Repositories;
 using EventSeller.Services.Repository;
 
 
@@ -22,7 +23,10 @@ namespace EventSeller.Services
         private IRepositoryAsync<Ticket> ticketRepository;
         private IRepositoryAsync<TicketSeat> ticketSeatRepository;
         private IRepositoryAsync<TicketTransaction> ticketTransactionRepository;
-        private IAnalyticsRepositoryAsync analyticsRepository;
+        private IPopularityAnalyticsRepository popularityAnalyticsRepository;
+        private ITrafficAnalyticsRepository trafficAnalyticsRepository;
+        private ISalesAnalyticsRepository salesAnalyticsRepository;
+
         /// <summary>
         /// Initializes a new instance of the <see cref="UnitOfWork"/> class with the specified context.
         /// </summary>
@@ -139,15 +143,39 @@ namespace EventSeller.Services
             }
         }
         /// <inheritdoc />
-        public IAnalyticsRepositoryAsync AnalyticsRepository
+        public ISalesAnalyticsRepository SalesAnalyticsRepository
         {
             get
             {
-                if (analyticsRepository == null)
+                if (salesAnalyticsRepository == null)
                 {
-                    analyticsRepository = new AnalyticsRepositoryAsync(context);
+                    salesAnalyticsRepository = new SalesAnalyticsRepository(context);
                 }
-                return analyticsRepository;
+                return salesAnalyticsRepository;
+            }
+        }
+        /// <inheritdoc />
+        public ITrafficAnalyticsRepository TrafficAnalyticsRepository
+        {
+            get
+            {
+                if (trafficAnalyticsRepository == null)
+                {
+                    trafficAnalyticsRepository = new TrafficAnalyticsRepository(context);
+                }
+                return trafficAnalyticsRepository;
+            }
+        }
+        /// <inheritdoc />
+        public IPopularityAnalyticsRepository PopularityAnalyticsRepository
+        {
+            get
+            {
+                if (popularityAnalyticsRepository == null)
+                {
+                    popularityAnalyticsRepository = new PopularityAnalyticsRepository(context);
+                }
+                return popularityAnalyticsRepository;
             }
         }
 

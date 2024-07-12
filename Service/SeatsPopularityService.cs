@@ -19,15 +19,15 @@ namespace EventSeller.Services.Service
 
         public async Task<IEnumerable<SeatPopularityDTO>> GetSeatsPopularityForEventAsync(long eventId, int maxCount = 0)
         {
-            return await _unitOfWork.AnalyticsRepository.GetSeatPopularityForEventAsync(obj => obj.PopularityStatistic.Popularity, obj => obj.EventSession.EventID == eventId, null, maxCount);
+            return await _unitOfWork.PopularityAnalyticsRepository.GetSeatPopularityForEventAsync(obj => obj.PopularityStatistic.Popularity, obj => obj.EventSession.EventID == eventId, null, maxCount);
         }
         public async Task<IEnumerable<SeatPopularityDTO>> GetSeatsPopularityInHallAsync(long placeHallId, int maxCount = 0)
         {
-            return await _unitOfWork.AnalyticsRepository.GetSeatPopularityAsync(obj => obj.PopularityStatistic.Popularity, obj => obj.HallSector.PlaceHallID == placeHallId, maxCount);
+            return await _unitOfWork.PopularityAnalyticsRepository.GetSeatPopularityAsync(obj => obj.PopularityStatistic.Popularity, obj => obj.HallSector.PlaceHallID == placeHallId, maxCount);
         }
         public async Task<IEnumerable<EventSeatPopularityDTO>> GetSeatsPopularityByEventGroupsAtHallAsync(long placeHallId, IEnumerable<long> eventIds, int maxCount = 0)
         {
-            return await _unitOfWork.AnalyticsRepository.GetSeatPopularityForEventsGroupsAsync(obj => obj.PopularityStatistic.Popularity, tickets => eventIds.Contains(tickets.EventSession.EventID), obj => obj.HallSector.PlaceHallID == placeHallId, maxCount);
+            return await _unitOfWork.PopularityAnalyticsRepository.GetSeatPopularityForEventsGroupsAsync(obj => obj.PopularityStatistic.Popularity, tickets => eventIds.Contains(tickets.EventSession.EventID), obj => obj.HallSector.PlaceHallID == placeHallId, maxCount);
         }
     }
 }

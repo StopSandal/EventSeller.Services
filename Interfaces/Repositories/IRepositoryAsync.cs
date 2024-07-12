@@ -1,6 +1,6 @@
 ﻿using System.Linq.Expressions;
 
-namespace EventSeller.Services.Interfaces
+namespace EventSeller.Services.Interfaces.Repositories
 {
     /// <summary>
     /// Defines the contract for a generic repository that supports asynchronous operations.
