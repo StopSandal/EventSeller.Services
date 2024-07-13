@@ -5,6 +5,7 @@ using Microsoft.Extensions.Logging;
 using System;
 using System.Collections.Generic;
 using System.Threading.Tasks;
+using static Microsoft.IO.RecyclableMemoryStreamManager;
 
 namespace EventSeller.Services.Service
 {
@@ -47,6 +48,11 @@ namespace EventSeller.Services.Service
         /// <inheritdoc/>
         public async Task<SalesStatisticsDTO> GetSalesStatisticForEventsAsync(IEnumerable<long> eventIds)
         {
+            if (!eventIds.Any())
+            {
+                _logger.LogError("No events provided");
+                throw new ArgumentNullException($"No events provided");
+            }
             _logger.LogInformation("Fetching sales statistics for events.");
             return await _unitOfWork.SalesAnalyticsRepository.GetTicketsSalesAsync(ticket => eventIds.Contains(ticket.EventSession.EventID));
         }
@@ -61,6 +67,11 @@ namespace EventSeller.Services.Service
         /// <inheritdoc/>
         public async Task<SalesStatisticsDTO> GetSalesStatisticForEventSessionsAsync(IEnumerable<long> eventSessionIds)
         {
+            if (!eventSessionIds.Any())
+            {
+                _logger.LogError("No event sessions provided");
+                throw new ArgumentNullException($"No events provided");
+            }
             _logger.LogInformation("Fetching sales statistics for event sessions.");
             return await _unitOfWork.SalesAnalyticsRepository.GetTicketsSalesAsync(ticket => eventSessionIds.Contains(ticket.EventSessionID));
         }

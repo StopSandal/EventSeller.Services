@@ -50,6 +50,11 @@ namespace EventSeller.Services.Service
         /// <inheritdoc/>
         public async Task<IEnumerable<EventSectorPopularityDTO>> GetSectorsPopularityByEventGroupsAtHallAsync(long placeHallId, IEnumerable<long> eventIds, int maxCount = 0)
         {
+            if (!eventIds.Any())
+            {
+                _logger.LogError("No events provided");
+                throw new ArgumentNullException($"No events provided");
+            }
             _logger.LogInformation("Fetching sector popularity for event groups at hall with ID: {PlaceHallId}", placeHallId);
             return await _unitOfWork.PopularityAnalyticsRepository.GetSectorsPopularityForEventsGroupsAsync(
                 obj => obj.PopularityStatistic.Popularity,

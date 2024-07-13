@@ -37,13 +37,13 @@ namespace EventSeller.Services.Repository
             var query = events
                 .Select(eventEntity => new
                 {
-                    Event = eventEntity,
+                    EventId = eventEntity.ID,
                     Tickets = eventEntity.EventSessions.SelectMany(x => x.Tickets).AsQueryable().ToList()
                 })
                 .Where(e => e.Tickets.Any())
                 .Select(events => new
                 {
-                    EventItem = events.Event,
+                    EventId = events.EventId,
                     TotalTickets = events.Tickets.Count(),
                     TotalSold = events.Tickets.Count(ticket => ticket.isSold),
                     PossibleIncome = events.Tickets.Sum(ticket => ticket.Price),
@@ -54,7 +54,7 @@ namespace EventSeller.Services.Repository
 
             if (maxCount > 0)
             {
-                query.Take(maxCount);
+                query = query.Take(maxCount);
             }
 
             var eventsWithPopularity = await query.ToListAsync();
@@ -69,20 +69,21 @@ namespace EventSeller.Services.Repository
                 orderBy = x => x.PopularityStatistic.Popularity;
             }
 
-            return eventsWithPopularity
+            var result = eventsWithPopularity
                 .Select(e => new EventPopularityStatistic
-                {
-                    PopularityStatistic = new PopularityStatisticDTO
-                    {
-                        Realization = (decimal)e.TotalSold / e.TotalTickets,
-                        TotalIncome = e.TotalIncome,
-                        TotalSold = e.TotalSold,
-                        Monetization = e.TotalIncome / e.PossibleIncome,
-                        Popularity = ((decimal)e.TotalSold / e.TotalTickets) * (e.TotalIncome / e.PossibleIncome)
-                    },
-                    EventItem = e.EventItem
+                 {
+                     PopularityStatistic = new PopularityStatisticDTO
+                     {
+                         Realization = (decimal)e.TotalSold / e.TotalTickets,
+                         TotalIncome = e.TotalIncome,
+                         TotalSold = e.TotalSold,
+                         Monetization = e.TotalIncome / e.PossibleIncome,
+                         Popularity = ((decimal)e.TotalSold / e.TotalTickets) * (e.TotalIncome / e.PossibleIncome)
+                     },
+                     EventId = e.EventId
                 })
                 .OrderByDescending(orderBy.Compile());
+            return result;
         }
 
         /// <inheritdoc />
@@ -105,7 +106,7 @@ namespace EventSeller.Services.Repository
                 .Where(e => e.Tickets.Any())
                 .Select(e => new
                 {
-                    EventType = e.EventType,
+                    EventTypeId = e.EventType.Id,
                     TotalTickets = e.Tickets.Count,
                     SoldCount = e.Tickets.Count(ticket => ticket.isSold),
                     PossibleIncome = e.Tickets.Sum(ticket => ticket.Price),
@@ -133,7 +134,7 @@ namespace EventSeller.Services.Repository
             var resultEntities = eventsWithPopularity
                 .Select(e => new EventTypePopularityStatisticDTO
                 {
-                    EventTypeItem = e.EventType,
+                    EventTypeId = e.EventTypeId,
                     PopularityStatistic = new PopularityStatisticDTO
                     {
                         Realization = (decimal)e.SoldCount / e.TotalTickets,
@@ -340,7 +341,7 @@ namespace EventSeller.Services.Repository
 
             if (maxCount > 0)
             {
-                query.Take(maxCount);
+                query = query.Take(maxCount);
             }
 
             var statisticsList = await query.ToListAsync();

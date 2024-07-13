@@ -72,7 +72,7 @@ namespace EventSeller.Services.Helpers
                         WriteHeader(elementProperties, worksheet, ref currentRow, ref currentCol);
                     }
                 }
-                else if (!property.PropertyType.IsPrimitive && property.PropertyType != typeof(string) && property.PropertyType != typeof(decimal))
+                else if (!property.PropertyType.IsPrimitive && property.PropertyType != typeof(string) && property.PropertyType != typeof(decimal) && property.PropertyType != typeof(DateTime))
                 {
                     var nestedProperties = property.PropertyType.GetProperties(BindingFlags.Public | BindingFlags.Instance);
                     WriteHeader(nestedProperties, worksheet, ref currentRow, ref currentCol);
@@ -102,7 +102,7 @@ namespace EventSeller.Services.Helpers
                         currentRow++;
                     }
                 }
-                else if (value != null && !value.GetType().IsPrimitive && value.GetType() != typeof(string) && value.GetType() != typeof(decimal))
+                else if (value != null && !value.GetType().IsPrimitive && value.GetType() != typeof(string) && value.GetType() != typeof(decimal) && value.GetType() != typeof(DateTime))
                 {
                     var nestedProperties = value.GetType().GetProperties(BindingFlags.Public | BindingFlags.Instance);
                     WriteData(nestedProperties, worksheet, value, ref currentRow, ref currentCol);
