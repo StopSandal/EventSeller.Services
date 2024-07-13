@@ -1,15 +1,10 @@
 ﻿using EventSeller.Services.Interfaces;
-using Microsoft.AspNetCore.Identity;
 using Microsoft.Extensions.Configuration;
 using Microsoft.IdentityModel.Tokens;
-using System;
-using System.Collections.Generic;
 using System.IdentityModel.Tokens.Jwt;
-using System.Linq;
 using System.Security.Claims;
 using System.Security.Cryptography;
 using System.Text;
-using System.Threading.Tasks;
 
 namespace EventSeller.Services.Helpers
 {
@@ -18,6 +13,10 @@ namespace EventSeller.Services.Helpers
     /// </summary>
     public class JWTFactory : IJWTFactory
     {
+        private const string AccessTokenExpirationDays = "JWT:AccessTokenDaysForExpiration";
+        private const string SecretKey = "JWT:Secret";
+        private const string RefreshTokenValidityDays = "JWT:RefreshTokenValidityInDays";
+
         private readonly IConfiguration _configuration;
 
         public JWTFactory(IConfiguration configuration)
@@ -38,10 +37,10 @@ namespace EventSeller.Services.Helpers
             var jwtToken = new JwtSecurityToken(
                 claims: claims,
                 notBefore: DateTime.UtcNow,
-                expires: DateTime.UtcNow.AddDays(int.Parse(_configuration["JWT:AccessTokenDaysForExpiration"])),
+                expires: DateTime.UtcNow.AddDays(int.Parse(_configuration[AccessTokenExpirationDays])),
                 signingCredentials: new SigningCredentials(
                     new SymmetricSecurityKey(
-                       Encoding.UTF8.GetBytes(_configuration["JWT:Secret"])
+                       Encoding.UTF8.GetBytes(_configuration[SecretKey])
                         ),
                     SecurityAlgorithms.HmacSha256Signature)
                 );
@@ -55,7 +54,7 @@ namespace EventSeller.Services.Helpers
                 ValidateAudience = false,
                 ValidateIssuer = false,
                 ValidateIssuerSigningKey = true,
-                IssuerSigningKey = new SymmetricSecurityKey(Encoding.UTF8.GetBytes(_configuration["JWT:Secret"])),
+                IssuerSigningKey = new SymmetricSecurityKey(Encoding.UTF8.GetBytes(_configuration[SecretKey])),
                 ValidateLifetime = false
             };
 
@@ -73,7 +72,7 @@ namespace EventSeller.Services.Helpers
         /// <inheritdoc/>
         public int GetRefreshTokenValidityInDays()
         {
-            return int.Parse(_configuration["JWT:RefreshTokenValidityInDays"]);
+            return int.Parse(_configuration[RefreshTokenValidityDays]);
         }
     }
 }

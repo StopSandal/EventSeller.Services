@@ -1,52 +1,16 @@
 ﻿using AutoMapper;
-using DataLayer.Model;
-using DataLayer.Models.Ticket;
+using EventSeller.DataLayer.Entities;
+using EventSeller.DataLayer.EntitiesDto.Ticket;
 using EventSeller.Services.Interfaces;
+using EventSeller.Services.Interfaces.Services;
+using Microsoft.Extensions.Logging;
+using System;
+using System.Collections.Generic;
+using System.Linq;
+using System.Threading.Tasks;
 
-namespace Services.Service
+namespace EventSeller.Services.Service
 {
-    /// <summary>
-    /// Represents all actions with the <see cref="Ticket"/> class.
-    /// </summary>
-    /// <remarks>All actions include CRUD operations</remarks>
-    public interface ITicketService
-    {
-        /// <summary>
-        /// Retrieves a ticket by its identifier.
-        /// </summary>
-        /// <param name="id">The identifier of the ticket.</param>
-        /// <returns>A task that represents the asynchronous operation. The task result contains the ticket.</returns>
-        Task<Ticket> GetByID(long id);
-
-        /// <summary>
-        /// Retrieves a collection of all tickets.
-        /// </summary>
-        /// <returns>A task that represents the asynchronous operation. The task result contains a collection of tickets.</returns>
-        Task<IEnumerable<Ticket>> GetTickets();
-
-        /// <summary>
-        /// Creates a new ticket.
-        /// </summary>
-        /// <param name="model">The data transfer object containing ticket details.</param>
-        /// <returns>A task that represents the asynchronous operation.</returns>
-        Task Create(AddTicketDto model);
-
-        /// <summary>
-        /// Updates an existing ticket.
-        /// </summary>
-        /// <param name="id">The identifier of the ticket to update.</param>
-        /// <param name="model">The data transfer object containing updated ticket details.</param>
-        /// <returns>A task that represents the asynchronous operation.</returns>
-        Task Update(long id, EditTicketDto model);
-
-        /// <summary>
-        /// Deletes a ticket by its identifier.
-        /// </summary>
-        /// <param name="id">The identifier of the ticket to delete.</param>
-        /// <returns>A task that represents the asynchronous operation.</returns>
-        Task Delete(long id);
-    }
-
     /// <summary>
     /// Represents the default implementation of the <see cref="ITicketService"/>.
     /// </summary>
@@ -55,53 +19,89 @@ namespace Services.Service
     {
         private readonly IUnitOfWork _unitOfWork;
         private readonly IMapper _mapper;
+        private readonly ILogger<TicketService> _logger;
 
         /// <summary>
-        /// Initializes a new instance of the <see cref="TicketService"/> class with the specified unit of work and mapper.
+        /// Initializes a new instance of the <see cref="TicketService"/> class with the specified unit of work, mapper, and logger.
         /// </summary>
         /// <param name="unitOfWork">The unit of work <see cref="IUnitOfWork"/>.</param>
         /// <param name="mapper">The mapper.</param>
-        public TicketService(IUnitOfWork unitOfWork, IMapper mapper)
+        /// <param name="logger">The logger.</param>
+        public TicketService(IUnitOfWork unitOfWork, IMapper mapper, ILogger<TicketService> logger)
         {
             _unitOfWork = unitOfWork;
             _mapper = mapper;
+            _logger = logger;
         }
 
         /// <inheritdoc/>
-        public async Task Create(AddTicketDto model)
+        public async Task CreateAsync(AddTicketDto model)
         {
-            await _unitOfWork.TicketRepository.Insert(_mapper.Map<Ticket>(model));
-            await _unitOfWork.Save();
+            _logger.LogInformation("Creating a new ticket.");
+            await _unitOfWork.TicketRepository.InsertAsync(_mapper.Map<Ticket>(model));
+            await _unitOfWork.SaveAsync();
+            _logger.LogInformation("Ticket created successfully.");
         }
 
         /// <inheritdoc/>
-        public async Task Delete(long id)
+        public async Task AddTicketListAsync(IEnumerable<Ticket> ticketList)
         {
-            await _unitOfWork.TicketRepository.Delete(id);
-            await _unitOfWork.Save();
+            _logger.LogInformation("Adding a list of tickets.");
+            await _unitOfWork.TicketRepository.InsertRangeAsync(ticketList);
+            await _unitOfWork.SaveAsync();
+            _logger.LogInformation("Tickets added successfully.");
         }
 
         /// <inheritdoc/>
-        public Task<Ticket> GetByID(long id)
+        public async Task DeleteAsync(long id)
         {
-            return _unitOfWork.TicketRepository.GetByID(id);
+            _logger.LogInformation("Deleting ticket with ID: {Id}", id);
+            await _unitOfWork.TicketRepository.DeleteAsync(id);
+            await _unitOfWork.SaveAsync();
+            _logger.LogInformation("Ticket deleted successfully.");
         }
 
         /// <inheritdoc/>
-        public Task<IEnumerable<Ticket>> GetTickets()
+        public Task<Ticket> GetByIDAsync(long id)
         {
-            return _unitOfWork.TicketRepository.Get();
+            _logger.LogInformation("Fetching ticket by ID: {Id}", id);
+            return _unitOfWork.TicketRepository.GetByIDAsync(id);
         }
 
         /// <inheritdoc/>
-        public async Task Update(long id, EditTicketDto model)
+        public Task<IEnumerable<Ticket>> GetTicketsAsync()
         {
-            var item = await _unitOfWork.TicketRepository.GetByID(id);
+            _logger.LogInformation("Fetching all tickets.");
+            return _unitOfWork.TicketRepository.GetAsync();
+        }
+
+        /// <inheritdoc/>
+        public async Task UpdateAsync(long id, EditTicketDto model)
+        {
+            _logger.LogInformation("Updating ticket with ID: {Id}", id);
+            var item = await _unitOfWork.TicketRepository.GetByIDAsync(id);
             if (item == null)
-                throw new NullReferenceException("No Ticket to update");
+            {
+                _logger.LogError("Ticket with ID {Id} not found.", id);
+                throw new NullReferenceException($"Ticket with ID {id} not found.");
+            }
+
             _mapper.Map(model, item);
             _unitOfWork.TicketRepository.Update(item);
-            await _unitOfWork.Save();
+            await _unitOfWork.SaveAsync();
+            _logger.LogInformation("Ticket updated successfully.");
+        }
+
+        /// <inheritdoc/>
+        public async Task<Ticket> GetTicketWithIncudesByIdAsync(long ticketId, string includes)
+        {
+            _logger.LogInformation("Fetching ticket with includes by ID: {TicketId}", ticketId);
+            var ticket = await _unitOfWork.TicketRepository.GetAsync(
+                filter: t => t.ID == ticketId,
+                includeProperties: includes
+            );
+
+            return ticket.FirstOrDefault();
         }
     }
 }

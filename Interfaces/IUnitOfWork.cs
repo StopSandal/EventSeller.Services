@@ -1,9 +1,5 @@
-﻿using DataLayer.Model;
-using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
+﻿using EventSeller.DataLayer.Entities;
+using EventSeller.Services.Interfaces.Repositories;
 
 namespace EventSeller.Services.Interfaces
 {
@@ -40,11 +36,37 @@ namespace EventSeller.Services.Interfaces
         /// Gets the repository for <see cref="TicketSeat"/> entities.
         /// </summary>
         IRepositoryAsync<TicketSeat> TicketSeatRepository { get; }
+        /// <summary>
+        /// Gets the repository for <see cref="TicketSeat"/> entities.
+        /// </summary>
+        IRepositoryAsync<TicketTransaction> TicketTransactionRepository { get; }
+        /// <summary>
+        /// Gets the repository for <see cref="EventType"/> entities.
+        /// </summary>
+        IRepositoryAsync<EventType> EventTypeRepository { get; }
+        /// <summary>
+        /// Gets the repository for <see cref="EventSession"/> entities.
+        /// </summary>
+        IRepositoryAsync<EventSession> EventSessionRepository { get; }
+        /// <summary>
+        /// Gets the repository for traffic analytics.
+        /// </summary>
+        ITrafficAnalyticsRepository TrafficAnalyticsRepository { get; }
+
+        /// <summary>
+        /// Gets the repository for sales analytics.
+        /// </summary>
+        ISalesAnalyticsRepository SalesAnalyticsRepository { get; }
+
+        /// <summary>
+        /// Gets the repository for popularity analytics.
+        /// </summary>
+        IPopularityAnalyticsRepository PopularityAnalyticsRepository { get; }
 
         /// <summary>
         /// Saves all changes made in this unit of work to the underlying database.
         /// </summary>
         /// <returns>A task that represents the asynchronous save operation.</returns>
-        Task Save();
+        Task SaveAsync();
     }
 }

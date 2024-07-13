@@ -1,10 +1,11 @@
-﻿using DataLayer.Model;
-using DataLayer.Model.EF;
+﻿using EventSeller.DataLayer.EF;
+using EventSeller.DataLayer.Entities;
 using EventSeller.Services.Interfaces;
-using Services.Repository;
+using EventSeller.Services.Interfaces.Repositories;
+using EventSeller.Services.Repository;
 
 
-namespace Services
+namespace EventSeller.Services
 {
     /// <summary>
     /// Represents the default implementation of the <see cref="IUnitOfWork"/>.
@@ -14,27 +15,34 @@ namespace Services
     {
         private readonly SellerContext context;
         private IRepositoryAsync<Event> eventRepository;
+        private IRepositoryAsync<EventType> eventTypeRepository;
+        private IRepositoryAsync<EventSession> eventSessionRepository;
         private IRepositoryAsync<HallSector> hallSectorRepository;
         private IRepositoryAsync<PlaceAddress> placeAddressRepository;
         private IRepositoryAsync<PlaceHall> placeHallRepository;
         private IRepositoryAsync<Ticket> ticketRepository;
         private IRepositoryAsync<TicketSeat> ticketSeatRepository;
+        private IRepositoryAsync<TicketTransaction> ticketTransactionRepository;
+        private IPopularityAnalyticsRepository popularityAnalyticsRepository;
+        private ITrafficAnalyticsRepository trafficAnalyticsRepository;
+        private ISalesAnalyticsRepository salesAnalyticsRepository;
+
         /// <summary>
         /// Initializes a new instance of the <see cref="UnitOfWork"/> class with the specified context.
         /// </summary>
         /// <param name="sellerContext">The database context.</param>
         public UnitOfWork(SellerContext sellerContext)
         {
-            context=sellerContext;
+            context = sellerContext;
         }
         /// <inheritdoc />
         public IRepositoryAsync<Event> EventRepository
         {
             get
             {
-                if (this.eventRepository == null)
+                if (eventRepository == null)
                 {
-                    this.eventRepository = new GenericRepository<Event>(context);
+                    eventRepository = new GenericRepository<Event>(context);
                 }
                 return eventRepository;
             }
@@ -44,9 +52,9 @@ namespace Services
         {
             get
             {
-                if (this.hallSectorRepository == null)
+                if (hallSectorRepository == null)
                 {
-                    this.hallSectorRepository = new GenericRepository<HallSector>(context);
+                    hallSectorRepository = new GenericRepository<HallSector>(context);
                 }
                 return hallSectorRepository;
             }
@@ -56,9 +64,9 @@ namespace Services
         {
             get
             {
-                if (this.placeAddressRepository == null)
+                if (placeAddressRepository == null)
                 {
-                    this.placeAddressRepository = new GenericRepository<PlaceAddress>(context);
+                    placeAddressRepository = new GenericRepository<PlaceAddress>(context);
                 }
                 return placeAddressRepository;
             }
@@ -68,9 +76,9 @@ namespace Services
         {
             get
             {
-                if (this.placeHallRepository == null)
+                if (placeHallRepository == null)
                 {
-                    this.placeHallRepository = new GenericRepository<PlaceHall>(context);
+                    placeHallRepository = new GenericRepository<PlaceHall>(context);
                 }
                 return placeHallRepository;
             }
@@ -79,9 +87,9 @@ namespace Services
         {
             get
             {
-                if (this.ticketRepository == null)
+                if (ticketRepository == null)
                 {
-                    this.ticketRepository = new GenericRepository<Ticket>(context);
+                    ticketRepository = new GenericRepository<Ticket>(context);
                 }
                 return ticketRepository;
             }
@@ -91,16 +99,88 @@ namespace Services
         {
             get
             {
-                if (this.ticketSeatRepository == null)
+                if (ticketSeatRepository == null)
                 {
-                    this.ticketSeatRepository = new GenericRepository<TicketSeat>(context);
+                    ticketSeatRepository = new GenericRepository<TicketSeat>(context);
                 }
                 return ticketSeatRepository;
             }
         }
-        
+        /// <inheritdoc />
+        public IRepositoryAsync<TicketTransaction> TicketTransactionRepository
+        {
+            get
+            {
+                if (ticketTransactionRepository == null)
+                {
+                    ticketTransactionRepository = new GenericRepository<TicketTransaction>(context);
+                }
+                return ticketTransactionRepository;
+            }
+        }
+        /// <inheritdoc />
+        public IRepositoryAsync<EventType> EventTypeRepository
+        {
+            get
+            {
+                if (eventTypeRepository == null)
+                {
+                    eventTypeRepository = new GenericRepository<EventType>(context);
+                }
+                return eventTypeRepository;
+            }
+        }
+        /// <inheritdoc />
+        public IRepositoryAsync<EventSession> EventSessionRepository
+        {
+            get
+            {
+                if (eventSessionRepository == null)
+                {
+                    eventSessionRepository = new GenericRepository<EventSession>(context);
+                }
+                return eventSessionRepository;
+            }
+        }
+        /// <inheritdoc />
+        public ISalesAnalyticsRepository SalesAnalyticsRepository
+        {
+            get
+            {
+                if (salesAnalyticsRepository == null)
+                {
+                    salesAnalyticsRepository = new SalesAnalyticsRepository(context);
+                }
+                return salesAnalyticsRepository;
+            }
+        }
+        /// <inheritdoc />
+        public ITrafficAnalyticsRepository TrafficAnalyticsRepository
+        {
+            get
+            {
+                if (trafficAnalyticsRepository == null)
+                {
+                    trafficAnalyticsRepository = new TrafficAnalyticsRepository(context);
+                }
+                return trafficAnalyticsRepository;
+            }
+        }
+        /// <inheritdoc />
+        public IPopularityAnalyticsRepository PopularityAnalyticsRepository
+        {
+            get
+            {
+                if (popularityAnalyticsRepository == null)
+                {
+                    popularityAnalyticsRepository = new PopularityAnalyticsRepository(context);
+                }
+                return popularityAnalyticsRepository;
+            }
+        }
+
         /// <inheritdoc/>
-        public Task Save()
+        public Task SaveAsync()
         {
             return context.SaveChangesAsync();
         }
@@ -109,14 +189,14 @@ namespace Services
 
         protected virtual void Dispose(bool disposing)
         {
-            if (!this.disposed)
+            if (!disposed)
             {
                 if (disposing)
                 {
                     context.Dispose();
                 }
             }
-            this.disposed = true;
+            disposed = true;
         }
 
         public void Dispose()

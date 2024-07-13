@@ -1,18 +1,17 @@
-﻿using DataLayer.Model.EF;
-using DataLayer.Model;
+﻿using EventSeller.DataLayer.EF;
+using EventSeller.Services.Interfaces.Repositories;
 using Microsoft.EntityFrameworkCore;
 using System.Linq.Expressions;
-using System.Reflection;
-using EventSeller.Services.Interfaces;
 
-namespace Services.Repository
+namespace EventSeller.Services.Repository
 {
     /// <summary>
     /// A generic implementation of <see cref="IRepositoryAsync{TEntity}"/> interface.
     /// </summary>
     /// <typeparam name="TEntity">The type of the entity.</typeparam>
     /// <inheritdoc cref="IRepositoryAsync{TEntity}"/>
-    public class GenericRepository<TEntity> : IRepositoryAsync<TEntity> where TEntity : class { 
+    public class GenericRepository<TEntity> : IRepositoryAsync<TEntity> where TEntity : class
+    {
         internal SellerContext context;
         internal DbSet<TEntity> dbSet;
         /// <summary>
@@ -22,10 +21,10 @@ namespace Services.Repository
         public GenericRepository(SellerContext context)
         {
             this.context = context;
-            this.dbSet = context.Set<TEntity>();
+            dbSet = context.Set<TEntity>();
         }
         /// <inheritdoc/>
-        public virtual async Task<IEnumerable<TEntity>> Get(
+        public virtual async Task<IEnumerable<TEntity>> GetAsync(
             Expression<Func<TEntity, bool>> filter = null,
             Func<IQueryable<TEntity>, IOrderedQueryable<TEntity>> orderBy = null,
             string includeProperties = "")
@@ -53,19 +52,29 @@ namespace Services.Repository
             }
         }
         /// <inheritdoc/>
-        public async virtual Task<TEntity> GetByID(object id)
+        public async virtual Task<TEntity> GetByIDAsync(object id)
         {
             return await dbSet.FindAsync(id);
         }
         /// <inheritdoc/>
-        public async virtual Task Insert(TEntity entity)
+        public async virtual Task<bool> DoesExistsAsync(Expression<Func<TEntity, bool>> predicate)
+        {
+            return await dbSet.AnyAsync(predicate);
+        }
+        /// <inheritdoc/>
+        public async virtual Task InsertAsync(TEntity entity)
         {
             await dbSet.AddAsync(entity);
         }
         /// <inheritdoc/>
-        public async virtual Task Delete(object id)
+        public async virtual Task InsertRangeAsync(IEnumerable<TEntity> entityList)
         {
-            TEntity entityToDelete = await GetByID(id);
+            await dbSet.AddRangeAsync(entityList);
+        }
+        /// <inheritdoc/>
+        public async virtual Task DeleteAsync(object id)
+        {
+            TEntity entityToDelete = await GetByIDAsync(id);
             Delete(entityToDelete);
         }
         /// <inheritdoc/>
@@ -82,6 +91,75 @@ namespace Services.Repository
         {
             dbSet.Attach(entityToUpdate);
             context.Entry(entityToUpdate).State = EntityState.Modified;
+        }
+        /// <inheritdoc/>
+        public virtual async Task<IEnumerable<TField>> GetFieldValuesAsync<TField>(Expression<Func<TEntity, bool>> filter, Expression<Func<TEntity, TField>> selector)
+        {
+            return await context.Set<TEntity>()
+                .Where(filter)
+                .Select(selector)
+                .ToListAsync();
+        }
+        /// <inheritdoc/>
+        public virtual async Task<int> GetCountAsync(Expression<Func<TEntity, bool>> filter = null, IEnumerable<string> includeProperties = null)
+        {
+            IQueryable<TEntity> query = dbSet;
+
+            if (filter != null)
+            {
+                query = query.Where(filter);
+            }
+
+            if (includeProperties != null)
+            {
+                foreach (var includeProperty in includeProperties)
+                {
+                    query = query.Include(includeProperty);
+                }
+            }
+
+            return await query.CountAsync();
+        }
+
+        /// <inheritdoc/>
+        public virtual async Task<decimal> GetAverageAsync(Expression<Func<TEntity, decimal>> selector, Expression<Func<TEntity, bool>> filter = null, IEnumerable<string> includeProperties = null)
+        {
+            IQueryable<TEntity> query = dbSet;
+
+            if (filter != null)
+            {
+                query = query.Where(filter);
+            }
+
+            if (includeProperties != null)
+            {
+                foreach (var includeProperty in includeProperties)
+                {
+                    query = query.Include(includeProperty);
+                }
+            }
+
+            return await query.AverageAsync(selector);
+        }
+        /// <inheritdoc/>
+        public virtual async Task<decimal> GetSumAsync(Expression<Func<TEntity, decimal>> selector, Expression<Func<TEntity, bool>> filter = null, IEnumerable<string> includeProperties = null)
+        {
+            IQueryable<TEntity> query = dbSet;
+
+            if (filter != null)
+            {
+                query = query.Where(filter);
+            }
+
+            if (includeProperties != null)
+            {
+                foreach (var includeProperty in includeProperties)
+                {
+                    query = query.Include(includeProperty);
+                }
+            }
+
+            return await query.SumAsync(selector);
         }
     }
 }
