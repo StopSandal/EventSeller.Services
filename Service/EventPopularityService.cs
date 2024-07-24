@@ -26,7 +26,7 @@ namespace EventSeller.Services.Service
 
         /// <inheritdoc />
         /// <exception cref="ArgumentNullException">Thrown when <paramref name="startDateTime"/> or <paramref name="endDateTime"/> is null.</exception>
-        public async Task<IEnumerable<EventPopularityStatistic>> GetEventsPopularityByPeriod(DateTime startDateTime, DateTime endDateTime)
+        public async Task<IEnumerable<EventPopularityStatistic>> GetEventsPopularityByPeriodAsync(DateTime startDateTime, DateTime endDateTime)
         {
             _logger.LogInformation($"Getting events popularity by period from {startDateTime} to {endDateTime}");
             var result = await _unitOfWork.PopularityAnalyticsRepository.GetEventsWithMaxPopularityAsync(
@@ -39,7 +39,7 @@ namespace EventSeller.Services.Service
 
         /// <inheritdoc />
         /// <exception cref="ArgumentNullException">Thrown when <paramref name="eventTypeId"/> is less than or equal to zero.</exception>
-        public async Task<EventTypePopularityStatisticDTO> GetEventTypeStatistic(long eventTypeId)
+        public async Task<EventTypePopularityStatisticDTO> GetEventTypeStatisticAsync(long eventTypeId)
         {
             _logger.LogInformation($"Getting event type statistic for event type ID: {eventTypeId}");
             var result = await _unitOfWork.PopularityAnalyticsRepository.GetEventTypesWithPopularityAsync(
@@ -60,7 +60,7 @@ namespace EventSeller.Services.Service
 
         /// <inheritdoc />
         /// <exception cref="ArgumentOutOfRangeException">Thrown when <paramref name="topCount"/> is less than or equal to zero.</exception>
-        public async Task<IEnumerable<EventPopularityStatistic>> GetMostPopularEvents(int topCount)
+        public async Task<IEnumerable<EventPopularityStatistic>> GetMostPopularEventsAsync(int topCount)
         {
             _logger.LogInformation($"Getting top {topCount} most popular events");
             var result = await _unitOfWork.PopularityAnalyticsRepository.GetEventsWithMaxPopularityAsync(
@@ -74,7 +74,7 @@ namespace EventSeller.Services.Service
 
         /// <inheritdoc />
         /// <exception cref="ArgumentOutOfRangeException">Thrown when <paramref name="topCount"/> is less than or equal to zero.</exception>
-        public async Task<IEnumerable<EventTypePopularityStatisticDTO>> GetMostPopularEventTypes(int topCount)
+        public async Task<IEnumerable<EventTypePopularityStatisticDTO>> GetMostPopularEventTypesAsync(int topCount)
         {
             _logger.LogInformation($"Getting top {topCount} most popular event types");
             var result = await _unitOfWork.PopularityAnalyticsRepository.GetEventTypesWithPopularityAsync(
@@ -88,7 +88,7 @@ namespace EventSeller.Services.Service
 
         /// <inheritdoc />
         /// <exception cref="ArgumentOutOfRangeException">Thrown when <paramref name="topCount"/> is less than or equal to zero.</exception>
-        public async Task<IEnumerable<EventPopularityStatistic>> GetMostRealizableEvents(int topCount)
+        public async Task<IEnumerable<EventPopularityStatistic>> GetMostRealizableEventsAsync(int topCount)
         {
             _logger.LogInformation($"Getting top {topCount} most realizable events");
             var result = await _unitOfWork.PopularityAnalyticsRepository.GetEventsWithMaxPopularityAsync(
@@ -102,7 +102,7 @@ namespace EventSeller.Services.Service
 
         /// <inheritdoc />
         /// <exception cref="ArgumentOutOfRangeException">Thrown when <paramref name="topCount"/> is less than or equal to zero.</exception>
-        public async Task<IEnumerable<EventTypePopularityStatisticDTO>> GetMostRealizableEventTypes(int topCount)
+        public async Task<IEnumerable<EventTypePopularityStatisticDTO>> GetMostRealizableEventTypesAsync(int topCount)
         {
             _logger.LogInformation($"Getting top {topCount} most realizable event types");
             var result = await _unitOfWork.PopularityAnalyticsRepository.GetEventTypesWithPopularityAsync(
