@@ -1,6 +1,4 @@
 ﻿using EventSeller.DataLayer.EntitiesDto.Statistics;
-using System.Collections.Generic;
-using System.Threading.Tasks;
 
 namespace EventSeller.Services.Interfaces.Services
 {

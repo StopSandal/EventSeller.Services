@@ -4,9 +4,6 @@ using EventSeller.DataLayer.EntitiesDto.HallSector;
 using EventSeller.Services.Interfaces;
 using EventSeller.Services.Interfaces.Services;
 using Microsoft.Extensions.Logging;
-using System;
-using System.Collections.Generic;
-using System.Threading.Tasks;
 
 namespace EventSeller.Services.Service
 {

@@ -3,11 +3,7 @@ using EventSeller.DataLayer.Entities;
 using EventSeller.DataLayer.EntitiesDto.Statistics;
 using EventSeller.Services.Interfaces.Repositories;
 using Microsoft.EntityFrameworkCore;
-using Microsoft.Extensions.Logging;
-using System;
-using System.Linq;
 using System.Linq.Expressions;
-using System.Threading.Tasks;
 
 namespace EventSeller.Services.Repository
 {

@@ -3,10 +3,7 @@ using EventSeller.DataLayer.EntitiesDto.Statistics;
 using EventSeller.Services.Interfaces;
 using EventSeller.Services.Interfaces.Services;
 using Microsoft.Extensions.Logging;
-using System;
-using System.Collections.Generic;
 using System.Linq.Expressions;
-using System.Threading.Tasks;
 
 namespace EventSeller.Services.Service
 {
@@ -40,7 +37,7 @@ namespace EventSeller.Services.Service
             catch (Exception ex)
             {
                 _logger.LogError(ex, "Error occurred while fetching day traffic statistics.");
-                throw;  
+                throw;
             }
         }
 
@@ -56,7 +53,7 @@ namespace EventSeller.Services.Service
             catch (Exception ex)
             {
                 _logger.LogError(ex, "Error occurred while fetching day traffic statistics for period: {StartPeriod} - {EndPeriod}", startPeriod, endPeriod);
-                throw;  
+                throw;
             }
         }
 
@@ -71,7 +68,7 @@ namespace EventSeller.Services.Service
             catch (Exception ex)
             {
                 _logger.LogError(ex, "Error occurred while fetching day traffic statistics for hall with ID: {PlaceHallId}", placeHallId);
-                throw;  
+                throw;
             }
         }
 
@@ -86,7 +83,7 @@ namespace EventSeller.Services.Service
             catch (Exception ex)
             {
                 _logger.LogError(ex, "Error occurred while fetching day traffic statistics for place with Address ID: {PlaceAddressId}", placeAddressId);
-                throw;  
+                throw;
             }
         }
     }

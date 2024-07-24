@@ -1,7 +1,5 @@
 ﻿using EventSeller.DataLayer.Entities;
 using EventSeller.DataLayer.EntitiesDto.Ticket;
-using System.Collections.Generic;
-using System.Threading.Tasks;
 
 namespace EventSeller.Services.Interfaces.Services
 {

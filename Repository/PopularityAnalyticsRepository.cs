@@ -13,7 +13,7 @@ namespace EventSeller.Services.Repository
     public class PopularityAnalyticsRepository : IPopularityAnalyticsRepository
     {
         private readonly SellerContext _context;
-        
+
         /// <summary>
         /// Initializes a new instance of the <see cref="PopularityAnalyticsRepository"/> class with the specified database context.
         /// </summary>
@@ -71,16 +71,16 @@ namespace EventSeller.Services.Repository
 
             var result = eventsWithPopularity
                 .Select(e => new EventPopularityStatistic
-                 {
-                     PopularityStatistic = new PopularityStatisticDTO
-                     {
-                         Realization = (decimal)e.TotalSold / e.TotalTickets,
-                         TotalIncome = e.TotalIncome,
-                         TotalSold = e.TotalSold,
-                         Monetization = e.TotalIncome / e.PossibleIncome,
-                         Popularity = ((decimal)e.TotalSold / e.TotalTickets) * (e.TotalIncome / e.PossibleIncome)
-                     },
-                     EventId = e.EventId
+                {
+                    PopularityStatistic = new PopularityStatisticDTO
+                    {
+                        Realization = (decimal)e.TotalSold / e.TotalTickets,
+                        TotalIncome = e.TotalIncome,
+                        TotalSold = e.TotalSold,
+                        Monetization = e.TotalIncome / e.PossibleIncome,
+                        Popularity = ((decimal)e.TotalSold / e.TotalTickets) * (e.TotalIncome / e.PossibleIncome)
+                    },
+                    EventId = e.EventId
                 })
                 .OrderByDescending(orderBy.Compile());
             return result;

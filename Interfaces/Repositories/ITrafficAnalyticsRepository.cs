@@ -1,8 +1,6 @@
 ﻿using EventSeller.DataLayer.Entities;
 using EventSeller.DataLayer.EntitiesDto.Statistics;
 using System.Linq.Expressions;
-using System.Threading.Tasks;
-using System.Collections.Generic;
 
 namespace EventSeller.Services.Interfaces.Repositories
 {
