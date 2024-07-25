@@ -29,7 +29,7 @@ namespace EventSeller.Services.Service
         public async Task<IEnumerable<EventPopularityStatistic>> GetEventsPopularityByPeriodAsync(DateTime startDateTime, DateTime endDateTime)
         {
             _logger.LogInformation($"Getting events popularity by period from {startDateTime} to {endDateTime}");
-            var result = await _unitOfWork.PopularityAnalyticsRepository.GetEventsWithMaxPopularityAsync(
+            var result = await _unitOfWork.EventPopularityRepository.GetEventsWithMaxPopularityAsync(
                 obj => obj.StartEventDateTime >= startDateTime && obj.EndEventDateTime <= endDateTime,
                 obj => obj.PopularityStatistic.Popularity
             );
@@ -42,7 +42,7 @@ namespace EventSeller.Services.Service
         public async Task<EventTypePopularityStatisticDTO> GetEventTypeStatisticAsync(long eventTypeId)
         {
             _logger.LogInformation($"Getting event type statistic for event type ID: {eventTypeId}");
-            var result = await _unitOfWork.PopularityAnalyticsRepository.GetEventTypesWithPopularityAsync(
+            var result = await _unitOfWork.EventTypePopularityRepository.GetEventTypesWithPopularityAsync(
                 eventType => eventType.Id == eventTypeId,
                 x => x.PopularityStatistic.Popularity,
                 1
@@ -63,7 +63,7 @@ namespace EventSeller.Services.Service
         public async Task<IEnumerable<EventPopularityStatistic>> GetMostPopularEventsAsync(int topCount)
         {
             _logger.LogInformation($"Getting top {topCount} most popular events");
-            var result = await _unitOfWork.PopularityAnalyticsRepository.GetEventsWithMaxPopularityAsync(
+            var result = await _unitOfWork.EventPopularityRepository.GetEventsWithMaxPopularityAsync(
                 null,
                 obj => obj.PopularityStatistic.Popularity,
                 topCount
@@ -77,7 +77,7 @@ namespace EventSeller.Services.Service
         public async Task<IEnumerable<EventTypePopularityStatisticDTO>> GetMostPopularEventTypesAsync(int topCount)
         {
             _logger.LogInformation($"Getting top {topCount} most popular event types");
-            var result = await _unitOfWork.PopularityAnalyticsRepository.GetEventTypesWithPopularityAsync(
+            var result = await _unitOfWork.EventTypePopularityRepository.GetEventTypesWithPopularityAsync(
                 null,
                 obj => obj.PopularityStatistic.Popularity,
                 topCount
@@ -91,7 +91,7 @@ namespace EventSeller.Services.Service
         public async Task<IEnumerable<EventPopularityStatistic>> GetMostRealizableEventsAsync(int topCount)
         {
             _logger.LogInformation($"Getting top {topCount} most realizable events");
-            var result = await _unitOfWork.PopularityAnalyticsRepository.GetEventsWithMaxPopularityAsync(
+            var result = await _unitOfWork.EventPopularityRepository.GetEventsWithMaxPopularityAsync(
                 null,
                 obj => obj.PopularityStatistic.Realization,
                 topCount
@@ -105,7 +105,7 @@ namespace EventSeller.Services.Service
         public async Task<IEnumerable<EventTypePopularityStatisticDTO>> GetMostRealizableEventTypesAsync(int topCount)
         {
             _logger.LogInformation($"Getting top {topCount} most realizable event types");
-            var result = await _unitOfWork.PopularityAnalyticsRepository.GetEventTypesWithPopularityAsync(
+            var result = await _unitOfWork.EventTypePopularityRepository.GetEventTypesWithPopularityAsync(
                 null,
                 obj => obj.PopularityStatistic.Realization,
                 topCount

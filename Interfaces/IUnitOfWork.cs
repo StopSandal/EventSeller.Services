@@ -59,9 +59,24 @@ namespace EventSeller.Services.Interfaces
         ISalesAnalyticsRepository SalesAnalyticsRepository { get; }
 
         /// <summary>
-        /// Gets the repository for popularity analytics.
+        /// Gets the repository for event popularity.
         /// </summary>
-        IPopularityAnalyticsRepository PopularityAnalyticsRepository { get; }
+        IEventPopularityRepository EventPopularityRepository { get; }
+
+        /// <summary>
+        /// Gets the repository for event type popularity.
+        /// </summary>
+        IEventTypePopularityRepository EventTypePopularityRepository { get; }
+
+        /// <summary>
+        /// Gets the repository for sector popularity.
+        /// </summary>
+        ISectorPopularityRepository SectorPopularityRepository { get; }
+
+        /// <summary>
+        /// Gets the repository for seat popularity.
+        /// </summary>
+        ISeatPopularityRepository SeatPopularityRepository { get; }
 
         /// <summary>
         /// Saves all changes made in this unit of work to the underlying database.

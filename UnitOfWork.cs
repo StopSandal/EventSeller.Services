@@ -23,8 +23,11 @@ namespace EventSeller.Services
         private IRepositoryAsync<Ticket> ticketRepository;
         private IRepositoryAsync<TicketSeat> ticketSeatRepository;
         private IRepositoryAsync<TicketTransaction> ticketTransactionRepository;
-        private IPopularityAnalyticsRepository popularityAnalyticsRepository;
         private ITrafficAnalyticsRepository trafficAnalyticsRepository;
+        private IEventPopularityRepository eventPopularityRepository;
+        private IEventTypePopularityRepository eventTypePopularityRepository;
+        private ISeatPopularityRepository seatPopularityRepository;
+        private ISectorPopularityRepository sectorPopularityRepository;
         private ISalesAnalyticsRepository salesAnalyticsRepository;
 
         /// <summary>
@@ -40,142 +43,131 @@ namespace EventSeller.Services
         {
             get
             {
-                if (eventRepository == null)
-                {
-                    eventRepository = new GenericRepository<Event>(context);
-                }
-                return eventRepository;
+                return eventRepository ??= new GenericRepository<Event>(context);
             }
         }
+
         /// <inheritdoc />
         public IRepositoryAsync<HallSector> HallSectorRepository
         {
             get
             {
-                if (hallSectorRepository == null)
-                {
-                    hallSectorRepository = new GenericRepository<HallSector>(context);
-                }
-                return hallSectorRepository;
+                return hallSectorRepository ??= new GenericRepository<HallSector>(context);
             }
         }
+
         /// <inheritdoc />
         public IRepositoryAsync<PlaceAddress> PlaceAddressRepository
         {
             get
             {
-                if (placeAddressRepository == null)
-                {
-                    placeAddressRepository = new GenericRepository<PlaceAddress>(context);
-                }
-                return placeAddressRepository;
+                return placeAddressRepository ??= new GenericRepository<PlaceAddress>(context);
             }
         }
+
         /// <inheritdoc />
         public IRepositoryAsync<PlaceHall> PlaceHallRepository
         {
             get
             {
-                if (placeHallRepository == null)
-                {
-                    placeHallRepository = new GenericRepository<PlaceHall>(context);
-                }
-                return placeHallRepository;
+                return placeHallRepository ??= new GenericRepository<PlaceHall>(context);
             }
         }
+
         public IRepositoryAsync<Ticket> TicketRepository
         {
             get
             {
-                if (ticketRepository == null)
-                {
-                    ticketRepository = new GenericRepository<Ticket>(context);
-                }
-                return ticketRepository;
+                return ticketRepository ??= new GenericRepository<Ticket>(context);
             }
         }
+
         /// <inheritdoc />
         public IRepositoryAsync<TicketSeat> TicketSeatRepository
         {
             get
             {
-                if (ticketSeatRepository == null)
-                {
-                    ticketSeatRepository = new GenericRepository<TicketSeat>(context);
-                }
-                return ticketSeatRepository;
+                return ticketSeatRepository ??= new GenericRepository<TicketSeat>(context);
             }
         }
+
         /// <inheritdoc />
         public IRepositoryAsync<TicketTransaction> TicketTransactionRepository
         {
             get
             {
-                if (ticketTransactionRepository == null)
-                {
-                    ticketTransactionRepository = new GenericRepository<TicketTransaction>(context);
-                }
-                return ticketTransactionRepository;
+                return ticketTransactionRepository ??= new GenericRepository<TicketTransaction>(context);
             }
         }
+
         /// <inheritdoc />
         public IRepositoryAsync<EventType> EventTypeRepository
         {
             get
             {
-                if (eventTypeRepository == null)
-                {
-                    eventTypeRepository = new GenericRepository<EventType>(context);
-                }
-                return eventTypeRepository;
+                return eventTypeRepository ??= new GenericRepository<EventType>(context);
             }
         }
+
         /// <inheritdoc />
         public IRepositoryAsync<EventSession> EventSessionRepository
         {
             get
             {
-                if (eventSessionRepository == null)
-                {
-                    eventSessionRepository = new GenericRepository<EventSession>(context);
-                }
-                return eventSessionRepository;
+                return eventSessionRepository ??= new GenericRepository<EventSession>(context);
             }
         }
+
         /// <inheritdoc />
         public ISalesAnalyticsRepository SalesAnalyticsRepository
         {
             get
             {
-                if (salesAnalyticsRepository == null)
-                {
-                    salesAnalyticsRepository = new SalesAnalyticsRepository(context);
-                }
-                return salesAnalyticsRepository;
+                return salesAnalyticsRepository ??= new SalesAnalyticsRepository(context);
             }
         }
+
         /// <inheritdoc />
         public ITrafficAnalyticsRepository TrafficAnalyticsRepository
         {
             get
             {
-                if (trafficAnalyticsRepository == null)
-                {
-                    trafficAnalyticsRepository = new TrafficAnalyticsRepository(context);
-                }
-                return trafficAnalyticsRepository;
+                return trafficAnalyticsRepository ??= new TrafficAnalyticsRepository(context);
             }
         }
+
         /// <inheritdoc />
-        public IPopularityAnalyticsRepository PopularityAnalyticsRepository
+        public IEventPopularityRepository EventPopularityRepository
         {
             get
             {
-                if (popularityAnalyticsRepository == null)
-                {
-                    popularityAnalyticsRepository = new PopularityAnalyticsRepository(context);
-                }
-                return popularityAnalyticsRepository;
+                return eventPopularityRepository ??= new EventPopularityRepository(context);
+            }
+        }
+        /// <inheritdoc />
+        public IEventTypePopularityRepository EventTypePopularityRepository
+        {
+            get
+            {
+                return eventTypePopularityRepository ??= new EventTypePopularityRepository(context);
+            }
+        }
+
+        /// <inheritdoc />
+        public ISectorPopularityRepository SectorPopularityRepository
+        {
+            get
+            {
+                return sectorPopularityRepository ??= new SectorPopularityRepository(context);
+            }
+        }
+
+        /// <inheritdoc />
+        public ISeatPopularityRepository SeatPopularityRepository
+        {
+            get
+            {
+                return seatPopularityRepository ??= new SeatPopularityRepository(context);
             }
         }
 

@@ -28,7 +28,7 @@ namespace EventSeller.Services.Service
         public async Task<IEnumerable<SeatPopularityDTO>> GetSeatsPopularityForEventAsync(long eventId, int maxCount = 0)
         {
             _logger.LogInformation("Fetching seat popularity for event with ID: {EventId}", eventId);
-            return await _unitOfWork.PopularityAnalyticsRepository.GetSeatPopularityForEventAsync(
+            return await _unitOfWork.SeatPopularityRepository.GetSeatPopularityForEventAsync(
                 obj => obj.PopularityStatistic.Popularity,
                 obj => obj.EventSession.EventID == eventId,
                 null,
@@ -39,7 +39,7 @@ namespace EventSeller.Services.Service
         public async Task<IEnumerable<SeatPopularityDTO>> GetSeatsPopularityInHallAsync(long placeHallId, int maxCount = 0)
         {
             _logger.LogInformation("Fetching seat popularity for hall with ID: {PlaceHallId}", placeHallId);
-            return await _unitOfWork.PopularityAnalyticsRepository.GetSeatPopularityAsync(
+            return await _unitOfWork.SeatPopularityRepository.GetSeatPopularityAsync(
                 obj => obj.PopularityStatistic.Popularity,
                 obj => obj.HallSector.PlaceHallID == placeHallId,
                 maxCount);
@@ -54,7 +54,7 @@ namespace EventSeller.Services.Service
                 throw new ArgumentNullException($"No events provided");
             }
             _logger.LogInformation("Fetching seat popularity for event groups at hall with ID: {PlaceHallId}", placeHallId);
-            return await _unitOfWork.PopularityAnalyticsRepository.GetSeatPopularityForEventsGroupsAsync(
+            return await _unitOfWork.SeatPopularityRepository.GetSeatPopularityForEventsGroupsAsync(
                 obj => obj.PopularityStatistic.Popularity,
                 tickets => eventIds.Contains(tickets.EventSession.EventID),
                 obj => obj.HallSector.PlaceHallID == placeHallId,
