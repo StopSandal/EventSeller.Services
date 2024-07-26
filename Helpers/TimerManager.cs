@@ -1,15 +1,8 @@
 ﻿using EventSeller.Services.Interfaces;
-using Microsoft.AspNetCore.DataProtection;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Logging;
-using System;
 using System.Collections.Concurrent;
-using System.Collections.Generic;
-using System.Linq;
 using System.Linq.Expressions;
-using System.Reflection;
-using System.Text;
-using System.Threading.Tasks;
 
 namespace EventSeller.Services.Helpers
 {
@@ -70,7 +63,7 @@ namespace EventSeller.Services.Helpers
                     }
                     finally
                     {
-                       // await CancelTimerAsync(key);
+                        // await CancelTimerAsync(key);
                         _logger.LogInformation("Timer for key {Key} has been removed from the dictionary.", key);
                     }
                 }

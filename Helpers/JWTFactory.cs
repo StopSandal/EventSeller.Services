@@ -1,4 +1,5 @@
-﻿using EventSeller.Services.Interfaces;
+﻿using EventSeller.Services.Helpers.Constants;
+using EventSeller.Services.Interfaces;
 using Microsoft.Extensions.Configuration;
 using Microsoft.IdentityModel.Tokens;
 using System.IdentityModel.Tokens.Jwt;
@@ -13,10 +14,6 @@ namespace EventSeller.Services.Helpers
     /// </summary>
     public class JWTFactory : IJWTFactory
     {
-        private const string AccessTokenExpirationDays = "JWT:AccessTokenDaysForExpiration";
-        private const string SecretKey = "JWT:Secret";
-        private const string RefreshTokenValidityDays = "JWT:RefreshTokenValidityInDays";
-
         private readonly IConfiguration _configuration;
 
         public JWTFactory(IConfiguration configuration)
@@ -37,10 +34,10 @@ namespace EventSeller.Services.Helpers
             var jwtToken = new JwtSecurityToken(
                 claims: claims,
                 notBefore: DateTime.UtcNow,
-                expires: DateTime.UtcNow.AddDays(int.Parse(_configuration[AccessTokenExpirationDays])),
+                expires: DateTime.UtcNow.AddDays(int.Parse(_configuration[ConfigurationPathConstants.AccessTokenExpirationDays])),
                 signingCredentials: new SigningCredentials(
                     new SymmetricSecurityKey(
-                       Encoding.UTF8.GetBytes(_configuration[SecretKey])
+                       Encoding.UTF8.GetBytes(_configuration[ConfigurationPathConstants.SecretKey])
                         ),
                     SecurityAlgorithms.HmacSha256Signature)
                 );
@@ -54,7 +51,7 @@ namespace EventSeller.Services.Helpers
                 ValidateAudience = false,
                 ValidateIssuer = false,
                 ValidateIssuerSigningKey = true,
-                IssuerSigningKey = new SymmetricSecurityKey(Encoding.UTF8.GetBytes(_configuration[SecretKey])),
+                IssuerSigningKey = new SymmetricSecurityKey(Encoding.UTF8.GetBytes(_configuration[ConfigurationPathConstants.SecretKey])),
                 ValidateLifetime = false
             };
 
@@ -72,7 +69,7 @@ namespace EventSeller.Services.Helpers
         /// <inheritdoc/>
         public int GetRefreshTokenValidityInDays()
         {
-            return int.Parse(_configuration[RefreshTokenValidityDays]);
+            return int.Parse(_configuration[ConfigurationPathConstants.RefreshTokenValidityDays]);
         }
     }
 }

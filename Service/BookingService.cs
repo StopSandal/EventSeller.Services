@@ -5,7 +5,6 @@ using EventSeller.Services.Interfaces;
 using EventSeller.Services.Interfaces.Services;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.Logging;
-using System.Net.Sockets;
 
 namespace EventSeller.Services.Service
 {
@@ -71,7 +70,7 @@ namespace EventSeller.Services.Service
                 _logger.LogInformation("TemporaryBookTicketForPurchase: Ticket booked until {BookedUntil}", ticket.BookedUntil);
 
                 _timerService.RegisterTimer<IBookingService>(ticket.ID, service => service.UnbookTicketByIdAsync(ticket.ID), minutesForBooking);
-                _logger.LogInformation("TemporaryBookTicketForPurchase: Started unbooking timer for ticket with ID {TicketId}.",ticket.ID);
+                _logger.LogInformation("TemporaryBookTicketForPurchase: Started unbooking timer for ticket with ID {TicketId}.", ticket.ID);
             }
             catch (FormatException ex)
             {
@@ -99,7 +98,7 @@ namespace EventSeller.Services.Service
                     throw new ArgumentNullException(nameof(ticket));
                 }
 
-                if (ticket.BookedUntil == null) 
+                if (ticket.BookedUntil == null)
                 {
                     _logger.LogWarning("UnbookTicketByIdAsync: Ticket with ID {TicketId} already was unbooked", ticketId);
                     return;
@@ -124,7 +123,7 @@ namespace EventSeller.Services.Service
             }
 
             await _timerService.CancelTimerAsync<IBookingService>(ticket.ID);
-            _logger.LogInformation( "PermanentlyBookTicketForPurchaseAsync: Canceled unbooking timer if exists");
+            _logger.LogInformation("PermanentlyBookTicketForPurchaseAsync: Canceled unbooking timer if exists");
 
             try
             {
@@ -134,7 +133,8 @@ namespace EventSeller.Services.Service
 
                 await _unitOfWork.SaveAsync();
 
-                _logger.LogInformation("PermanentlyBookTicketForPurchaseAsync: Ticket booked until {BookedUntil}", ticket.BookedUntil); }
+                _logger.LogInformation("PermanentlyBookTicketForPurchaseAsync: Ticket booked until {BookedUntil}", ticket.BookedUntil);
+            }
             catch (Exception ex)
             {
                 _logger.LogError(ex.Message);
