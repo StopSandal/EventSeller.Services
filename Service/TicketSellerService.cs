@@ -1,8 +1,10 @@
 ﻿using AutoMapper;
 using EventSeller.DataLayer.Entities;
 using EventSeller.DataLayer.EntitiesDto;
+using EventSeller.Services.Helpers.Constants;
 using EventSeller.Services.Interfaces;
 using EventSeller.Services.Interfaces.Services;
+using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.Logging;
 
 namespace EventSeller.Services.Service
@@ -20,6 +22,8 @@ namespace EventSeller.Services.Service
         private readonly IExternalPaymentService _externalPaymentService;
         private readonly IUnitOfWork _unitOfWork;
         private readonly IUserService _userService;
+        private readonly IConfiguration _configuration;
+        private readonly ITimerManager<long> _timerService;
         private readonly IMapper _mapper;
         private readonly ILogger<TicketSellerService> _logger;
 
@@ -42,7 +46,9 @@ namespace EventSeller.Services.Service
             IMapper mapper,
             IUserService userService,
             ILogger<TicketSellerService> logger,
-            IEventSessionService eventSessionService)
+            IEventSessionService eventSessionService,
+            ITimerManager<long> timerManager,
+            IConfiguration configuration)
         {
             _ticketService = ticketService;
             _unitOfWork = unitOfWork;
@@ -52,6 +58,8 @@ namespace EventSeller.Services.Service
             _userService = userService;
             _logger = logger;
             _eventSessionService = eventSessionService;
+            _timerService = timerManager;
+            _configuration = configuration;
         }
 
         /// <inheritdoc />
@@ -102,12 +110,17 @@ namespace EventSeller.Services.Service
             {
                 await _externalPaymentService.ConfirmPaymentAsync(transactionId, confirmationCode);
                 _logger.LogInformation("ConfirmTicketPaymentAsync: Payment confirmed for TransactionId {TransactionId}", transactionId);
+
+                await _timerService.CancelTimerAsync<ITicketSellerService>(transactionId);
+                _logger.LogInformation("ConfirmTicketPaymentAsync: Canceling timer for unpaid transaction {TransactionId}", transactionId);
             }
             catch (Exception ex)
             {
                 _logger.LogError(ex, "ConfirmTicketPaymentAsync: Error confirming payment for TransactionId {TransactionId}", transactionId);
                 throw;
             }
+
+            await _bookingService.PermanentlyBookTicketForPurchaseAsync(ticket);
 
             ticket.isSold = true;
 
@@ -237,6 +250,13 @@ namespace EventSeller.Services.Service
 
                 _logger.LogInformation("ProcessTicketBuyingAsync: Ticket buying processed successfully for TicketId {TicketId}", ticketId);
 
+                var minutesForCancel = int.Parse(_configuration[ConfigurationPathConstants.TemporalBookingInMinutes]);
+                _timerService.RegisterTimer<ITicketSellerService>(
+                    result.TransactionId
+                    , service => service.CancelTicketPaymentAsync(result.TicketId, result.TransactionId)
+                    , minutesForCancel);
+
+                _logger.LogInformation("ProcessTicketBuyingAsync: TicketId {TicketId} booked temporarily", ticketId);
                 return result;
             }
             catch

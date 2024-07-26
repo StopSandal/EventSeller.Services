@@ -28,5 +28,6 @@ namespace EventSeller.Services.Interfaces.Services
         /// <param name="ticketId">The ID of the ticket to be unbooked.</param>
         /// <returns>A task that represents the asynchronous operation.</returns>
         Task UnbookTicketByIdAsync(long ticketId);
+        public Task PermanentlyBookTicketForPurchaseAsync(Ticket ticket);
     }
 }
