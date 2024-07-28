@@ -10,6 +10,7 @@ namespace EventSeller.Services.Interfaces.Services
     {
         /// <summary>
         /// Asynchronously temporarily books a ticket for purchase.
+        ///  Also starts timer for unbooking ticket <see cref="UnbookTicketByIdAsync"/>
         /// </summary>
         /// <param name="ticket">The ticket to be temporarily booked.</param>
         /// <returns>A task that represents the asynchronous operation.</returns>
@@ -24,6 +25,7 @@ namespace EventSeller.Services.Interfaces.Services
 
         /// <summary>
         /// Asynchronously unbooks a ticket by its ID.
+        ///  Also cancels timer for <code>ticketId</code> as key
         /// </summary>
         /// <param name="ticketId">The ID of the ticket to be unbooked.</param>
         /// <returns>A task that represents the asynchronous operation.</returns>

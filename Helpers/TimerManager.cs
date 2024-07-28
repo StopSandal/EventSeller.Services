@@ -6,6 +6,12 @@ using System.Linq.Expressions;
 
 namespace EventSeller.Services.Helpers
 {
+    /// <summary>
+    /// The TimerManager class manages the registration, execution, and cancellation of timed tasks.
+    /// It allows you to register methods to be executed after a specified delay.
+    /// The timers are tracked by service type and a unique key.
+    /// </summary>
+    /// <typeparam name="TKey">The type of the key used to identify and manage timers.</typeparam>
     public class TimerManager<TKey> : ITimerManager<TKey>
     {
         private readonly ConcurrentDictionary<Type, ConcurrentDictionary<TKey, CancellationTokenSource>> _serviceTimers
@@ -14,12 +20,18 @@ namespace EventSeller.Services.Helpers
         private readonly ILogger<TimerManager<TKey>> _logger;
         private readonly IServiceProvider _serviceProvider;
 
+        /// <summary>
+        /// Initializes a new instance of the TimerManager class.
+        /// </summary>
+        /// <param name="logger">The logger instance for logging timer operations.</param>
+        /// <param name="serviceProvider">The service provider for resolving service dependencies.</param>
         public TimerManager(ILogger<TimerManager<TKey>> logger, IServiceProvider serviceProvider)
         {
             _logger = logger;
             _serviceProvider = serviceProvider;
         }
 
+        /// <inheritdoc/>
         public void RegisterTimer<TServiceInterface>(TKey key, Expression<Func<TServiceInterface, Task>> methodExpression, int delayMinutes) where TServiceInterface : class
         {
             var (method, methodArgs) = MethodUtils.ExtractMethodInfoAndArgs(methodExpression);
@@ -63,7 +75,7 @@ namespace EventSeller.Services.Helpers
                     }
                     finally
                     {
-                        // await CancelTimerAsync(key);
+                        await CancelTimerAsync<TServiceInterface>(key);
                         _logger.LogInformation("Timer for key {Key} has been removed from the dictionary.", key);
                     }
                 }
@@ -77,9 +89,10 @@ namespace EventSeller.Services.Helpers
             _logger.LogInformation("Timer for key {Key} has been registered with a delay of {DelayMinutes} minutes.", key, delayMinutes);
         }
 
-        public Task CancelTimerAsync<TService>(TKey key)
+        /// <inheritdoc/>
+        public Task CancelTimerAsync<TServiceInterface>(TKey key)
         {
-            var serviceType = typeof(TService);
+            var serviceType = typeof(TServiceInterface);
             if (_serviceTimers.TryGetValue(serviceType, out var timers))
             {
                 if (timers.TryRemove(key, out var cts))

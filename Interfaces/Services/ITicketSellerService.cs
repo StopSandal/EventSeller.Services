@@ -25,6 +25,7 @@ namespace EventSeller.Services.Interfaces.Services
 
         /// <summary>
         /// Asynchronously processes the purchase of a ticket.
+        /// Also starts timer for transaction Cancel <see cref="CancelTicketPaymentAsync"/>
         /// </summary>
         /// <param name="purchaseTicketDTO">The data transfer object containing the purchase details.</param>
         /// <returns>A task that represents the asynchronous operation, containing the payment confirmation details.</returns>
@@ -32,6 +33,7 @@ namespace EventSeller.Services.Interfaces.Services
 
         /// <summary>
         /// Asynchronously confirms the payment for a ticket.
+        /// Also cancels timer for <code>transactionId</code> as key
         /// </summary>
         /// <param name="userName">The name of the user who made the payment.</param>
         /// <param name="paymentConfirmationDTO">The data transfer object containing the payment confirmation details.</param>
@@ -40,6 +42,7 @@ namespace EventSeller.Services.Interfaces.Services
 
         /// <summary>
         /// Asynchronously cancels the payment for a ticket by its ID and transaction ID.
+        /// Also cancels timer for <code>transactionId</code> as key
         /// </summary>
         /// <param name="ticketId">The ID of the ticket.</param>
         /// <param name="transactionId">The ID of the transaction to cancel.</param>

@@ -67,6 +67,10 @@ namespace EventSeller.Services.Service
         public async Task CancelTicketPaymentAsync(long ticketId, long transactionId)
         {
             _logger.LogInformation("CancelTicketPaymentAsync: Cancelling ticket payment for TicketId {TicketId} and TransactionId {TransactionId}", ticketId, transactionId);
+
+            await _timerService.CancelTimerAsync<ITicketSellerService>(transactionId);
+            _logger.LogInformation("CancelTicketPaymentAsync: Removed timer for cancel for TransactionId {TransactionId}", transactionId);
+
             if ((await _ticketService.GetByIDAsync(ticketId)) == null)
             {
                 _logger.LogWarning("CancelTicketPaymentAsync: Ticket is null");
